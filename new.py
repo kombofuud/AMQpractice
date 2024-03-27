@@ -1,6 +1,6 @@
 import os
 files = ["merged","loadingcutlist"]
-with open("../../../Downloads/merged.json","r", encoding='utf-8') as file:
+with open("~/Downloads/merged.json","r", encoding='utf-8') as file:
     data = file.read()
     encodedData = data.encode("utf-8")
 for f in files:
