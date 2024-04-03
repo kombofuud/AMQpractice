@@ -96,4 +96,4 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("]")
 
 #print out the randomized practice stataistics
-print("Test the "+str(lists[r2])+" section which has "+str(rweightl[r])+" songs.\nMin: "+str(songmin)+" Mean: "+str(songmean)+" Max: "+str(songmax)+" Total: "+str(songtotal)+" Learned: "+str(learnedsize))
+print("Test the "+str(lists[r2])+" section which has "+str(rweightl[r2]+1)+" songs.\nMin: "+str(songmin)+" Mean: "+str(songmean)+" Max: "+str(songmax)+" Total: "+str(songtotal)+" Learned: "+str(learnedsize))
