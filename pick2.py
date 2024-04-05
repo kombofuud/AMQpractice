@@ -54,16 +54,23 @@ songmax = max(rweightl)+1
 songmean = math.floor(statistics.mean(rweightl)+1)
 songtotal = sum(rweightl)+len(rweightl)
 r = random.choices(range(len(lists)), weights = weightl)[0]
+temp = -1
+if r != len(lists)-1:
+    temp = rweightl[r]
+    rweightl[r] = 0
 for i in range(len(rweightl)):
     rweightl[i] = rweightl[i]*rweightl[i]
 r2 = random.choices(range(len(lists)-1),weights = rweightl)[0]
 for i in range(len(rweightl)):
     rweightl[i] = int(math.sqrt(rweightl[i]))
 rweightl.append(min(learnedsize,songmax))
+if temp > -1:
+    rweightl[r] = temp
+
 
 #create random song selection from selected list
 file = str(lists[r])+"cutlist.json"
-songCount = math.ceil((math.sqrt(rweightl[r]))+0.25*math.sqrt(rweightl[r]-math.sqrt(rweightl[r])))
+songCount = math.ceil(math.sqrt(rweightl[r]))+math.ceil(0.33*math.sqrt(rweightl[r2]))
 totalSongs = rweightl[r]
 permutation = list(range(totalSongs))
 random.shuffle(permutation)
@@ -73,7 +80,7 @@ with open(file,'r', encoding = 'utf8') as f:
 songs = set()
 index = 0
 songlist = []
-while index<totalSongs and len(songlist) < math.floor(songCount*3/4):
+while index<totalSongs and len(songlist) < math.ceil(math.sqrt(rweightl[r])):
     if data1[permutation[index]]["video720"] not in songs:
         songs.add(data1[permutation[index]]["video720"])
         songlist.append(data1[permutation[index]])
@@ -82,6 +89,7 @@ while index<totalSongs and len(songlist) < math.floor(songCount*3/4):
 file2 = str(lists[r2])+"cutlist.json"
 with open(file2,'r', encoding = 'utf8') as f:
     data1 = json.load(f)
+permutation = list(range(rweightl[r2]))
 random.shuffle(permutation)
 while index<totalSongs and len(songlist) < songCount:
     if data1[permutation[index]]["video720"] not in songs:
