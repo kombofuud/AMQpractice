@@ -63,7 +63,7 @@ rweightl.append(min(learnedsize,songmax))
 
 #create random song selection from selected list
 file = str(lists[r])+"cutlist.json"
-songCount = math.ceil((math.sqrt(rweightl[r])))
+songCount = math.ceil((math.sqrt(rweightl[r]))+math.sqrt(rweightl[r]-math.sqrt(rweightl[r])))
 totalSongs = rweightl[r]
 permutation = list(range(totalSongs))
 random.shuffle(permutation)
@@ -73,7 +73,7 @@ with open(file,'r', encoding = 'utf8') as f:
 songs = set()
 index = 0
 songlist = []
-while index<math.floor(totalSongs*3/4) and len(songlist) < songCount:
+while index<totalSongs and len(songlist) < math.floor(songCount*3/4):
     if data1[permutation[index]]["video720"] not in songs:
         songs.add(data1[permutation[index]]["video720"])
         songlist.append(data1[permutation[index]])
