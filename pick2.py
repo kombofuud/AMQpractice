@@ -63,7 +63,7 @@ rweightl.append(min(learnedsize,songmax))
 
 #create random song selection from selected list
 file = str(lists[r])+"cutlist.json"
-songCount = math.ceil((math.sqrt(rweightl[r]))+math.sqrt(rweightl[r]-math.sqrt(rweightl[r])))
+songCount = math.ceil((math.sqrt(rweightl[r]))+0.25*math.sqrt(rweightl[r]-math.sqrt(rweightl[r])))
 totalSongs = rweightl[r]
 permutation = list(range(totalSongs))
 random.shuffle(permutation)
