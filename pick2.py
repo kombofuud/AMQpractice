@@ -3,6 +3,7 @@ import math
 import statistics
 import json
 import fileinput
+import copy
 
 #updating learnedcutlist.json
 filelist = [0,10,20,30,40,50,60,70,80,90,100,"last","loading"]
@@ -48,60 +49,54 @@ for file in lists:
     weightl.append(1)
     rweightl.append(len(f.readlines())-2)
   f.close()
-learnedsize = rweightl.pop()+1
+learnedsize = rweightl[-1]+1
 songmin = min(rweightl)+1
 songmax = max(rweightl)+1
 songmean = math.floor(statistics.mean(rweightl)+1)
 songtotal = sum(rweightl)+len(rweightl)
-r = random.choices(range(len(lists)), weights = weightl)[0]
-temp = -1
-if r != len(lists)-1:
-    temp = rweightl[r]
-    rweightl[r] = 0
-for i in range(len(rweightl)):
-    rweightl[i] = rweightl[i]*rweightl[i]
-r2 = random.choices(range(len(lists)-1),weights = rweightl)[0]
-for i in range(len(rweightl)):
-    rweightl[i] = int(math.sqrt(rweightl[i]))
-rweightl.append(min(learnedsize,songmax))
-if temp > -1:
-    rweightl[r] = temp
-
+#selecting the target list
+sqweight = copy.deepcopy(rweightl)
+for i in range(len(sqweight)):
+    sqweight[i] = sqweight[i]*sqweight[i]
+sqweight.pop()
+r = random.choices(range(len(lists)-1), weights = sqweight)[0]
+weightl[r] = 0
+s = random.sample(range(len(lists)),k=4)
+for i in range(4):
+    if i==3 or s[i]==r:
+        s.pop(i)
+        break
 
 #create random song selection from selected list
-file = str(lists[r])+"cutlist.json"
-songCount = math.ceil(math.sqrt(rweightl[r]))+math.ceil(0.33*math.sqrt(rweightl[r2]))
+files = [str(lists[s[0]])+"cutlist.json", str(lists[s[1]])+"cutlist.json", str(lists[s[2]])+"cutlist.json", str(lists[r])+"cutlist.json"]
+fileindices = s+[r]
+songCounts = [math.ceil(rweightl[s[0]]/3), math.ceil(rweightl[s[1]]/3), math.ceil(rweightl[s[2]]/3), math.ceil(rweightl[r]/2)]
 totalSongs = rweightl[r]
-permutation = list(range(totalSongs))
-random.shuffle(permutation)
-
-with open(file,'r', encoding = 'utf8') as f:
-    data1 = json.load(f)
 songs = set()
-index = 0
-songlist = []
-while index<totalSongs and len(songlist) < math.ceil(math.sqrt(rweightl[r])):
-    if data1[permutation[index]]["video720"] not in songs:
-        songs.add(data1[permutation[index]]["video720"])
-        songlist.append(data1[permutation[index]])
-    index+=1
+practicesonglist = []
+fileindex = 0
 
-file2 = str(lists[r2])+"cutlist.json"
-with open(file2,'r', encoding = 'utf8') as f:
-    data1 = json.load(f)
-permutation = list(range(rweightl[r2]))
-random.shuffle(permutation)
-while index<totalSongs and len(songlist) < songCount:
-    if data1[permutation[index]]["video720"] not in songs:
-        songs.add(data1[permutation[index]]["video720"])
-        songlist.append(data1[permutation[index]])
-    index+=1
+for file in files:
+    with open(file, 'r', encoding = 'utf8') as f:
+        data1 = json.load(f)
+    index = 0
+    songlist = []
+    permutation = list(range(rweightl[fileindices[fileindex]]))
+    random.shuffle(permutation)
+    while index<len(permutation) and len(songlist) < songCounts[i]:
+        if data1[permutation[index]]["video720"] not in songs:
+            songs.add(data1[permutation[index]]["video720"])
+            songlist.append(data1[permutation[index]])
+        index+=1
+    practicesonglist += songlist
+    fileindex+=1
+    
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
-    json.dump(songlist, f)
+    json.dump(practicesonglist, f)
 
 #clear practice list
 with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("]")
 
 #print out the randomized practice stataistics
-print("Test the "+str(lists[r2])+" section which has "+str(rweightl[r2]+1)+" songs.\nMin: "+str(songmin)+" Mean: "+str(songmean)+" Max: "+str(songmax)+" Total: "+str(songtotal)+" Learned: "+str(learnedsize))
+print("Test the "+str(lists[r])+" section which has "+str(rweightl[r]+1)+" songs.\nMin: "+str(songmin)+" Mean: "+str(songmean)+" Max: "+str(songmax)+" Total: "+str(songtotal)+" Learned: "+str(learnedsize))
