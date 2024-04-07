@@ -70,7 +70,7 @@ for i in range(4):
 #create random song selection from selected list
 files = [str(lists[s[0]])+"cutlist.json", str(lists[s[1]])+"cutlist.json", str(lists[s[2]])+"cutlist.json", str(lists[r])+"cutlist.json"]
 fileindices = s+[r]
-songCounts = [math.ceil(rweightl[s[0]]/3), math.ceil(rweightl[s[1]]/3), math.ceil(rweightl[s[2]]/3), math.ceil(rweightl[r]/2)]
+songCounts = [math.ceil(math.sqrt(rweightl[s[0]])/3), math.ceil(math.sqrt(rweightl[s[1]])/3), math.ceil(math.sqrt(rweightl[s[2]])/3), math.ceil(math.sqrt(rweightl[r])/2)]
 totalSongs = rweightl[r]
 songs = set()
 practicesonglist = []
