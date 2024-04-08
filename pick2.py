@@ -55,6 +55,8 @@ songmax = max(rweightl[:12])+1
 songmean = math.floor(statistics.mean(rweightl[:12])+1)
 songtotal = sum(rweightl[:12])+len(rweightl[:12])
 #selecting the target list
+rweightl[-1] = min(songmean, rweightl[-1])
+print(rweightl)
 sqweight = copy.deepcopy(rweightl)
 for i in range(len(sqweight)):
     sqweight[i] = sqweight[i]*sqweight[i]
