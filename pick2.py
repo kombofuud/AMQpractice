@@ -50,10 +50,10 @@ for file in lists:
     rweightl.append(len(f.readlines())-2)
   f.close()
 learnedsize = rweightl[-1]+1
-songmin = min(rweightl)+1
-songmax = max(rweightl)+1
-songmean = math.floor(statistics.mean(rweightl)+1)
-songtotal = sum(rweightl)+len(rweightl)
+songmin = min(rweightl[:12])+1
+songmax = max(rweightl[:12])+1
+songmean = math.floor(statistics.mean(rweightl[:12])+1)
+songtotal = sum(rweightl[:12])+len(rweightl[:12])
 #selecting the target list
 sqweight = copy.deepcopy(rweightl)
 for i in range(len(sqweight)):
@@ -83,7 +83,7 @@ for file in files:
     songlist = []
     permutation = list(range(rweightl[fileindices[fileindex]]))
     random.shuffle(permutation)
-    while index<len(permutation) and len(songlist) < songCounts[i]:
+    while index<len(permutation) and len(songlist) < songCounts[fileindex]:
         if data1[permutation[index]]["video720"] not in songs:
             songs.add(data1[permutation[index]]["video720"])
             songlist.append(data1[permutation[index]])
@@ -93,7 +93,6 @@ for file in files:
     
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
     json.dump(practicesonglist, f)
-
 #clear practice list
 with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("]")
