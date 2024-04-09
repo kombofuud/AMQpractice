@@ -56,23 +56,27 @@ songmean = math.floor(statistics.mean(rweightl[:12])+1)
 songtotal = sum(rweightl[:12])+len(rweightl[:12])
 #selecting the target list
 rweightl[-1] = min(songmean, rweightl[-1])
-print(rweightl)
 sqweight = copy.deepcopy(rweightl)
 for i in range(len(sqweight)):
     sqweight[i] = sqweight[i]*sqweight[i]
 sqweight.pop()
 r = random.choices(range(len(lists)-1), weights = sqweight)[0]
 weightl[r] = 0
-s = random.sample(range(len(lists)),k=4)
-for i in range(4):
-    if i==3 or s[i]==r:
+s = random.sample(range(len(lists)),k=5)
+for i in range(5):
+    if i==4 or s[i]==r:
         s.pop(i)
         break
 
 #create random song selection from selected list
-files = [str(lists[s[0]])+"cutlist.json", str(lists[s[1]])+"cutlist.json", str(lists[s[2]])+"cutlist.json", str(lists[r])+"cutlist.json"]
 fileindices = s+[r]
-songCounts = [math.ceil(math.sqrt(rweightl[s[0]])/3), math.ceil(math.sqrt(rweightl[s[1]])/3), math.ceil(math.sqrt(rweightl[s[2]])/3), math.ceil(math.sqrt(rweightl[r])/2)]
+files = []
+for i in fileindices:
+    files.append(str(lists[i])+"cutlist.json")
+songCounts = []
+for i in s:
+    songCounts.append(math.ceil(math.sqrt(rweightl[i])/4))
+songCounts.append(math.ceil(math.sqrt(rweightl[r])/3))
 totalSongs = rweightl[r]
 songs = set()
 practicesonglist = []
