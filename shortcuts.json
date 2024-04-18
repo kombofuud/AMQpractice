@@ -104,7 +104,7 @@
 ,{"name":"Slow Loop","shortcut":"ow ","allnames":["Slow Loop","Slow Loop"]}
 ,{"name":"Demon Slayer: Kimetsu no Yaiba Mugen Train Arc","shortcut":"in ar","allnames":["Kimetsu no Yaiba: Mugen Ressha-hen","Demon Slayer: Kimetsu no Yaiba Mugen Train Arc"]}
 ,{"name":"The Melancholy of Haruhi Suzumiya","shortcut":"aruh","allnames":["Suzumiya Haruhi no Yuuutsu","The Melancholy of Haruhi Suzumiya"]}
-,{"name":"The Disappearance of Haruhi Suzumiya","shortcut":"sap","allnames":["Suzumiya Haruhi no Shoushitsu","The Disappearance of Haruhi Suzumiya"]}
+,{"name":"The Disappearance of Haruhi Suzumiya","shortcut":"eara","allnames":["Suzumiya Haruhi no Shoushitsu","The Disappearance of Haruhi Suzumiya"]}
 ,{"name":"Hamefura","shortcut":"ef","allnames":["Hamefura","My Next Life as a Villainess: All Routes Lead to Doom!","Otome Game no Hametsu Flag Shika Nai Akuyaku Reijou ni Tensei Shiteshimatta..."]}
 ,{"name":"Initial D","shortcut":"tia","allnames":["Initial D","Initial D","Initial D: First Stage"]}
 ,{"name":"Initial D: Second Stage","shortcut":" d s","allnames":["Initial D: Second Stage","Initial D: Second Stage"]}
@@ -248,6 +248,56 @@
 ,{"name":"Detective Conan vs. Kaito Kid","shortcut":"s. k","allnames":["Detective Conan vs. Kaito Kid","Detective Conan vs. Kaito Kid"]}
 ,{"name":"Chikomaru","shortcut":"chik","allnames":["Chikomaru"]}
 ,{"name":"Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e","shortcut":"so ji","allnames":["Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e","Classroom of the Elite"]}
+,{"name":"Spice and Wolf: Merchant Meets the Wise Wolf","shortcut":"f: m","allnames":["Spice and Wolf: Merchant Meets the Wise Wolf","Ookami to Koushinryou: Merchant Meets the Wise Wolf"]}
+,{"name":"Blue Archive The Animation","shortcut":"hive","allnames":["Blue Archive The Animation"]}
+,{"name":"Viral Hit","shortcut":"l h","allnames":["Viral Hit","Kenka Dokugaku"]}
+,{"name":"Oblivion Battery","shortcut":"bliv","allnames":["Boukyaku Battery","Oblivion Battery"]}
+,{"name":"Mission: Yozakura Family","shortcut":"ra f","allnames":["Yozakura-san Chi no Daisakusen","Mission: Yozakura Family"]}
+,{"name":"Touken Ranbu Kai: Kyoden Moyuru Honnouji","shortcut":"noji","allnames":["Touken Ranbu Kai: Kyoden Moyuru Honnouji"]}
+,{"name":"Unnamed Memory","shortcut":"med ","allnames":["Unnamed Memory"]}
+,{"name":"Kuramerukagari","shortcut":"ukag","allnames":["Kuramerukagari"]}
+,{"name":"Henjin no Salad Bowl","shortcut":"bowl","allnames":["A Salad Bowl of Eccentrics","Henjin no Salad Bowl"]}
+,{"name":"Astro Note","shortcut":" no","allnames":["Astro Note"]}
+,{"name":"Sound! Euphonium 3","shortcut":"m 3","allnames":["Hibike! Euphonium 3","Sound! Euphonium 3"]}
+,{"name":"Himitsu no AiPri","shortcut":"aip","allnames":["Himitsu no AiPri"]}
+,{"name":"Nijiyon Animation 2","shortcut":"ion 2","allnames":["Nijiyon Animation 2"]}
+,{"name":"A Condition Called Love","shortcut":"ed l","allnames":["A Condition Called Love","Hananoi-kun to Koi no Yamai"]}
+,{"name":"Wind Breaker","shortcut":"ind b","allnames":["Wind Breaker"]}
+,{"name":"Date A Live V","shortcut":"ve v","allnames":["Date A Live V"]}
+,{"name":"Vampire Dormitory","shortcut":"dorm","allnames":["Vampire Dormitory"]}
+,{"name":"Tensura","shortcut":"ten","allnames":["Tensei shitara Slime Datta Ken","That Time I Got Reincarnated as a Slime","Tensura"]}
+,{"name":"Grandpa and Grandma Turn Young Again","shortcut":"dpa","allnames":["Jii-san Baa-san Wakagaeru","Grandpa and Grandma Turn Young Again"]}
+,{"name":"Tadaima, Okaeri","shortcut":"a,","allnames":["Tadaima, Okaeri"]}
+,{"name":"Madome","shortcut":"ado","allnames":["An Archdemon's Dilemma: How to Love Your Elf Bride","Maou no Ore ga Dorei Elf o Yome ni Shitanda ga, Dou Medereba Ii?","Madome"]}
+,{"name":"Karasu wa Aruji o Erabanai","shortcut":"o er","allnames":["Karasu wa Aruji o Erabanai","Yatagarasu: The Raven Does Not Choose Its Master"]}
+,{"name":"Yuru Camp△ Season 3","shortcut":"on 3","allnames":["Laid-Back Camp Season 3","Yuru Camp△ Season 3"]}
+,{"name":"Mahouka Koukou no Rettousei 3rd Season","shortcut":"ei 3","allnames":["Mahouka Koukou no Rettousei 3rd Season","The Irregular at Magic High School Season 3"]}
+,{"name":"Re:Monster","shortcut":":m","allnames":["Re:Monster"]}
+,{"name":"Tonari no Yokai-san","shortcut":"okai-","allnames":["Tonari no Youkai-san","Tonari no Yokai-san"]}
+,{"name":"Saint Seiya: Knights of the Zodiac - Battle for Sanctuary","shortcut":"- ba","allnames":["Saint Seiya: Knights of the Zodiac - Battle for Sanctuary"]}
+,{"name":"Yoru no Kurage wa Oyogenai","shortcut":"gena","allnames":["Yoru no Kurage wa Oyogenai","Jellyfish Can't Swim in the Night"]}
+,{"name":"Shadowverse Flame: Arc-hen","shortcut":"c-h","allnames":["Shadowverse Flame: Arc-hen"]}
+,{"name":"Lv2 Cheat","shortcut":"v2","allnames":["Chillin' in Another World with Level 2 Super Cheat Powers","Lv2 kara Cheat datta Moto Yuusha Kouho no Mattari Isekai Life","Lv2 Cheat"]}
+,{"name":"Seiyuu Radio no Uraomote","shortcut":"aom","allnames":["Seiyuu Radio no Uraomote","The Many Sides of Voice Actor Radio"]}
+,{"name":"Rinkai!","shortcut":"nka","allnames":["Rinkai!"]}
+,{"name":"Tonbo","shortcut":"nb","allnames":["Ooi! Tonbo","Tonbo"]}
+,{"name":"The Duke of Death and His Maid","shortcut":"duke","allnames":["The Duke of Death and His Maid","Shinigami Bocchan to Kuro Maid"]}
+,{"name":"I Was Reincarnated as the 7th Prince So I Can Take My Time Perfecting My Magical Ability","shortcut":"he 7","allnames":["I Was Reincarnated as the 7th Prince So I Can Take My Time Perfecting My Magical Ability","Tensei shitara Dainana Ouji Datta node, Kimamani Majutsu o Kiwamemasu"]}
+,{"name":"GO! GO! Loser Ranger!","shortcut":"oser","allnames":["GO! GO! Loser Ranger!","Sentai Daishikkaku"]}
+,{"name":"Studio Apartment, Good Lighting, Angel Included","shortcut":"g,","allnames":["Studio Apartment, Good Lighting, Angel Included","One Room, Hiatari Futsuu, Tenshi-tsuki."]}
+,{"name":"Girls Band Cry","shortcut":"band","allnames":["Girls Band Cry"]}
+,{"name":"The iDOLM@STER Shiny Colors","shortcut":"y col","allnames":["The iDOLM@STER Shiny Colors"]}
+,{"name":"Shuumatsu Train Doko e Iku?","shortcut":" e i","allnames":["Shuumatsu Train Doko e Iku?","Train to the End of the World"]}
+,{"name":"The Banished Former Hero Lives as He Pleases","shortcut":"as h","allnames":["Dekisokonai to Yobareta Motoeiyuu wa Jikka kara Tsuihou sareta node Sukikatte ni Ikiru Koto ni Shita","The Banished Former Hero Lives as He Pleases"]}
+,{"name":"Bartender Glass of God","shortcut":"r gl","allnames":["Bartender Glass of God","Bartender: Kami no Glass"]}
+,{"name":"Black Butler: Public School Arc","shortcut":"pub","allnames":["Black Butler: Public School Arc","Kuroshitsuji: Kishuku Gakkou-hen"]}
+,{"name":"The Fable","shortcut":"abl","allnames":["The Fable"]}
+,{"name":"Mysterious Disappearences","shortcut":"sap","allnames":["Kaii to Otome to Kamikakushi","Mysterious Disappearences"]}
+,{"name":"God's Game We Play","shortcut":"me w","allnames":["Kami wa Game ni Ueteiru.","God's Game We Play"]}
+,{"name":"Ateuma Chara no Kuse Shite, Spadali Ouji ni Chouai Sarete Imasu.","shortcut":"hoa","allnames":["Ateuma Chara no Kuse Shite, Spadali Ouji ni Chouai Sarete Imasu.","AteKuse"]}
+,{"name":"Shinkansen Henkei Robo Shinkalion: Change the World","shortcut":"lion c","allnames":["Shinkansen Henkei Robo Shinkalion: Change the World"]}
+,{"name":"As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","shortcut":"l sk","allnames":["As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","Tensei Kizoku, Kantei Skill de Nariagaru"]}
+,{"name":"Made in Abyss","shortcut":" ab","allnames":["Made in Abyss"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
