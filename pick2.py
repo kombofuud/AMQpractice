@@ -61,12 +61,16 @@ for i in range(len(sqweight)):
     sqweight[i] = sqweight[i]*sqweight[i]
 sqweight.pop()
 r = random.choices(range(len(lists)-1), weights = sqweight)[0]
-weightl[r] = 0
-s = random.sample(range(len(lists)),k=5)
-for i in range(5):
-    if i==4 or s[i]==r:
+s = random.sample(range(len(lists)),k=6)
+for i in range(6):
+    if s[i]==r:
         s.pop(i)
-        break
+i = 0
+while len(s) > 4:
+    if math.abs(s[i]-r) > 1 or s[i] = len(lists)-1:
+        s.pop(i)
+    else
+        i+=1
 
 #create random song selection from selected list
 fileindices = s+[r]
@@ -76,7 +80,7 @@ for i in fileindices:
 songCounts = []
 for i in s:
     songCounts.append(math.ceil(math.sqrt(rweightl[i])/4))
-songCounts.append(math.ceil(math.sqrt(rweightl[r])/3))
+songCounts.append(math.ceil(math.sqrt(rweightl[r])*2/3))
 totalSongs = rweightl[r]
 songs = set()
 practicesonglist = []
