@@ -253,7 +253,7 @@
 ,{"name":"Viral Hit","shortcut":"l h","allnames":["Viral Hit","Kenka Dokugaku"]}
 ,{"name":"Oblivion Battery","shortcut":"bliv","allnames":["Boukyaku Battery","Oblivion Battery"]}
 ,{"name":"Mission: Yozakura Family","shortcut":"ra f","allnames":["Yozakura-san Chi no Daisakusen","Mission: Yozakura Family"]}
-,{"name":"Touken Ranbu Kai: Kyoden Moyuru Honnouji","shortcut":"noji","allnames":["Touken Ranbu Kai: Kyoden Moyuru Honnouji"]}
+,{"name":"Touken Ranbu Kai: Kyoden Moyuru Honnouji","shortcut":"oyur","allnames":["Touken Ranbu Kai: Kyoden Moyuru Honnouji","Touken Ranbu Kai Kyoden"]}
 ,{"name":"Unnamed Memory","shortcut":"med ","allnames":["Unnamed Memory"]}
 ,{"name":"Kuramerukagari","shortcut":"ukag","allnames":["Kuramerukagari"]}
 ,{"name":"Henjin no Salad Bowl","shortcut":"bowl","allnames":["A Salad Bowl of Eccentrics","Henjin no Salad Bowl"]}
@@ -298,14 +298,14 @@
 ,{"name":"Shinkansen Henkei Robo Shinkalion: Change the World","shortcut":"lion c","allnames":["Shinkansen Henkei Robo Shinkalion: Change the World"]}
 ,{"name":"As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","shortcut":"l sk","allnames":["As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","Tensei Kizoku, Kantei Skill de Nariagaru"]}
 ,{"name":"Made in Abyss","shortcut":" ab","allnames":["Made in Abyss"]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
+,{"name":"Mahjong Soul Kan!!","shortcut":"hj","allnames":["Jantama Kan!!","Mahjong Soul Kan!!"]}
+,{"name":"Sasayaku You ni Koi o Utau","shortcut":"utau","allnames":["Sasayaku You ni Koi o Utau","Whisper Me a Love Song"]}
+,{"name":"The New Gate","shortcut":" new","allnames":["The New Gate"]}
+,{"name":"Highspeed Étoile","shortcut":"ghs","allnames":["Highspeed Étoile"]}
+,{"name":"Maou Gakuin no Futekigousha II","shortcut":"ha i","allnames":["The Misfit of Demon King Academy II","Maou Gakuin no Futekigousha II"]}
+,{"name":"Kurayukaba","shortcut":"rayu","allnames":["Kurayukaba"]}
+,{"name":"KONOSUBA: God's Blessing on This Wonderful World! 3","shortcut":"d  3","allnames":["KONOSUBA: God's Blessing on This Wonderful World! 3","Kono Subarashii Sekai ni Shukufuku o! 3"]}
+,{"name":"Kaijuu 8-gou","shortcut":"u 8","allnames":["Kaiju No. 8","Kaijuu 8-gou"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
