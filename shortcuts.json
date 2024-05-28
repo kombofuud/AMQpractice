@@ -104,7 +104,7 @@
 ,{"name":"Slow Loop","shortcut":"ow ","allnames":["Slow Loop","Slow Loop"]}
 ,{"name":"Demon Slayer: Kimetsu no Yaiba Mugen Train Arc","shortcut":"in ar","allnames":["Kimetsu no Yaiba: Mugen Ressha-hen","Demon Slayer: Kimetsu no Yaiba Mugen Train Arc"]}
 ,{"name":"The Melancholy of Haruhi Suzumiya","shortcut":"aruh","allnames":["Suzumiya Haruhi no Yuuutsu","The Melancholy of Haruhi Suzumiya"]}
-,{"name":"The Disappearance of Haruhi Suzumiya","shortcut":"eara","allnames":["Suzumiya Haruhi no Shoushitsu","The Disappearance of Haruhi Suzumiya"]}
+,{"name":"Suzumiya Haruhi no Shoushitsu","shortcut":"shosh","allnames":["Suzumiya Haruhi no Shoushitsu","The Disappearance of Haruhi Suzumiya"]}
 ,{"name":"Hamefura","shortcut":"ef","allnames":["Hamefura","My Next Life as a Villainess: All Routes Lead to Doom!","Otome Game no Hametsu Flag Shika Nai Akuyaku Reijou ni Tensei Shiteshimatta..."]}
 ,{"name":"Initial D","shortcut":"tia","allnames":["Initial D","Initial D","Initial D: First Stage"]}
 ,{"name":"Initial D: Second Stage","shortcut":" d s","allnames":["Initial D: Second Stage","Initial D: Second Stage"]}
@@ -149,7 +149,7 @@
 ,{"name":"Am I Actually the Strongest?","shortcut":"rong","allnames":["Jitsu wa Ore, Saikyou deshita?","Am I Actually the Strongest?"]}
 ,{"name":"Miru Tights","shortcut":"hts","allnames":["Miru Tights","Miru Tights"]}
 ,{"name":"The Apothecary Diaries","shortcut":"hec","allnames":["Kusuriya no Hitorigoto","The Apothecary Diaries"]}
-,{"name":"Nekketsu Jinmenken: Life Is Movie","shortcut":"inme","allnames":["Nekketsu Jinmenken: Life Is Movie","Nekketsu Jinmenken: Life Is Movie"]}
+,{"name":"Nekketsu Jinmenken: Life Is Movie","shortcut":"nmen","allnames":["Nekketsu Jinmenken: Life Is Movie","Nekketsu Jinmenken: Life Is Movie"]}
 ,{"name":"Di Gi Charat Summer Special","shortcut":"at su","allnames":["Di Gi Charat Summer Special","Di Gi Charat Summer Special"]}
 ,{"name":"Shrine of the Morning Mist","shortcut":"hrin","allnames":["Asagiri no Miko","Shrine of the Morning Mist"]}
 ,{"name":"Little Charo: Tohoku-hen","shortcut":"toho","allnames":["Little Charo: Tohoku-hen","Little Charo: Tohoku-hen"]}
@@ -292,8 +292,8 @@
 ,{"name":"Bartender Glass of God","shortcut":"r gl","allnames":["Bartender Glass of God","Bartender: Kami no Glass"]}
 ,{"name":"Black Butler: Public School Arc","shortcut":"pub","allnames":["Black Butler: Public School Arc","Kuroshitsuji: Kishuku Gakkou-hen"]}
 ,{"name":"The Fable","shortcut":"abl","allnames":["The Fable"]}
-,{"name":"Mysterious Disappearences","shortcut":"sap","allnames":["Kaii to Otome to Kamikakushi","Mysterious Disappearences"]}
-,{"name":"God's Game We Play","shortcut":"me w","allnames":["Kami wa Game ni Ueteiru.","God's Game We Play"]}
+,{"name":"Mysterious Disappearances","shortcut":"sap","allnames":["Kaii to Otome to Kamikakushi","Mysterious Disappearances"]}
+,{"name":"Gods' Game We Play","shortcut":"me w","allnames":["Kami wa Game ni Ueteiru.","Gods' Game We Play"]}
 ,{"name":"Ateuma Chara no Kuse Shite, Spadali Ouji ni Chouai Sarete Imasu.","shortcut":"hoa","allnames":["Ateuma Chara no Kuse Shite, Spadali Ouji ni Chouai Sarete Imasu.","AteKuse"]}
 ,{"name":"Shinkansen Henkei Robo Shinkalion: Change the World","shortcut":"lion c","allnames":["Shinkansen Henkei Robo Shinkalion: Change the World"]}
 ,{"name":"As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","shortcut":"l sk","allnames":["As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","Tensei Kizoku, Kantei Skill de Nariagaru"]}
@@ -306,8 +306,8 @@
 ,{"name":"Kurayukaba","shortcut":"rayu","allnames":["Kurayukaba"]}
 ,{"name":"KONOSUBA: God's Blessing on This Wonderful World! 3","shortcut":"d  3","allnames":["KONOSUBA: God's Blessing on This Wonderful World! 3","Kono Subarashii Sekai ni Shukufuku o! 3"]}
 ,{"name":"Kaijuu 8-gou","shortcut":"u 8","allnames":["Kaiju No. 8","Kaijuu 8-gou"]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
+,{"name":"T・P BON","shortcut":" p","allnames":["T・P BON"]}
+,{"name":"Shin Yaranai ka","shortcut":"yar","allnames":["Shin Yaranai ka"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
