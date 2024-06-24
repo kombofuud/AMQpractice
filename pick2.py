@@ -9,12 +9,16 @@ import copy
 filelist = [0,10,20,30,40,50,60,70,80,90,100,"last","loading"]
 includedSongs = set()
 
-# read songs from files and add them to a set
+# read songs from files and add them to a set (also count number of unique songs)
+uniqueSongCount = 0
 for filename in filelist:
     with open(str(filename)+"cutlist.json",'r', encoding='utf8') as f:
         data = json.load(f)
         for entry in data:
             includedSongs.add(entry["video720"])
+            if filename == "loading":
+                uniqueSongCount += 1
+uniqueSongCount = len(includedSongs)-uniqueSongCount
 
 #read list of all songs
 with open("merged.json",'r', encoding = 'utf8') as f:
@@ -109,4 +113,4 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("]")
 
 #print out the randomized practice stataistics
-print("Test the "+str(lists[r])+" section which has "+str(rweightl[r]+1)+" songs.\nMin: "+str(songmin)+" Mean: "+str(songmean)+" Max: "+str(songmax)+" Total: "+str(songtotal)+" Learned: "+str(learnedsize))
+print("Test the "+str(lists[r])+" section which has "+str(rweightl[r]+1)+" songs.\nMin: "+str(songmin)+" Mean: "+str(songmean)+" Max: "+str(songmax)+" Total: "+str(songtotal)+" Unique: "+str(uniqueSongCount)+" Learned: "+str(learnedsize))
