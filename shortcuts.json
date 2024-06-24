@@ -9,7 +9,7 @@
 ,{"name":"Made in Abyss: Dawn of the Deep Soul","shortcut":"p so","allnames":["Made in Abyss: Fukaki Tamashii no Reimei","Made in Abyss: Dawn of the Deep Soul"]}
 ,{"name":"Dead Mount Death Play","shortcut":"ad mo","allnames":["Dead Mount Death Play","Dead Mount Death Play"]}
 ,{"name":"Death Note","shortcut":"ath","allnames":["Death Note","Death Note"]}
-,{"name":"Kimetsu no Yaiba","shortcut":" yai","allnames":["Kimetsu no Yaiba","Demon Slayer: Kimetsu no Yaiba"]}
+,{"name":"Kimetsu no Yaiba","shortcut":"on sl","allnames":["Kimetsu no Yaiba","Demon Slayer: Kimetsu no Yaiba"]}
 ,{"name":"Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc","shortcut":"dsmi","allnames":["Kimetsu no Yaiba: Katanakaji no Sato-Hen","Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc"]}
 ,{"name":"Why Raeliana Ended Up at the Duke’s Mansion","shortcut":"ke'","allnames":["Kanojo ga Koushaku-tei ni Itta Riyuu","Why Raeliana Ended Up at the Duke's Mansion","Why Raeliana Ended Up at the Duke’s Mansion"]}
 ,{"name":"The Most Heretical Last Boss Queen: From Villainess to Savior","shortcut":"s q","allnames":["Higeki no Genkyou to Naru Saikyou Gedou Last Boss Joou wa Tami no Tame ni Tsukushimasu.","The Most Heretical Last Boss Queen: From Villainess to Savior"]}
@@ -64,7 +64,6 @@
 ,{"name":"Synduality: Noir","shortcut":"alit","allnames":["Synduality: Noir","Synduality: Noir"]}
 ,{"name":"Bottom-Tier Character Tomozaki","shortcut":"m-t","allnames":["Jaku-Chara Tomozaki-kun","Bottom-Tier Character Tomozaki"]}
 ,{"name":"Tonikaku Kawaii","shortcut":"aii","allnames":["Tonikaku Kawaii","TONIKAWA: Over The Moon For You"]}
-,{"name":"Tonikaku Kawaii: Joshikou-hen","shortcut":"aii:","allnames":["Tonikaku Kawaii: Joshikou-hen","TONIKAWA: Over The Moon For You - High School Days"]}
 ,{"name":"Undead Murder Farce","shortcut":"ad m","allnames":["Undead Girl Murder Farce","Undead Murder Farce"]}
 ,{"name":"Urusei Yatsura","shortcut":"ruse","allnames":["Urusei Yatsura","Urusei Yatsura"]}
 ,{"name":"Vampire Hunter D: Bloodlust","shortcut":"dlu","allnames":["Vampire Hunter D: Bloodlust","Vampire Hunter D: Bloodlust"]}
@@ -78,14 +77,14 @@
 ,{"name":"Saint Cecilia and Pastor Lawrence","shortcut":"wren","allnames":["Shiro Seijo to Kuro Bokushi","Saint Cecilia and Pastor Lawrence"]}
 ,{"name":"Yohane The Parhelion: Sunshine in the Mirror","shortcut":"arh","allnames":["Genjitsu no Yohane: Sunshine in the Mirror","Yohane The Parhelion: Sunshine in the Mirror"]}
 ,{"name":"Youjo Senki","shortcut":"jo ","allnames":["Youjo Senki","Saga of Tanya the Evil"]}
-,{"name":"Gekijouban Youjo Senki","shortcut":"ban y","allnames":["Gekijouban Youjo Senki","Saga of Tanya the Evil: The Movie"]}
+,{"name":"Gekijouban Youjo Senki","shortcut":"an yo","allnames":["Gekijouban Youjo Senki","Saga of Tanya the Evil: The Movie"]}
 ,{"name":"KimiUso","shortcut":"uso","allnames":["KimiUso","Your Lie in April","Shigatsu wa Kimi no Uso"]}
 ,{"name":"Your Lie in April: Moments","shortcut":"ril ","allnames":["Shigatsu wa Kimi no Uso: Moments","Your Lie in April: Moments","KimiUso: Moments"]}
 ,{"name":"The Dreaming Boy is A Realist","shortcut":"g bo","allnames":["Yumemiru Danshi wa Genjitsushugisha","The Dreaming Boy is A Realist"]}
 ,{"name":"Zetsuen no Tempest","shortcut":"pes","allnames":["Zetsuen no Tempest","Blast of Tempest","Blast of Tempest: The Civilization Blaster","Zetsuen no Tempest: The Civilization Blaster"]}
 ,{"name":"Zom 100: Bucket List of the Dead","shortcut":"0 b","allnames":["Zom 100: Zombie ni Naru Made ni Shitai 100 no Koto","Zom 100: Bucket List of the Dead"]}
 ,{"name":"Lucky Star","shortcut":"luc","allnames":["Lucky Star","Lucky Star"]}
-,{"name":"Komi Can't Communicate","shortcut":"icat","allnames":["Komi-san wa Comyushou desu.","Komi Can't Communicate"]}
+,{"name":"Komi-san wa Comyushou desu.","shortcut":"wa,","allnames":["Komi-san wa Comyushou desu.","Komi Can't Communicate"]}
 ,{"name":"Takt Op.Destiny","shortcut":"kt ","allnames":["Takt Op.Destiny","Takt Op.Destiny"]}
 ,{"name":"Made in Abyss: Retsujitsu no Ougonkyou","shortcut":"gonk","allnames":["Made in Abyss: Retsujitsu no Ougonkyou","Made in Abyss: The Golden City of the Scorching Sun"]}
 ,{"name":"TsureKano","shortcut":"rek","allnames":["Mamahaha no Tsurego ga Motokano Datta","My Stepmom's Daughter is My Ex","TsureKano"]}
@@ -130,7 +129,7 @@
 ,{"name":"Kawagoe Boys Sing","shortcut":"wago","allnames":["Kawagoe Boys Sing: Now or Never","Kawagoe Boys Sing"]}
 ,{"name":"My Daughter Left the Nest and Returned an S-Rank Adventurer","shortcut":"s-r","allnames":["Boukensha ni Naritai to Miyako ni Deteitta Musume ga S-rank ni Natteta","My Daughter Left the Nest and Returned an S-Rank Adventurer"]}
 ,{"name":"Paradox Live The Animation","shortcut":"ox l","allnames":["Paradox Live The Animation","Paradox Live The Animation"]}
-,{"name":"Ron Kamonohashi's Forbidden Deductions","shortcut":"educ","allnames":["Kamonohashi Ron no Kindan Suiri","Ron Kamonohashi's Forbidden Deductions"]}
+,{"name":"Ron Kamonohashi's Forbidden Deductions","shortcut":"ron k","allnames":["Kamonohashi Ron no Kindan Suiri","Ron Kamonohashi's Forbidden Deductions"]}
 ,{"name":"Shangri-La Frontier: Kusoge Hunter, Kamige ni Idoman to su","shortcut":"mige","allnames":["Shangri-La Frontier: Kusoge Hunter, Kamige ni Idoman to su","Shangri-La Frontier"]}
 ,{"name":"Hyakkano","shortcut":"kka","allnames":["Kimi no Koto ga Daidaidaidaidaisuki na 100-nin no Kanojo","The 100 Girlfriends Who Really, Really, Really, Really, REALLY Love You","Hyakkano"]}
 ,{"name":"Kage no Jitsuryokusha ni Naritakute! 2nd Season","shortcut":"ute 2","allnames":["Kage no Jitsuryokusha ni Naritakute! 2nd Season","The Eminence in Shadow Season 2"]}
@@ -238,12 +237,11 @@
 ,{"name":"Brave Bang Bravern","shortcut":"vern","allnames":["Yuuki Bakuhatsu Bang Bravern","Brave Bang Bravern"]}
 ,{"name":"Tsukimichi: Moonlit Fantasy","shortcut":"lit ","allnames":["Tsuki ga Michibiku Isekai Douchuu","Tsukimichi: Moonlit Fantasy"]}
 ,{"name":"Koukaku Kidoutai Arise: Alternative Architecture","shortcut":"itec","allnames":["Koukaku Kidoutai Arise: Alternative Architecture","Ghost in the Shell: Arise Alternative Architecture"]}
-,{"name":"Koukaku Kidoutai S.A.C. 2nd GIG","shortcut":". 2n","allnames":["Koukaku Kidoutai S.A.C. 2nd GIG","Ghost in the Shell: Stand Alone Complex 2nd GIG"]}
+,{"name":"Koukaku Kidoutai S.A.C. 2nd GIG","shortcut":"a.c","allnames":["Koukaku Kidoutai S.A.C. 2nd GIG","Ghost in the Shell: Stand Alone Complex 2nd GIG"]}
 ,{"name":"Koukaku Kidoutai: SAC_2045","shortcut":"c_","allnames":["Koukaku Kidoutai: SAC_2045","Ghost in the Shell: SAC_2045"]}
 ,{"name":"Koukaku Kidoutai S.A.C. Solid State Society","shortcut":"ciet","allnames":["Koukaku Kidoutai S.A.C. Solid State Society","Ghost in the Shell: Stand Alone Complex - Solid State Society"]}
 ,{"name":"Ghost In the Shell: The New Movie","shortcut":"w mov","allnames":["Koukaku Kidoutai Shin Gekijouban","Ghost In the Shell: The New Movie"]}
 ,{"name":"Great Pretender Razbliuto","shortcut":"liu","allnames":["Great Pretender Razbliuto"]}
-,{"name":"Blue Exorcist: Shimane Illuminati Saga","shortcut":"ti s","allnames":["Ao no Exorcist: Shimane Illuminati-hen","Blue Exorcist: Shimane Illuminati Saga"]}
 ,{"name":"Cardfight!! Vanguard Divinez","shortcut":"rd di","allnames":["Cardfight!! Vanguard Divinez","Cardfight!! Vanguard Divinez"]}
 ,{"name":"Detective Conan vs. Kaito Kid","shortcut":"s. k","allnames":["Detective Conan vs. Kaito Kid","Detective Conan vs. Kaito Kid"]}
 ,{"name":"Chikomaru","shortcut":"chik","allnames":["Chikomaru"]}
@@ -308,8 +306,8 @@
 ,{"name":"Kaijuu 8-gou","shortcut":"u 8","allnames":["Kaiju No. 8","Kaijuu 8-gou"]}
 ,{"name":"T・P BON","shortcut":" p","allnames":["T・P BON"]}
 ,{"name":"Shin Yaranai ka","shortcut":"yar","allnames":["Shin Yaranai ka"]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
+,{"name":"Ginga Eiyuu Densetsu","shortcut":"a ei","allnames":["Ginga Eiyuu Densetsu","Legend of the Galactic Heroes"]}
+,{"name":"Kimetsu no Yaiba: Hashira Geiko-hen","shortcut":"geik","allnames":["Kimetsu no Yaiba: Hashira Geiko-hen","Demon Slayer: Kimetsu no Yaiba Hashira Training Arc"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
