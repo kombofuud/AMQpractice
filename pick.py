@@ -124,7 +124,6 @@ for i in range(len(localSongWeights)):
 #create random song selection from selected list
 practicesonglist = []
 songCount = int(math.sqrt(len(localSongList)))
-practicesonglist += ["hi","bye"]
 
 learnedSongCount = int(((songCount-1)/20)+1)
 learnedSongCount = min(learnedSongCount, learnedSize)
@@ -151,14 +150,15 @@ while iterator < len(localSongList) and practiceRunningTotal < practiceSongCount
     if localSongList[iterator]["video720"] in pickedSongs:
         iterator += 1
         continue
-    practiceSongSelector = numpy.append(practiceSongSelector, [localSongList[iterator]])
+    practicesonglist = numpy.append(practicesonglist, [practiceSongSelector[iterator]])
     iterator += 1
     practiceRunningTotal += 1
+
+#write to _quiz.json
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
     json.dump(practicesonglist.tolist(), f)
 #clear practice list
 with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("]")
-
 #print out the randomized practice stataistics
 print("Test the "+str(lists[r])+" section which has "+str(rweightl[r]+1)+" songs.\nMean: "+str(int(sum(globalSongWeights)/len(lists1)))+" Locally_Unique: "+str(len(localSongList))+" Total: "+str(songtotal)+" Unique: "+str(uniqueSongCount)+" Learned: "+str(learnedSize))
