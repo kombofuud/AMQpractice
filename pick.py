@@ -144,15 +144,13 @@ for song in practicesonglist:
 practiceSongSelector = numpy.random.choice(localSongList, size = len(localSongList), p = localSongWeights, replace = False)
 iterator = 0
 practiceRunningTotal = 0
-while iterator < len(localSongList) and practiceRunningTotal < practiceSongCount:
-    if localSongList[iterator]["video720"] is None:
-        localSongList[iterator]["video720"] = localSongList[iterator]["video480"]
-    if localSongList[iterator]["video720"] in pickedSongs:
-        iterator += 1
-        continue
-    practicesonglist = numpy.append(practicesonglist, [practiceSongSelector[iterator]])
+while iterator < len(practiceSongSelector) and practiceRunningTotal < practiceSongCount:
+    if practiceSongSelector[iterator]["video720"] is None:
+        practiceSongSelector[iterator]["video720"] = practiceSongSelector[iterator]["video480"]
+    if practiceSongSelector[iterator]["video720"] not in pickedSongs:
+        practicesonglist = numpy.append(practicesonglist, [practiceSongSelector[iterator]])
+        practiceRunningTotal += 1
     iterator += 1
-    practiceRunningTotal += 1
 
 #write to _quiz.json
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
