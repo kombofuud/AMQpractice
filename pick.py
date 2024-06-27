@@ -46,44 +46,21 @@ with open("learnedcutlist.json", 'w', encoding = 'utf8') as f:
 #getting statistics about the lists
 lists = [0,10,20,30,40,50,60,70,80,90,100,'last','learned']
 lists1 = [0,10,20,30,40,50,60,70,80,90,100,'last']
-weightl = []
-rweightl = []
-index = -1
-for file in lists:
-  with open((str(file)+"cutlist.json"),'r', encoding = 'utf-8') as f:
-    weightl.append(1)
-    rweightl.append(len(f.readlines())-1)
-  f.close()
-zScores = copy.deepcopy(rweightl)
-zScores.pop()
-songmean = statistics.mean(zScores)
-songmax = max(zScores)
-songmin = min(zScores)
-songtotal = sum(zScores)
-stdev = statistics.pstdev(zScores)
-learnedSize = rweightl[-1]
-for i in range(len(zScores)):
-    zScores[i] = (zScores[i]-songmean)/stdev
 
-#selecting the target list
-rweightl[-1] = min(songmean, rweightl[-1])
-targetWeights = []
-for score in zScores:
-    targetWeights.append(math.exp(score))
-
-r = random.choices(range(len(lists1)), weights = targetWeights)[0]
-
-#create list of songs and their weights
+#count song frequency
 fullSongList = [] #doesn't include learned and loading songs
 songListMap = dict()
 globalSongWeights = []
 adjustedGlobalSongWeights = []
+zScores = []
 
-for file in lists1:
+for file in lists:
     with open(str(file)+"cutlist.json", 'r', encoding = 'utf8') as f:
         data1 = json.load(f)
     traversedSongs = set()
+    zScores.append(0)
     for song in data1:
+        zScores[-1] += 1
         if song["video720"] in traversedSongs:
             continue
         if song["video720"] is None:
@@ -96,67 +73,48 @@ for file in lists1:
             fullSongList.append(song)
             globalSongWeights.append(1)
 for i in range(len(globalSongWeights)):
-    adjustedGlobalSongWeights.append(pow(2,globalSongWeights[i]))
-temp = sum(adjustedGlobalSongWeights)
-for i in range(len(adjustedGlobalSongWeights)):
-    adjustedGlobalSongWeights[i] /= temp
+    adjustedGlobalSongWeights.append(pow(2,globalSongWeights[i]-1))
 
+#Pick the practice list and get song statistics
+learnedSize = zScores.pop()
+songmean = statistics.mean(zScores)
+songmax = max(zScores)
+songmin = min(zScores)
+songtotal = sum(zScores)
+stdev = statistics.pstdev(zScores)
+for i in range(len(zScores)):
+    zScores[i] = (zScores[i]-songmean)/stdev
+targetWeights = []
+for score in zScores:
+    targetWeights.append(math.exp(score))
+r = random.choices(range(len(lists1)), weights = targetWeights)[0]
 
-localSongList = []
-localSongListMap = dict()
-localSongWeights = []
-
+#Create modify the song frequency based on picked list
+localSongList = set()
 with open(str(lists1[r])+"cutlist.json", 'r', encoding = 'utf8') as f:
     data1 = json.load(f)
 for song in data1:
     if song["video720"] is None:
         song["video720"] = song["video480"]
-    if song["video720"] in localSongListMap:
-        localSongWeights[localSongListMap[song["video720"]]] *= 2
-    else:
-        localSongListMap[song["video720"]] = len(localSongList)
-        localSongList.append(song)
-        localSongWeights.append(1)
-temp = sum(localSongWeights)
-for i in range(len(localSongWeights)):
-    localSongWeights[i] /= temp
+    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 2
+    localSongList.add(song["video720"])
 
-#create random song selection from selected list
+totalWeight = sum(adjustedGlobalSongWeights)
+for i in range(len(adjustedGlobalSongWeights)):
+    adjustedGlobalSongWeights[i] /= totalWeight
+
+#create random song selection for the selected list
 practicesonglist = []
 songCount = int(math.sqrt(len(localSongList)))
-
-learnedSongCount = int(((songCount-1)/20)+1)
-learnedSongCount = min(learnedSongCount, learnedSize)
-with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
-    data1 = json.load(f)
-practicesonglist = numpy.random.choice(learnedcutSongs, size = learnedSongCount, replace = False)
-
-quizSongCount = int(((songCount-1)*3/5)+1)
-quizSongCount = min(quizSongCount, len(fullSongList))
-practicesonglist = numpy.append(practicesonglist, numpy.random.choice(fullSongList, size = quizSongCount, p = adjustedGlobalSongWeights, replace = False))
-
-practiceSongCount = int(((songCount-1)*2/5)+1)
-pickedSongs = set()
-for song in practicesonglist:
-    if song["video720"] is None:
-        song["video720"] = song["video480"]
-    pickedSongs.add(song["video720"])
-practiceSongSelector = numpy.random.choice(localSongList, size = len(localSongList), p = localSongWeights, replace = False)
-iterator = 0
-practiceRunningTotal = 0
-while iterator < len(practiceSongSelector) and practiceRunningTotal < practiceSongCount:
-    if practiceSongSelector[iterator]["video720"] is None:
-        practiceSongSelector[iterator]["video720"] = practiceSongSelector[iterator]["video480"]
-    if practiceSongSelector[iterator]["video720"] not in pickedSongs:
-        practicesonglist = numpy.append(practicesonglist, [practiceSongSelector[iterator]])
-        practiceRunningTotal += 1
-    iterator += 1
+practicesonglist = numpy.append(practicesonglist, numpy.random.choice(fullSongList, size = songCount, p = adjustedGlobalSongWeights, replace = False))
 
 #write to _quiz.json
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
     json.dump(practicesonglist.tolist(), f)
+
 #clear practice list
 with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("]")
-#print out the randomized practice stataistics
-print("Test the "+str(lists[r])+" section which has "+str(rweightl[r]+1)+" songs.\nMean: "+str(int(sum(globalSongWeights)/len(lists1)))+" Locally_Unique: "+str(len(localSongList))+" Total: "+str(songtotal)+" Unique: "+str(uniqueSongCount)+" Learned: "+str(learnedSize))
+
+#print the practice list and song statistics
+print("Test "+str(lists[r])+" section\nMeanCount: "+str(int(sum(globalSongWeights)/len(lists1)))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" Learned: "+str(learnedSize))
