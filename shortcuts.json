@@ -155,7 +155,7 @@
 ,{"name":"KimiZero","shortcut":"ize","allnames":["Keikenzumi na Kimi to, Keiken Zero na Ore ga, Otsukiai Suru Hanashi","Our Dating Story: The Experienced You and The Inexperienced Me","KimiZero"]}
 ,{"name":"Onimusha","shortcut":"usha","allnames":["Onimusha","Onimusha"]}
 ,{"name":"Akuma-kun","shortcut":"ma-","allnames":["Akuma-kun","Devil Boy"]}
-,{"name":"Devil Boy: Welcome to Devil Land!!","shortcut":"y wel","allnames":["Akuma-kun: Youkoso Akuma Land e!!","Devil Boy: Welcome to Devil Land!!"]}
+,{"name":"Devil Boy: Welcome to Devil Land!!","shortcut":"d e ","allnames":["Akuma-kun: Youkoso Akuma Land e!!","Devil Boy: Welcome to Devil Land!!"]}
 ,{"name":"Akuma-kun","shortcut":"ma-","allnames":["Akuma-kun","Akuma Kun"]}
 ,{"name":"Ghost in the Shell","shortcut":"st i","allnames":["Koukaku Kidoutai","Ghost in the Shell"]}
 ,{"name":"Ghost in the Shell: Stand Alone Complex","shortcut":"nd al","allnames":["Koukaku Kidoutai: Stand Alone Complex","Ghost in the Shell: Stand Alone Complex"]}
@@ -321,16 +321,15 @@
 ,{"name":"Black Butler II","shortcut":"r ii","allnames":["Kuroshitsuji II","Black Butler II"]}
 ,{"name":"Urusei Yatsura OVA","shortcut":"ura o","allnames":["Urusei Yatsura OVA"]}
 ,{"name":"Sword Art Online: Extra Edition","shortcut":"ne e","allnames":["Sword Art Online: Extra Edition"]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
+,{"name":"DanMachi","shortcut":"anm","allnames":["DanMachi","Is It Wrong to Try to Pick Up Girls in a Dungeon?","Dungeon ni Deai o Motomeru no wa Machigatteiru Darou ka"]}
+,{"name":"Dororo","shortcut":"do","allnames":["Dororo"]}
+,{"name":"DanMachi III","shortcut":"i iii","allnames":["Dungeon ni Deai o Motomeru no wa Machigatteiru Darou ka III","Is It Wrong to Try to Pick Up Girls in a Dungeon? III","DanMachi III"]}
+,{"name":"Shingeki no Kyojin Zenpen: Guren no Yumiya","shortcut":"pen g","allnames":["Shingeki no Kyojin Zenpen: Guren no Yumiya","Attack on Titan: Crimson Arrows"]}
+,{"name":"Gekijouban Mahou Shoujo Madoka★Magica Shinpen: Hangyaku no Monogatari","shortcut":"ca sh","allnames":["Gekijouban Mahou Shoujo Madoka★Magica Shinpen: Hangyaku no Monogatari","Puella Magi Madoka Magica The Movie Part 3: Rebellion"]}
+,{"name":"Shingeki! Kyojin Chuugakkou","shortcut":"huga","allnames":["Shingeki! Kyojin Chuugakkou","Attack on Titan: Junior High"]}
+,{"name":"Urusei Yatsura Movie 2: Beautiful Dreamer","shortcut":"2 bea","allnames":["Urusei Yatsura Movie 2: Beautiful Dreamer"]}
+,{"name":"The Ancient Magus' Bride","shortcut":"s' b","allnames":["Mahoutsukai no Yome","The Ancient Magus' Bride"]}
+,{"name":"Maarui Kanojo to Zannen na Kareshi","shortcut":"aaru","allnames":["Maarui Kanojo to Zannen na Kareshi"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
