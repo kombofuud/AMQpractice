@@ -1,7 +1,7 @@
 [{"name":"[Oshi no Ko]","shortcut":"]","allnames":["\"Oshi no Ko\"","[Oshi no Ko]"]}
 ,{"name":"Rent-a-Girlfriend","shortcut":"-a-","allnames":["Kanojo, Okarishimasu","Rent-a-Girlfriend"]}
 ,{"name":"AkuLas","shortcut":"ul","allnames":["AkuLas","I'm the Villainess, So I'm Taming the Final Boss","Akuyaku Reijou Nanode Last Boss o Katte Mimashita"]}
-,{"name":"spoi","shortcut":"The Angel Next Door Spoils Me Rotten","allnames":["Otonari no Tenshi-sama ni Itsu no Ma ni ka Dame Ningen ni Sareteita Ken","The Angel Next Door Spoils Me Rotten"]}
+,{"name":"The Angel Next Door Spoils Me Rotten","shortcut":"spoi","allnames":["Otonari no Tenshi-sama ni Itsu no Ma ni ka Dame Ningen ni Sareteita Ken","The Angel Next Door Spoils Me Rotten"]}
 ,{"name":"Bibliophile Princess","shortcut":"oph","allnames":["Mushikaburi-hime","Bibliophile Princess"]}
 ,{"name":"Bocchi the Rock!","shortcut":"i th","allnames":["Bocchi the Rock!","Bocchi the Rock!"]}
 ,{"name":"Chainsaw Man","shortcut":"nsa","allnames":["Chainsaw Man","Chainsaw Man"]}
@@ -12,7 +12,7 @@
 ,{"name":"Kimetsu no Yaiba","shortcut":"on sl","allnames":["Kimetsu no Yaiba","Demon Slayer: Kimetsu no Yaiba"]}
 ,{"name":"Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc","shortcut":"dsmi","allnames":["Kimetsu no Yaiba: Katanakaji no Sato-Hen","Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc"]}
 ,{"name":"Why Raeliana Ended Up at the Duke’s Mansion","shortcut":"ke'","allnames":["Kanojo ga Koushaku-tei ni Itta Riyuu","Why Raeliana Ended Up at the Duke's Mansion","Why Raeliana Ended Up at the Duke’s Mansion"]}
-,{"name":"The Most Heretical Last Boss Queen: From Villainess to Savior","shortcut":"s q","allnames":["Higeki no Genkyou to Naru Saikyou Gedou Last Boss Joou wa Tami no Tame ni Tsukushimasu.","The Most Heretical Last Boss Queen: From Villainess to Savior"]}
+,{"name":"The Most Heretical Last Boss Queen: From Villainess to Savior","shortcut":"om v","allnames":["Higeki no Genkyou to Naru Saikyou Gedou Last Boss Joou wa Tami no Tame ni Tsukushimasu.","The Most Heretical Last Boss Queen: From Villainess to Savior"]}
 ,{"name":"The Eminence in Shadow","shortcut":"nenc","allnames":["Kage no Jitsuryokusha ni Naritakute!","The Eminence in Shadow"]}
 ,{"name":"TsunLise","shortcut":"nl","allnames":["Tsundere Akuyaku Reijou Lieselotte to Jikkyou no Endou-kun to Kaisetsu no Kobayashi-san","Endo and Kobayashi Live! The Latest on Tsundere Villainess Lieselotte","TsunLise"]}
 ,{"name":"The Girl I Like Forgot Her Glasses","shortcut":"got ","allnames":["Suki na Ko ga Megane o Wasureta","The Girl I Like Forgot Her Glasses"]}
@@ -84,7 +84,7 @@
 ,{"name":"Zetsuen no Tempest","shortcut":"pes","allnames":["Zetsuen no Tempest","Blast of Tempest","Blast of Tempest: The Civilization Blaster","Zetsuen no Tempest: The Civilization Blaster"]}
 ,{"name":"Zom 100: Bucket List of the Dead","shortcut":"0 b","allnames":["Zom 100: Zombie ni Naru Made ni Shitai 100 no Koto","Zom 100: Bucket List of the Dead"]}
 ,{"name":"Lucky Star","shortcut":"luc","allnames":["Lucky Star","Lucky Star"]}
-,{"name":"Komi-san wa Comyushou desu.","shortcut":"wa,","allnames":["Komi-san wa Comyushou desu.","Komi Can't Communicate"]}
+,{"name":"Komi-san wa, Comyushou desu.","shortcut":"wa,","allnames":["Komi-san wa, Comyushou desu.","Komi Can't Communicate"]}
 ,{"name":"Takt Op.Destiny","shortcut":"kt ","allnames":["Takt Op.Destiny","Takt Op.Destiny"]}
 ,{"name":"Made in Abyss: Retsujitsu no Ougonkyou","shortcut":"gonk","allnames":["Made in Abyss: Retsujitsu no Ougonkyou","Made in Abyss: The Golden City of the Scorching Sun"]}
 ,{"name":"TsureKano","shortcut":"rek","allnames":["Mamahaha no Tsurego ga Motokano Datta","My Stepmom's Daughter is My Ex","TsureKano"]}
@@ -101,7 +101,7 @@
 ,{"name":"Yofukashi no Uta","shortcut":"yof","allnames":["Yofukashi no Uta","Call of the Night"]}
 ,{"name":"Star Wars: Visions","shortcut":"ar w","allnames":["Star Wars: Visions","Star Wars: Visions"]}
 ,{"name":"Slow Loop","shortcut":"ow ","allnames":["Slow Loop","Slow Loop"]}
-,{"name":"Demon Slayer: Kimetsu no Yaiba Mugen Train Arc","shortcut":"in ar","allnames":["Kimetsu no Yaiba: Mugen Ressha-hen","Demon Slayer: Kimetsu no Yaiba Mugen Train Arc"]}
+,{"name":"Kimetsu no Yaiba: Mugen Ressha-hen","shortcut":"gen r","allnames":["Kimetsu no Yaiba: Mugen Ressha-hen","Demon Slayer: Kimetsu no Yaiba Mugen Train Arc"]}
 ,{"name":"The Melancholy of Haruhi Suzumiya","shortcut":"aruh","allnames":["Suzumiya Haruhi no Yuuutsu","The Melancholy of Haruhi Suzumiya"]}
 ,{"name":"Suzumiya Haruhi no Shoushitsu","shortcut":"shosh","allnames":["Suzumiya Haruhi no Shoushitsu","The Disappearance of Haruhi Suzumiya"]}
 ,{"name":"Hamefura","shortcut":"ef","allnames":["Hamefura","My Next Life as a Villainess: All Routes Lead to Doom!","Otome Game no Hametsu Flag Shika Nai Akuyaku Reijou ni Tensei Shiteshimatta..."]}
@@ -179,7 +179,7 @@
 ,{"name":"Isekai de Mofumofu Nadenade Suru Tame ni Ganbattemasu","shortcut":"mofu","allnames":["Isekai de Mofumofu Nadenade Suru Tame ni Ganbattemasu","At the Isekai Fluffy Paradise I'm Trying to Do My Best"]}
 ,{"name":"Momochi-san Chi no Ayakashi Ouji","shortcut":"hi ou","allnames":["Momochi-san Chi no Ayakashi Ouji","The Demon Prince of Momochi House"]}
 ,{"name":"Saikyou Tank no Meikyuu Kouryaku: Tairyoku 9999 no Rare Skill Mochi Tank, Yuusha Party o Tsuihou sareru","shortcut":"k,","allnames":["Saikyou Tank no Meikyuu Kouryaku: Tairyoku 9999 no Rare Skill Mochi Tank, Yuusha Party o Tsuihou sareru","The Strongest Tank's Labyrinth Raids"]}
-,{"name":"Modaete yo, Adam-kun","shortcut":", a","allnames":["Modaete yo, Adam-kun","Modaete yo, Adam-kun"]}
+,{"name":"Modaete yo, Adam-kun","shortcut":", a","allnames":["Modaete yo, Adam-kun","Adam's Sweet Agony"]}
 ,{"name":"Kekkon Yubiwa Monogatari","shortcut":"biw","allnames":["Kekkon Yubiwa Monogatari","Tales of Wedding Rings"]}
 ,{"name":"Chained Soldier","shortcut":"ned","allnames":["Mato Seihei no Slave","Chained Soldier"]}
 ,{"name":"Mahou Shoujo ni Akogarete","shortcut":"ni a","allnames":["Mahou Shoujo ni Akogarete","Gushing Over Magical Girls"]}
@@ -198,7 +198,7 @@
 ,{"name":"Harimaware! Koinu","shortcut":"koin","allnames":["Harimaware! Koinu"]}
 ,{"name":"Majo to Yajuu","shortcut":"ajo ","allnames":["The Witch and the Beast","Majo to Yajuu"]}
 ,{"name":"Saijaku Tamer wa Gomihiroi no Tabi o Hajimemashita.","shortcut":"bi o","allnames":["The Weakest Tamer Began a Journey to Pick Up Trash","Saijaku Tamer wa Gomihiroi no Tabi o Hajimemashita."]}
-,{"name":"Meitou \"Isekai no Yu\" Kaitaku-ki","shortcut":"\"is","allnames":["Meitou \"Isekai no Yu\" Kaitaku-ki"]}
+,{"name":"Meitou \"Isekai no Yu\" Kaitaku-ki: Around 40 Onsen Mania no Tensei Saki wa, Nonbiri Onsen Tengoku Deshita","shortcut":"\"is","allnames":["Meitou \"Isekai no Yu\" Kaitaku-ki: Around 40 Onsen Mania no Tensei Saki wa, Nonbiri Onsen Tengoku Deshita","Isekai Onsen Paradise"]}
 ,{"name":"Gekai Elise","shortcut":"i e","allnames":["Doctor Elise: The Royal Lady with the Lamp","Gekai Elise"]}
 ,{"name":"Mashle: Shinkakusha Kouho Senbatsu Shiken-hen","shortcut":"senb","allnames":["Mashle: Magic and Muscles - The Divine Visionary Candidate Exam Arc","Mashle: Shinkakusha Kouho Senbatsu Shiken-hen"]}
 ,{"name":"Snack Basue","shortcut":"nac","allnames":["Snack Basue"]}
@@ -207,7 +207,7 @@
 ,{"name":"Gekkan Mousou Kagaku","shortcut":"agak","allnames":["Delusional Monthly Magazine","Gekkan Mousou Kagaku"]}
 ,{"name":"Shin no Nakama ja Nai to Yuusha no Party o Oidasareta node, Henkyou de Slow Life Suru Koto ni Shimashita 2nd","shortcut":"ta 2n","allnames":["Banished from the Hero's Party, I Decided to Live a Quiet Life in the Countryside Season 2","Shin no Nakama ja Nai to Yuusha no Party o Oidasareta node, Henkyou de Slow Life Suru Koto ni Shimashita 2nd"]}
 ,{"name":"Jaku-Chara Tomozaki-kun 2nd Stage","shortcut":"n 2n","allnames":["Bottom-Tier Character Tomozaki 2nd Stage","Jaku-Chara Tomozaki-kun 2nd Stage"]}
-,{"name":"Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","shortcut":"gini","allnames":["Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","30-sai Doutei dato Mahou Tsukai ni Nareru Rashii"]}
+,{"name":"Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","shortcut":"of vi","allnames":["Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","30-sai Doutei dato Mahoutsukai ni Nareru Rashii"]}
 ,{"name":"Ishura","shortcut":"hu","allnames":["Ishura"]}
 ,{"name":"High Card","shortcut":"gh ","allnames":["High Card"]}
 ,{"name":"Oroka na Tenshi wa Akuma to Odoru","shortcut":"roka ","allnames":["Oroka na Tenshi wa Akuma to Odoru","The Foolish Angel Dances with the Devil"]}
@@ -229,7 +229,7 @@
 ,{"name":"Koukaku Kidoutai: Stand Alone Complex - The Laughing Man","shortcut":"ex -","allnames":["Koukaku Kidoutai: Stand Alone Complex - The Laughing Man","Ghost in the Shell: Stand Alone Complex - The Laughing Man"]}
 ,{"name":"Innocence","shortcut":"oce","allnames":["Innocence","Ghost in the Shell 2: Innocence"]}
 ,{"name":"Metallic Rouge","shortcut":"etal","allnames":["Metallic Rouge"]}
-,{"name":"Appleseed: Ex Machina","shortcut":"d: e","allnames":["Appleseed: Ex Machina","Ex Machina"]}
+,{"name":"Appleseed: Ex Machina","shortcut":"ed:","allnames":["Appleseed: Ex Machina","Ex Machina"]}
 ,{"name":"Wonderful Precure!","shortcut":"l pre","allnames":["Wonderful Precure!"]}
 ,{"name":"Sengoku Youko","shortcut":"u yo","allnames":["Sengoku Youko"]}
 ,{"name":"Shaman King Flowers","shortcut":"g fl","allnames":["Shaman King Flowers"]}
@@ -292,7 +292,7 @@
 ,{"name":"The Fable","shortcut":"abl","allnames":["The Fable"]}
 ,{"name":"Mysterious Disappearances","shortcut":"sap","allnames":["Kaii to Otome to Kamikakushi","Mysterious Disappearances"]}
 ,{"name":"Gods' Game We Play","shortcut":"me w","allnames":["Kami wa Game ni Ueteiru.","Gods' Game We Play"]}
-,{"name":"Ateuma Chara no Kuse Shite, Spadali Ouji ni Chouai Sarete Imasu.","shortcut":"hoa","allnames":["Ateuma Chara no Kuse Shite, Spadali Ouji ni Chouai Sarete Imasu.","AteKuse"]}
+,{"name":"AteKuse","shortcut":"kus","allnames":["Ateuma Chara no Kuse Shite, Spadali Ouji ni Chouai Sarete Imasu.","AteKuse"]}
 ,{"name":"Shinkansen Henkei Robo Shinkalion: Change the World","shortcut":"lion c","allnames":["Shinkansen Henkei Robo Shinkalion: Change the World"]}
 ,{"name":"As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","shortcut":"l sk","allnames":["As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","Tensei Kizoku, Kantei Skill de Nariagaru"]}
 ,{"name":"Made in Abyss","shortcut":" ab","allnames":["Made in Abyss"]}
