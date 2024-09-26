@@ -3,14 +3,20 @@ import json
 import shutil
 
 #Move downloaded file to local directory and delete previous version
-shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 
 #load songs from each list
-with open("merged.json", 'r', encoding = 'utf8') as f:
+#fileMerged = "merged"
+#fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
+#fileLoad = "loading"
+fileLearned = "learned"
+fileMerged = "dummyMerged"
+fileList = ["dummy0", "dummy1"]
+fileLoad = "dummyLoad"
+
+with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
     songList = json.load(f)
-with open("known.json", 'r', encoding = 'utf8') as f:
-    knownList = json.load(f)
-with open("loading.json", 'r', encoding = 'utf8') as f:
+with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     loadingList = json.load(f)
 with open("modifications.json", 'r', encoding = 'utf8') as f:
     equivalances = json.load(f)
@@ -25,10 +31,10 @@ for relation in equivalances:
     index += 1
     altNames.append(set())
 
-#prepare new lists
-newKnownList = []
-newLoadingList = []
-newList = []
+#add missing info to songs
+songCodes = dict()
+nameCodes = dict()
+index = 0
 for song in songList:
     if song["video720"] is None:
         song["video720"] = song["video480"]
@@ -37,62 +43,131 @@ for song in songList:
     if song["songArtist"]+song["songName"] in equiv:
         for name in song["altAnimeNames"]:
            altNames[equiv[song["songArtist"]+song["songName"]]].add(name)
+    songCodes[song["video720"]] = index
+    nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]] = index
+    index += 1
 for song in songList:
     if song["songArtist"]+song["songName"] in equiv:
         song["altAnimeNamesAnswers"] = list(altNames[equiv[song["songArtist"]+song["songName"]]])
 
-nameMap = []
-mirrorMap = []
-urlMap = []
-vintageMap = []
-for song in knownList:
-    urlMap.append(song["video720"])
-    nameMap.append(song["animeEnglishName"]+song["songName"])
-    mirrorMap.append(song["songArtist"]+song["songName"])
-    vintageMap.append(song["songArtist"]+song["songName"]+song["animeVintage"])
+#Replace old json objects with new ones
+nameSet = set()
+mirrorSet = set()
+urlSet = set()
+vintageSet = set()
+pickedMap = dict()
+for section in fileList:
+    with open(section+"cutlist.json", 'r', encoding = 'utf8') as f:
+        knownList = json.load(f)
+    index = 0
+    while index<len(knownList):
+        song = knownList[index]
+        if song["video720"] is None:
+            song["video720"] = song["video480"]
+        if song["animeVintage"] is None:
+            song["animeVintage"] = ""
+        urlSet.add(song["video720"])
+        nameSet.add(song["animeEnglishName"]+song["songName"])
+        mirrorSet.add(song["songArtist"]+song["songName"])
+        vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
+        if song["video720"] in songCodes:
+            knownList[index] = songList[songCodes[song["video720"]]]
+            index = index+1
+        elif song["songArtist"]+song["songName"]+song["animeVintage"] in nameCodes:
+            knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]]]
+            index = index+1
+        else:
+            knownList.pop(index)
+    with open(section+"cutlist.json", 'w', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        json.dump(knownList, f)
 
-for song in loadingList:
-    urlMap.append(song["video720"])
-    vintageMap.append(song["animeEnglishName"]+song["songName"])
-
-#add songs to respective lists by url
-for song in songList:
-    if song["animeEnglishName"]+song["songName"] in nameMap or song["songArtist"]+song["songName"] in mirrorMap:
-        newKnownList.append(song)
+newKnownList = []
+with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
+    knownList = json.load(f)
+index = 0
+while index<len(knownList):
+    song = knownList[index]
+    if song["video720"] is None:
+        song["video720"] = song["video480"]
+    if song["animeVintage"] is None:
+        song["animeVintage"] = ""
+    urlSet.add(song["video720"])
+    vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
+    if song["video720"] in songCodes:
+        knownList[index] = songList[songCodes[song["video720"]]]
+    elif song["songArtist"]+song["songName"]+song["animeVintage"] in nameCodes:
+        knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]]]
     else:
-        newLoadingList.append(song)
-    if song["songArtist"]+song["songName"]+song["animeVintage"] not in vintageMap and song["video720"] not in urlMap:
+        knownList.pop(index)
+        continue
+    if song["animeEnglishName"]+song["songName"] in nameSet:
+        knownList.pop(index)
+        newKnownList.append(song)
+        continue
+    elif song["songArtist"]+song["songName"] in mirrorSet:
+        knownList.pop(index)
+        newKnownList.append(song)
+        continue
+    index = index+1
+with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(knownList, f)
+
+#add new songs to respective lists depending on if it's similar to other practiced ones
+newLoadingList = []
+newList = []
+for song in songList:
+    if song["video720"] not in urlSet and song["songArtist"]+song["songName"]+song["animeVintage"] not in vintageSet:
+        if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
+            newKnownList.append(song)
+        else:
+            newLoadingList.append(song)
         newList.append(song)
+for section in fileList:
+    with open(section+"cutlist.json", 'r+', encoding = 'utf8') as f:
+        knownList = json.load(f)
+        knownList.extend(newKnownList)
+        f.truncate(0)
+        f.seek(0)
+        json.dump(knownList,f)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
 
-#Write songs to files
-with open("known.json", 'w', encoding = 'utf8') as f:
-    json.dump(newKnownList, f)
-with open("known.json", 'r', encoding = 'utf8') as f:
-    filedata = f.read()
-filedata = filedata.replace(", {","\n,{")
-filedata = filedata.replace("}]","}\n]")
-with open("known.json", 'w', encoding = 'utf8') as f:
-    f.write(filedata)
+with open(fileLoad+".json", "r+", encoding = 'utf8') as f:
+    knownList = json.load(f)
+    knownList.extend(newLoadingList)
+    f.truncate(0)
+    f.seek(0)
+    json.dump(knownList,f)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
 
-with open("loading.json", 'w', encoding = 'utf8') as f:
-    json.dump(newLoadingList, f)
-with open("loading.json", 'r', encoding = 'utf8') as f:
-    filedata = f.read()
-filedata = filedata.replace(", {","\n,{")
-filedata = filedata.replace("}]","}\n]")
-with open("loading.json", 'w', encoding = 'utf8') as f:
-    f.write(filedata)
+with open(fileMerged+".json", "r+", encoding = 'utf8') as f:
+    f.truncate(0)
+    json.dump(songList,f)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
 
-with open("merged.json", 'w', encoding = 'utf8') as f:
-    json.dump(songList, f)
-with open("merged.json", 'r', encoding = 'utf8') as f:
-    filedata = f.read()
-filedata = filedata.replace(", {","\n,{")
-filedata = filedata.replace("}]","}\n]")
-with open("merged.json", 'w', encoding = 'utf8') as f:
-    f.write(filedata)
 
 #Print out new songs
-print("newSongs:")
-for song in newList:
+print("newLearning:")
+for song in newKnownList:
+    print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
+print("newLoading:")
+for song in newKnownList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
