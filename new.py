@@ -3,9 +3,9 @@ import json
 import shutil
 
 #Move downloaded file to local directory and delete previous version
-shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 #load songs from each list
-
+'''
 fileMerged = "merged"
 fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
 fileLoad = "loadingcutlist"
@@ -17,7 +17,9 @@ fileMerged = "dummyMerged"
 fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 fileDead = "dummyDead"
-'''
+if fileLearned not in fileList:
+    fileList.append(fileLearned)
+
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
     songList = json.load(f)
 with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
@@ -152,7 +154,7 @@ for section in fileList:
             knownList.extend(newKnownList)
             f.truncate(0)
             f.seek(0)
-            json.dump(knownList,f)
+            json.dump(knownList,f,ensure_ascii=False)
         f.seek(0)
         fileData = f.read()
         fileData = fileData.replace(", {","\n,{")
@@ -165,7 +167,7 @@ with open(fileLoad+".json", "r+", encoding = 'utf8') as f:
     knownList.extend(newLoadingList)
     f.truncate(0)
     f.seek(0)
-    json.dump(knownList,f)
+    json.dump(knownList,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
     fileData = fileData.replace(", {","\n,{")
@@ -178,7 +180,7 @@ with open(fileDead+".json", "r+", encoding = 'utf8') as f:
     knownList.extend(deadSongs)
     f.truncate(0)
     f.seek(0)
-    json.dump(knownList,f)
+    json.dump(knownList,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
     fileData = fileData.replace(", {","\n,{")
@@ -188,7 +190,7 @@ with open(fileDead+".json", "r+", encoding = 'utf8') as f:
 
 with open(fileMerged+".json", "r+", encoding = 'utf8') as f:
     f.truncate(0)
-    json.dump(songList,f)
+    json.dump(songList,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
     fileData = fileData.replace(", {","\n,{")
