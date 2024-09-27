@@ -201,16 +201,9 @@ with open(fileMerged+".json", "r+", encoding = 'utf8') as f:
 print("newLearning:-----------------------------------")
 for song in newKnownList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
-<<<<<<< HEAD
 print("newLoading:-----------------------------------")
 for song in newLoadingList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 print("Deprecated:-----------------------------------")
-=======
-print("newLoading:")
-for song in newLoadingList:
-    print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
-print("Deprecated:")
->>>>>>> a525bf95df5798d7a93c54f16c840ebe89e002a6
 for song in deadSongs:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
