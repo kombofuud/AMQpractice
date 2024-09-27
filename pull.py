@@ -4,6 +4,7 @@ import shutil
 
 #Move downloaded file to local directory and delete previous version
 #shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+<<<<<<< HEAD
 '''
 load songs from each list
 fileMerged = "merged"
@@ -12,8 +13,20 @@ fileLoad = "loading"
 fileDead = "dead"
 '''
 fileLearned = "learned"
+=======
+
+#load songs from each list
+'''
+fileMerged = "merged"
+fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
+fileLoad = "loadingcutlist"
+fileLearned = "learnedcutlist"
+fileDead = "Dead"
+'''
+fileLearned = "dummyLearned"
+>>>>>>> a525bf95df5798d7a93c54f16c840ebe89e002a6
 fileMerged = "dummyMerged"
-fileList = ["dummy0", "dummy1"]
+fileList = ["dummy0", "dummy1", "dummyLearned"]
 fileLoad = "dummyLoad"
 fileDead = "dummyDead"
 
@@ -66,6 +79,7 @@ mirrorSet = set()
 urlSet = set()
 vintageSet = set()
 pickedMap = dict()
+deadSongs = []
 for section in fileList:
     with open(section+"cutlist.json", 'r', encoding = 'utf8') as f:
         knownList = json.load(f)
@@ -118,10 +132,14 @@ while index<len(knownList):
     if song["animeEnglishName"]+song["songName"] in nameSet:
         knownList.pop(index)
         newKnownList.append(song)
+        urlSet.add(song["video720"])
+        vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
         continue
     elif song["songArtist"]+song["songName"] in mirrorSet:
         knownList.pop(index)
         newKnownList.append(song)
+        urlSet.add(song["video720"])
+        nameSet.add(song["animeEnglishName"]+song["songName"])
         continue
     index = index+1
 with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
@@ -141,11 +159,12 @@ for song in songList:
         newList.append(song)
 for section in fileList:
     with open(section+"cutlist.json", 'r+', encoding = 'utf8') as f:
-        knownList = json.load(f)
-        knownList.extend(newKnownList)
-        f.truncate(0)
-        f.seek(0)
-        json.dump(knownList,f)
+        if section != fileLearned:
+            knownList = json.load(f)
+            knownList.extend(newKnownList)
+            f.truncate(0)
+            f.seek(0)
+            json.dump(knownList,f)
         f.seek(0)
         fileData = f.read()
         fileData = fileData.replace(", {","\n,{")
@@ -194,9 +213,16 @@ with open(fileMerged+".json", "r+", encoding = 'utf8') as f:
 print("newLearning:-----------------------------------")
 for song in newKnownList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
+<<<<<<< HEAD
 print("newLoading:-----------------------------------")
 for song in newLoadingList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 print("Deprecated:-----------------------------------")
+=======
+print("newLoading:")
+for song in newLoadingList:
+    print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
+print("Deprecated:")
+>>>>>>> a525bf95df5798d7a93c54f16c840ebe89e002a6
 for song in deadSongs:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
