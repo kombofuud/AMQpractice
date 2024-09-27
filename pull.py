@@ -4,17 +4,6 @@ import shutil
 
 #Move downloaded file to local directory and delete previous version
 #shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
-<<<<<<< HEAD
-'''
-load songs from each list
-fileMerged = "merged"
-fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
-fileLoad = "loading"
-fileDead = "dead"
-'''
-fileLearned = "learned"
-=======
-
 #load songs from each list
 '''
 fileMerged = "merged"
@@ -24,7 +13,6 @@ fileLearned = "learnedcutlist"
 fileDead = "Dead"
 '''
 fileLearned = "dummyLearned"
->>>>>>> a525bf95df5798d7a93c54f16c840ebe89e002a6
 fileMerged = "dummyMerged"
 fileList = ["dummy0", "dummy1", "dummyLearned"]
 fileLoad = "dummyLoad"
