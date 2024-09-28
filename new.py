@@ -140,6 +140,7 @@ with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
 #add new songs to respective lists depending on if it's similar to other practiced ones
 newLoadingList = []
 newList = []
+
 for song in songList:
     if song["video720"] not in urlSet and song["songArtist"]+song["songName"]+song["animeVintage"] not in vintageSet:
         if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
@@ -147,6 +148,7 @@ for song in songList:
         else:
             newLoadingList.append(song)
         newList.append(song)
+
 for section in fileList:
     with open(section+"cutlist.json", 'r+', encoding = 'utf8') as f:
         if section != fileLearned:
@@ -197,7 +199,6 @@ with open(fileMerged+".json", "r+", encoding = 'utf8') as f:
     fileData = fileData.replace("}]","}\n]")
     f.seek(0)
     f.write(fileData)
-
 
 #Print out new songs
 print("newLearning:-----------------------------------")
