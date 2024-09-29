@@ -2,7 +2,7 @@ import sys
 import json
 import random
 
-'''
+
 fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
 fileLoad = "loadingcutlist"
 fileLearned = "learned"
@@ -10,7 +10,7 @@ fileLearned = "learned"
 fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 fileLearned = "dummyLearned"
-
+'''
 #read number of new songs (default 15)
 songCount = 0
 if len(sys.argv) > 1:
