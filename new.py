@@ -3,13 +3,13 @@ import json
 import shutil
 
 #Move downloaded file to local directory and delete previous version
-#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 #load songs from each list
-'''
+
 fileMerged = "merged"
 fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
 fileLoad = "loadingcutlist"
-fileLearned = "learnedcutlist"
+fileLearned = "learned"
 fileDead = "Dead"
 '''
 fileLearned = "dummyLearned"
@@ -17,6 +17,7 @@ fileMerged = "dummyMerged"
 fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 fileDead = "dummyDead"
+'''
 if fileLearned not in fileList:
     fileList.append(fileLearned)
 
