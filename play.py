@@ -73,7 +73,7 @@ for file in lists:
             fullSongList.append(song)
             globalSongWeights.append(1)
 for i in range(len(globalSongWeights)):
-    adjustedGlobalSongWeights.append(pow(2,globalSongWeights[i]-1))
+    adjustedGlobalSongWeights.append(1)
 
 #Pick the practice list and get song statistics
 learnedSize = zScores.pop()
@@ -96,9 +96,13 @@ with open(str(lists1[r])+"cutlist.json", 'r', encoding = 'utf8') as f:
 for song in data1:
     if song["video720"] is None:
         song["video720"] = song["video480"]
-    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 4
+    adjustedGlobalSongWeights[songListMap[song["video720"]]] += 1
     localSongList.add(song["video720"])
 
+#Weight all songs
+for i in range(len(globalSongWeights)):
+    adjustedGlobalSongWeights[i] *= globalSongWeights[i]
+    adjustedGlobalSongWeights[i] = math.exp(math.sqrt(adjustedGlobalSongWeights[i])-1)
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):
     adjustedGlobalSongWeights[i] /= totalWeight

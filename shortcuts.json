@@ -77,7 +77,7 @@
 ,{"name":"Saint Cecilia and Pastor Lawrence","shortcut":"wren","allnames":["Shiro Seijo to Kuro Bokushi","Saint Cecilia and Pastor Lawrence"]}
 ,{"name":"Yohane The Parhelion: Sunshine in the Mirror","shortcut":"arh","allnames":["Genjitsu no Yohane: Sunshine in the Mirror","Yohane The Parhelion: Sunshine in the Mirror"]}
 ,{"name":"Youjo Senki","shortcut":"jo ","allnames":["Youjo Senki","Saga of Tanya the Evil"]}
-,{"name":"Gekijouban Youjo Senki","shortcut":"an yo","allnames":["Gekijouban Youjo Senki","Saga of Tanya the Evil: The Movie"]}
+,{"name":"Saga of Tanya the Evil: The Movie","shortcut":"vil: t","allnames":["Gekijouban Youjo Senki","Saga of Tanya the Evil: The Movie"]}
 ,{"name":"KimiUso","shortcut":"uso","allnames":["KimiUso","Your Lie in April","Shigatsu wa Kimi no Uso"]}
 ,{"name":"Your Lie in April: Moments","shortcut":"ril ","allnames":["Shigatsu wa Kimi no Uso: Moments","Your Lie in April: Moments","KimiUso: Moments"]}
 ,{"name":"The Dreaming Boy is A Realist","shortcut":"g bo","allnames":["Yumemiru Danshi wa Genjitsushugisha","The Dreaming Boy is A Realist"]}
@@ -337,12 +337,12 @@
 ,{"name":"Puberty syndrome: Abnormal experiences during adolescence due to sensitivity and instability.","shortcut":"nsit","allnames":["Seishun Buta Yarou wa Bunny Girl Senpai no Yume o Minai", "Rascal Does Not Dream of Bunny Girl Senpai", "Puberty syndrome: Abnormal experiences during adolescence due to sensitivity and instability."]}
 ,{"name":"My Wife Has No Emotion","shortcut":"wif","allnames":["Boku no Tsuma wa Kanjou ga Nai", "My Wife Has No Emotion"]}
 ,{"name":"Why Does Nobody Remember Me in This World?","shortcut":"ld?","allnames":["Naze Boku no Sekai o Dare mo Oboeteinai no ka?", "Why Does Nobody Remember Me in This World?"]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
+,{"name":"Gekijouban Psycho-Pass","shortcut":"n ps","allnames":["Gekijouban Psycho-Pass", "Psycho-Pass Movie"]}
+,{"name":"Psycho-Pass","shortcut":"syc","allnames":["Psycho-Pass", "Psycho-Pass"]}
+,{"name":"Laid-Back Camp The Movie","shortcut":"mp t","allnames":["Eiga Yuru Camp△", "Laid-Back Camp The Movie"]}
+,{"name":"Great Pretender","shortcut":"at p","allnames":["Great Pretender", "Great Pretender"]}
+,{"name":"The Ancient Magus' Bride Season 2","shortcut":"de se","allnames":["Mahoutsukai no Yome Season 2", "The Ancient Magus' Bride Season 2"]}
+,{"name":"Made in Abyss Recaps","shortcut":"ecap","allnames":["Gekijouban Soushuuhen Made in Abyss", "Made in Abyss Recaps"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
