@@ -19,6 +19,7 @@ if len(sys.argv) > 1:
 #read files
 nameSet = set()
 mirrorSet = set()
+urlSet = set()
 with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     loadingList = json.load(f)
 for file in fileList+[fileLearned]:
@@ -27,6 +28,7 @@ for file in fileList+[fileLearned]:
         for song in tempList:
             nameSet.add(song["animeEnglishName"]+song["songName"])
             mirrorSet.add(song["songArtist"]+song["songName"])
+            urlSet.add(song["video720"])
 
 #get song samples
 newSongs = random.sample(loadingList, min(songCount,len(loadingList)))
@@ -37,11 +39,15 @@ for song in newSongs:
 #get all songs similar to the songs in sample
 newSongList = []
 loadingSongList = []
+duplicateSet = set()
 for song in loadingList:
+    if song["video720"] in testSet:
+        continue
     if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
         newSongList.append(song)
     else:
         loadingSongList.append(song)
+    duplicateSet.add(song["video720"])
 
 #rewrite files
 for section in fileList:
@@ -60,7 +66,7 @@ for section in fileList:
         f.write(fileData)
 
 with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
-    json.dump(loadingSongList, f)
+    json.dump(loadingSongList, f, ensure_ascii=False)
 with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     filedata = f.read()
 filedata = filedata.replace(", {","\n,{")
@@ -72,4 +78,4 @@ with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
 print("Added Songs:")
 for song in newSongList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
-print(str(len(loadingSongList))+" songs in Loading")
+print(str(len(loadingSongList))+" songs in Loading. "+ str(len(urlSet)+len(newSongList))+" songs in circulation.")

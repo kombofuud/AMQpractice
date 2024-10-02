@@ -87,15 +87,20 @@ for section in fileList:
         vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
         if song["video720"] in songCodes:
             knownList[index] = songList[songCodes[song["video720"]]]
-            index = index+1
         elif song["songArtist"]+song["songName"]+song["animeVintage"] in nameCodes:
             knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]]]
-            index = index+1
         else:
             knownList.pop(index)
             if song["video720"] not in deadSongMap:
                 deadSongMap.add(song["video720"])
                 deadSongs.append(song)
+            continue
+        song = knownList[index]
+        urlSet.add(song["video720"])
+        nameSet.add(song["animeEnglishName"]+song["songName"])
+        mirrorSet.add(song["songArtist"]+song["songName"])
+        vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
+        index = index+1
     with open(section+"cutlist.json", 'w', encoding = 'utf8') as f:
         f.truncate(0)
         f.seek(0)
@@ -119,19 +124,25 @@ while index<len(knownList):
         knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]]]
     else:
         knownList.pop(index)
+        if song["video720"] not in deadSongMap:
+            deadSongMap.add(song["video720"])
+            deadSongs.append(song)
         continue
     if song["animeEnglishName"]+song["songName"] in nameSet:
         knownList.pop(index)
         newKnownList.append(song)
-        urlSet.add(song["video720"])
-        vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
+        nameSet.add(song["animeEnglishName"]+song["songName"])
+        mirrorSet.add(song["songArtist"]+song["songName"])
         continue
     elif song["songArtist"]+song["songName"] in mirrorSet:
         knownList.pop(index)
         newKnownList.append(song)
-        urlSet.add(song["video720"])
         nameSet.add(song["animeEnglishName"]+song["songName"])
+        mirrorSet.add(song["songArtist"]+song["songName"])
         continue
+    song = knownList[index]
+    urlSet.add(song["video720"])
+    vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
     index = index+1
 with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
     f.truncate(0)
