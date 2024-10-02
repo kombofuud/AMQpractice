@@ -41,7 +41,8 @@ newSongList = []
 loadingSongList = []
 duplicateSet = set()
 for song in loadingList:
-    if song["video720"] in testSet:
+    if song["video720"] in duplicateSet:
+        print(song["songName"])
         continue
     if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
         newSongList.append(song)
