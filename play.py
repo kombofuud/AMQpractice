@@ -97,13 +97,13 @@ with open(str(lists1[r])+"cutlist.json", 'r', encoding = 'utf8') as f:
 for song in data1:
     if song["video720"] is None:
         song["video720"] = song["video480"]
-    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 1
+    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 2
     localSongList.add(song["video720"])
 
 #Weight all songs
 for i in range(len(globalSongWeights)):
     adjustedGlobalSongWeights[i] += globalSongWeights[i]-1
-    adjustedGlobalSongWeights[i] = math.exp(adjustedGlobalSongWeights[i]-1)
+    adjustedGlobalSongWeights[i] = math.exp(adjustedGlobalSongWeights[i])
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):
     adjustedGlobalSongWeights[i] /= totalWeight
