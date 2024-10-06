@@ -103,7 +103,7 @@ for song in data1:
 #Weight all songs
 for i in range(len(globalSongWeights)):
     adjustedGlobalSongWeights[i] += globalSongWeights[i]-1
-    adjustedGlobalSongWeights[i] = math.exp(adjustedGlobalSongWeights[i])
+    adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):
     adjustedGlobalSongWeights[i] /= totalWeight
@@ -123,3 +123,10 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
 
 #print the practice list and song statistics
 print("Test "+str(lists[r])+" section\nMeanCount: "+str(int(sum(globalSongWeights)/len(lists1)))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" Learned: "+str(learnedSize))
+
+frequencyList = [0]*len(filelist)
+for element in globalSongWeights:
+    frequencyList[element] += 1
+frequencyList[0] = learnedSize
+frequencyList[1] -= learnedSize
+print("songFrequencyDistribution: "+str(frequencyList))
