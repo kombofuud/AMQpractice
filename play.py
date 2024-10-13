@@ -51,6 +51,7 @@ lists1 = [0,10,20,30,40,50,60,70,80,90,100,'last']
 fullSongList = [] #doesn't include learned and loading songs
 songListMap = dict()
 globalSongWeights = []
+globalSongTally = []
 adjustedGlobalSongWeights = []
 zScores = []
 
@@ -62,6 +63,7 @@ for file in lists:
     for song in data1:
         zScores[-1] += 1
         if song["video720"] in traversedSongs:
+            globalSongTally[songListMap[song["video720"]]] += 1
             continue
         if song["video720"] is None:
             song["video720"] = song["video480"]
@@ -72,6 +74,7 @@ for file in lists:
             songListMap[song["video720"]] = len(fullSongList)
             fullSongList.append(song)
             globalSongWeights.append(1)
+            globalSongTally.append(1)
 for i in range(len(globalSongWeights)):
     adjustedGlobalSongWeights.append(1)
 
@@ -102,8 +105,8 @@ for song in data1:
 
 #Weight all songs
 for i in range(len(globalSongWeights)):
-    adjustedGlobalSongWeights[i] += globalSongWeights[i]-1
-    adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
+    adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
+    adjustedGlobalSongWeights[i] = math.pow(1.8,adjustedGlobalSongWeights[i])
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):
     adjustedGlobalSongWeights[i] /= totalWeight
