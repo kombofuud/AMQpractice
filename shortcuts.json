@@ -97,13 +97,13 @@
 ,{"name":"Ansatsu Kizoku","shortcut":"sat","allnames":["Ansatsu Kizoku","The World's Finest Assassin Gets Reincarnated in a Different World as an Aristocrat","Sekai Saikou no Ansatsusha, Isekai Kizoku ni Tensei Suru"]}
 ,{"name":"Kimetsu no Yaiba: Yuukaku-hen","shortcut":"ba y","allnames":["Kimetsu no Yaiba: Yuukaku-hen","Demon Slayer: Kimetsu no Yaiba Entertainment District Arc"]}
 ,{"name":"Sono Bisque Doll wa Koi o Suru","shortcut":"isq","allnames":["Sono Bisque Doll wa Koi o Suru","My Dress-Up Darling"]}
-,{"name":"Cyberpunk: Edgerunners","shortcut":"rpu","allnames":["Cyberpunk: Edgerunners","Cyberpunk: Edgerunners"]}
+,{"name":"Cyberpunk: Edgerunners","shortcut":"k e","allnames":["Cyberpunk: Edgerunners","Cyberpunk: Edgerunners"]}
 ,{"name":"Yofukashi no Uta","shortcut":"yof","allnames":["Yofukashi no Uta","Call of the Night"]}
 ,{"name":"Star Wars: Visions","shortcut":"ar w","allnames":["Star Wars: Visions","Star Wars: Visions"]}
 ,{"name":"Slow Loop","shortcut":"ow ","allnames":["Slow Loop","Slow Loop"]}
 ,{"name":"Kimetsu no Yaiba: Mugen Ressha-hen","shortcut":"gen r","allnames":["Kimetsu no Yaiba: Mugen Ressha-hen","Demon Slayer: Kimetsu no Yaiba Mugen Train Arc"]}
 ,{"name":"The Melancholy of Haruhi Suzumiya","shortcut":"aruh","allnames":["Suzumiya Haruhi no Yuuutsu","The Melancholy of Haruhi Suzumiya"]}
-,{"name":"Suzumiya Haruhi no Shoushitsu","shortcut":"shosh","allnames":["Suzumiya Haruhi no Shoushitsu","The Disappearance of Haruhi Suzumiya"]}
+,{"name":"Suzumiya Haruhi no Shoushitsu","shortcut":"sap","allnames":["Suzumiya Haruhi no Shoushitsu","The Disappearance of Haruhi Suzumiya"]}
 ,{"name":"Hamefura","shortcut":"ef","allnames":["Hamefura","My Next Life as a Villainess: All Routes Lead to Doom!","Otome Game no Hametsu Flag Shika Nai Akuyaku Reijou ni Tensei Shiteshimatta..."]}
 ,{"name":"Initial D","shortcut":"tia","allnames":["Initial D","Initial D","Initial D: First Stage"]}
 ,{"name":"Initial D: Second Stage","shortcut":" d s","allnames":["Initial D: Second Stage","Initial D: Second Stage"]}
@@ -133,7 +133,7 @@
 ,{"name":"Shangri-La Frontier: Kusoge Hunter, Kamige ni Idoman to su","shortcut":"mige","allnames":["Shangri-La Frontier: Kusoge Hunter, Kamige ni Idoman to su","Shangri-La Frontier"]}
 ,{"name":"Hyakkano","shortcut":"kka","allnames":["Kimi no Koto ga Daidaidaidaidaisuki na 100-nin no Kanojo","The 100 Girlfriends Who Really, Really, Really, Really, REALLY Love You","Hyakkano"]}
 ,{"name":"Kage no Jitsuryokusha ni Naritakute! 2nd Season","shortcut":"ute 2","allnames":["Kage no Jitsuryokusha ni Naritakute! 2nd Season","The Eminence in Shadow Season 2"]}
-,{"name":"Saihate no Paladin: Tetsusabi no Yama no Ou","shortcut":"susa","allnames":["Saihate no Paladin: Tetsusabi no Yama no Ou","The Faraway Paladin: The Lord of Rust Mountains"]}
+,{"name":"Saihate no Paladin: Tetsusabi no Yama no Ou","shortcut":"din t","allnames":["Saihate no Paladin: Tetsusabi no Yama no Ou","The Faraway Paladin: The Lord of Rust Mountains"]}
 ,{"name":"The Kingdoms of Ruin","shortcut":"f ru","allnames":["Hametsu no Oukoku","The Kingdoms of Ruin"]}
 ,{"name":"Migi&Dali","shortcut":"&","allnames":["Migi to Dali","Migi&Dali"]}
 ,{"name":"Firefighter Daigo: Rescuer in Orange","shortcut":"efi","allnames":["Me-gumi no Daigo: Kyuukoku no Orange","Firefighter Daigo: Rescuer in Orange"]}
@@ -347,8 +347,8 @@
 ,{"name":"Attack on Titan: The Roar of Awakening","shortcut":"f aw","allnames":["Shingeki no Kyojin Season 2: Kakusei no Houkou", "Attack on Titan: The Roar of Awakening"]}
 ,{"name":"Attack on Titan: Chronicle","shortcut":"tan c","allnames":["Shingeki no Kyojin: Chronicle", "Attack on Titan: Chronicle"]}
 ,{"name":"Kinoko Inu","shortcut":"o i","allnames":["Kinoko Inu", "Kinokoinu Mushroom Pup"]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
+,{"name":"Shakugan no Shana III (Final)","shortcut":"(f","allnames":["Shakugan no Shana III (Final)", "Shakugan no Shana III (Final)", "Shakugan no Shana Final"]}
+,{"name":"Jujutsu Kaisen","shortcut":"jut","allnames":["Jujutsu Kaisen", "Jujutsu Kaisen"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
