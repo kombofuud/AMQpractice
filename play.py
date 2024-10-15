@@ -113,7 +113,8 @@ for i in range(len(adjustedGlobalSongWeights)):
 
 #create random song selection for the selected list
 practicesonglist = []
-songCount = int(math.sqrt(len(localSongList)))
+    #songCount = int(math.sqrt(len(localSongList)))
+songCount = min(30,len(localSongList))
 practicesonglist = numpy.append(practicesonglist, numpy.random.choice(fullSongList, size = songCount, p = adjustedGlobalSongWeights, replace = False))
 
 #write to _quiz.json

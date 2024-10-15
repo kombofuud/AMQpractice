@@ -12,7 +12,7 @@
 ,{"name":"Kimetsu no Yaiba","shortcut":"on sl","allnames":["Kimetsu no Yaiba","Demon Slayer: Kimetsu no Yaiba"]}
 ,{"name":"Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc","shortcut":"dsmi","allnames":["Kimetsu no Yaiba: Katanakaji no Sato-Hen","Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc"]}
 ,{"name":"Why Raeliana Ended Up at the Duke’s Mansion","shortcut":"ke'","allnames":["Kanojo ga Koushaku-tei ni Itta Riyuu","Why Raeliana Ended Up at the Duke's Mansion","Why Raeliana Ended Up at the Duke’s Mansion"]}
-,{"name":"The Most Heretical Last Boss Queen: From Villainess to Savior","shortcut":"om v","allnames":["Higeki no Genkyou to Naru Saikyou Gedou Last Boss Joou wa Tami no Tame ni Tsukushimasu.","The Most Heretical Last Boss Queen: From Villainess to Savior"]}
+,{"name":"LasTame","shortcut":"stam","allnames":["Higeki no Genkyou to Naru Saikyou Gedou Last Boss Joou wa Tami no Tame ni Tsukushimasu.","The Most Heretical Last Boss Queen: From Villainess to Savior", "LasTame"]}
 ,{"name":"The Eminence in Shadow","shortcut":"nenc","allnames":["Kage no Jitsuryokusha ni Naritakute!","The Eminence in Shadow"]}
 ,{"name":"TsunLise","shortcut":"nl","allnames":["Tsundere Akuyaku Reijou Lieselotte to Jikkyou no Endou-kun to Kaisetsu no Kobayashi-san","Endo and Kobayashi Live! The Latest on Tsundere Villainess Lieselotte","TsunLise"]}
 ,{"name":"The Girl I Like Forgot Her Glasses","shortcut":"got ","allnames":["Suki na Ko ga Megane o Wasureta","The Girl I Like Forgot Her Glasses"]}
@@ -33,7 +33,7 @@
 ,{"name":"KONOSUBA: God's Blessing on This Wonderful World! 2","shortcut":"d  2","allnames":["Kono Subarashii Sekai ni Shukufuku o! 2","KONOSUBA: God's Blessing on This Wonderful World! 2"]}
 ,{"name":"KONOSUBA: God's Blessing on This Wonderful World! - Legend of Crimson","shortcut":"- le","allnames":["Kono Subarashii Sekai ni Shukufuku o!: Kurenai Densetsu","KONOSUBA: God's Blessing on This Wonderful World! - Legend of Crimson"]}
 ,{"name":"KONOSUBA: An Explosion on This Wonderful World!","shortcut":"osio","allnames":["Kono Subarashii Sekai ni Bakuen o!","KONOSUBA: An Explosion on This Wonderful World!"]}
-,{"name":"Saikyou Onmyouji no Isekai Tenseiki","shortcut":"ou on","allnames":["Saikyou Onmyouji no Isekai Tenseiki","The Reincarnation of the Strongest Exorcist in Another World"]}
+,{"name":"Saikyou Onmyouji no Isekai Tenseiki","shortcut":"est e","allnames":["Saikyou Onmyouji no Isekai Tenseiki","The Reincarnation of the Strongest Exorcist in Another World"]}
 ,{"name":"Liar Liar","shortcut":"iar","allnames":["Liar Liar","Liar Liar"]}
 ,{"name":"Reign of the Seven Spellblades","shortcut":"lbl","allnames":["Nanatsu no Maken ga Shihai Suru","Reign of the Seven Spellblades"]}
 ,{"name":"Lycoris Recoil","shortcut":"lyc","allnames":["Lycoris Recoil","Lycoris Recoil"]}
@@ -73,7 +73,7 @@
 ,{"name":"Violet Evergarden","shortcut":"iol","allnames":["Violet Evergarden","Violet Evergarden"]}
 ,{"name":"Gekijouban Violet Evergarden","shortcut":"n vio","allnames":["Gekijouban Violet Evergarden","Violet Evergarden: The Movie"]}
 ,{"name":"Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou","shortcut":"jido","allnames":["Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou","Violet Evergarden: Eternity and the Auto Memories Doll"]}
-,{"name":"G-Witch","shortcut":"-w","allnames":["G-Witch","Mobile Suit Gundam: The Witch From Mercury","Kidou Senshi Gundam: Suisei no Majo"]}
+,{"name":"G-Witch","shortcut":" w","allnames":["G-Witch","Mobile Suit Gundam: The Witch From Mercury","Kidou Senshi Gundam: Suisei no Majo"]}
 ,{"name":"Saint Cecilia and Pastor Lawrence","shortcut":"wren","allnames":["Shiro Seijo to Kuro Bokushi","Saint Cecilia and Pastor Lawrence"]}
 ,{"name":"Yohane The Parhelion: Sunshine in the Mirror","shortcut":"arh","allnames":["Genjitsu no Yohane: Sunshine in the Mirror","Yohane The Parhelion: Sunshine in the Mirror"]}
 ,{"name":"Youjo Senki","shortcut":"jo ","allnames":["Youjo Senki","Saga of Tanya the Evil"]}
@@ -349,9 +349,9 @@
 ,{"name":"Kinoko Inu","shortcut":"o i","allnames":["Kinoko Inu", "Kinokoinu Mushroom Pup"]}
 ,{"name":"Shakugan no Shana III (Final)","shortcut":"(f","allnames":["Shakugan no Shana III (Final)", "Shakugan no Shana III (Final)", "Shakugan no Shana Final"]}
 ,{"name":"Jujutsu Kaisen","shortcut":"jut","allnames":["Jujutsu Kaisen", "Jujutsu Kaisen"]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
+,{"name":"Urusei Yatsura Movie 1: Only You","shortcut":"1 o","allnames":["Urusei Yatsura Movie 1: Only You", "Urusei Yatsura Movie 1: Only You"]}
+,{"name":"Seirei Gensouki 2","shortcut":"ki 2","allnames":["Seirei Gensouki 2", "Seirei Gensouki: Spirit Chronicles Season 2"]}
+,{"name":"Shakugan no Shana Special: Off-Campus Class on Love and Onsen!","shortcut":"-ca","allnames":["Shakugan no Shana Tokubetsu-hen: Koi to Onsen no Kougai Gakushuu!", "Shakugan no Shana Special: Off-Campus Class on Love and Onsen!"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
