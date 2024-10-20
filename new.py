@@ -3,7 +3,7 @@ import json
 import shutil
 
 #Move downloaded file to local directory and delete previous version
-#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 #load songs from each list
 
 fileMerged = "merged"
@@ -75,12 +75,12 @@ for song in songList:
 for song in songList:
     if song["songArtist"]+song["songName"] in equiv:
         song["altAnimeNamesAnswers"] = list(altNames[equiv[song["songArtist"]+song["songName"]]])
-    altNames = set()
+    altNameList = set()
     for name in song["altAnimeNames"]:
-        altNames.add(name)
-    for name in song["altAnimeNameAnswers"]
-        altNames.add(name)
-    song["altAnimeNames"] = list(altNames)
+        altNameList.add(name)
+    for name in song["altAnimeNamesAnswers"]:
+        altNameList.add(name)
+    song["altAnimeNames"] = list(altNameList)
 
 #Replace old json objects with new ones
 nameSet = set()
