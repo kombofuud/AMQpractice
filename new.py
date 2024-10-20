@@ -31,7 +31,7 @@ with open(fileDead+".json", 'r', encoding = 'utf8') as f:
     deadList = json.load(f)
 
 #rearrange elements in songList
-ordering = ["songType","songTypeNumber","animeVintage","songName","animeEnglishName","songArtist","altAnimeNames","altAnimeNamesAnswers","animeRomajiName","songDifficulty","animeType","annId","malId","kitsuId","aniListId","animeTags","animeGenre","startPoint","audio","video480","video720","correctGuess","incorrectGuess"]
+ordering = ["songName","animeEnglishName","songArtist","altAnimeNames","altAnimeNamesAnswers","animeRomajiName","songType","songTypeNumber","songDifficulty","animeType","annId","malId","kitsuId","aniListId","animeTags","animeGenre","animeVintage","startPoint","audio","video480","video720","correctGuess","incorrectGuess"]
 songList = []
 for index in range(len(rawSongList)):
     songList.append({})
