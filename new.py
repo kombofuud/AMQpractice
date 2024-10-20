@@ -75,12 +75,6 @@ for song in songList:
 for song in songList:
     if song["songArtist"]+song["songName"] in equiv:
         song["altAnimeNamesAnswers"] = list(altNames[equiv[song["songArtist"]+song["songName"]]])
-    altNames = set()
-    for name in song["altAnimeNames"]:
-        altNames.add(name)
-    for name in song["altAnimeNameAnswers"]
-        altNames.add(name)
-    song["altAnimeNames"] = list(altNames)
 
 #Replace old json objects with new ones
 nameSet = set()
