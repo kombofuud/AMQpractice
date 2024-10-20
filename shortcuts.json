@@ -11,7 +11,7 @@
 ,{"name":"Death Note","shortcut":"ath","allnames":["Death Note","Death Note"]}
 ,{"name":"Kimetsu no Yaiba","shortcut":"on sl","allnames":["Kimetsu no Yaiba","Demon Slayer: Kimetsu no Yaiba"]}
 ,{"name":"Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc","shortcut":"dsmi","allnames":["Kimetsu no Yaiba: Katanakaji no Sato-Hen","Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc"]}
-,{"name":"Why Raeliana Ended Up at the Duke’s Mansion","shortcut":"ke'","allnames":["Kanojo ga Koushaku-tei ni Itta Riyuu","Why Raeliana Ended Up at the Duke's Mansion","Why Raeliana Ended Up at the Duke’s Mansion"]}
+,{"name":"Why Raeliana Ended Up at the Duke’s Mansion","shortcut":"an e","allnames":["Kanojo ga Koushaku-tei ni Itta Riyuu","Why Raeliana Ended Up at the Duke's Mansion","Why Raeliana Ended Up at the Duke’s Mansion"]}
 ,{"name":"LasTame","shortcut":"stam","allnames":["Higeki no Genkyou to Naru Saikyou Gedou Last Boss Joou wa Tami no Tame ni Tsukushimasu.","The Most Heretical Last Boss Queen: From Villainess to Savior", "LasTame"]}
 ,{"name":"The Eminence in Shadow","shortcut":"nenc","allnames":["Kage no Jitsuryokusha ni Naritakute!","The Eminence in Shadow"]}
 ,{"name":"TsunLise","shortcut":"nl","allnames":["Tsundere Akuyaku Reijou Lieselotte to Jikkyou no Endou-kun to Kaisetsu no Kobayashi-san","Endo and Kobayashi Live! The Latest on Tsundere Villainess Lieselotte","TsunLise"]}
@@ -164,9 +164,9 @@
 ,{"name":"Shingeki no Kyojin","shortcut":"ngek","allnames":["Shingeki no Kyojin","Attack on Titan"]}
 ,{"name":"Attack on Titan: Ilse's Notebook","shortcut":"se'","allnames":["Shingeki no Kyojin: Ilse no Techou - Aru Chousa Heidan-in no Shuki","Attack on Titan: Ilse's Notebook"]}
 ,{"name":"Dr. Stone Season 2","shortcut":"ne se","allnames":["Dr. Stone: Stone Wars","Dr. Stone Season 2"]}
-,{"name":"Cautious Hero: The Hero Is Overpowered But Overly Cautious","shortcut":"caut","allnames":["Shinchou Yuusha: Kono Yuusha ga Ore Tueee Kuse ni Shinchou Sugiru","Cautious Hero: The Hero Is Overpowered But Overly Cautious"]}
+,{"name":"Cautious Hero: The Hero Is Overpowered But Overly Cautious","shortcut":"erly","allnames":["Shinchou Yuusha: Kono Yuusha ga Ore Tueee Kuse ni Shinchou Sugiru","Cautious Hero: The Hero Is Overpowered But Overly Cautious"]}
 ,{"name":"Fullmetal Alchemist","shortcut":"lch","allnames":["Hagane no Renkinjutsushi","Fullmetal Alchemist"]}
-,{"name":"Burning-Eyed Shana","shortcut":"g-e","allnames":["Shakugan no Shana","Burning-Eyed Shana"]}
+,{"name":"Burning-Eyed Shana","shortcut":"g e","allnames":["Shakugan no Shana","Burning-Eyed Shana"]}
 ,{"name":"Golgo 13: The Professional","shortcut":"ofe","allnames":["Golgo 13: The Professional","Golgo 13: The Professional"]}
 ,{"name":"Golgo 13","shortcut":"lg","allnames":["Golgo 13","Golgo 13"]}
 ,{"name":"Kuroshitsuji","shortcut":"suj","allnames":["Kuroshitsuji","Black Butler"]}
@@ -198,7 +198,7 @@
 ,{"name":"Harimaware! Koinu","shortcut":"koin","allnames":["Harimaware! Koinu"]}
 ,{"name":"Majo to Yajuu","shortcut":"ajo ","allnames":["The Witch and the Beast","Majo to Yajuu"]}
 ,{"name":"Saijaku Tamer wa Gomihiroi no Tabi o Hajimemashita.","shortcut":"bi o","allnames":["The Weakest Tamer Began a Journey to Pick Up Trash","Saijaku Tamer wa Gomihiroi no Tabi o Hajimemashita."]}
-,{"name":"Meitou \"Isekai no Yu\" Kaitaku-ki: Around 40 Onsen Mania no Tensei Saki wa, Nonbiri Onsen Tengoku Deshita","shortcut":"\"is","allnames":["Meitou \"Isekai no Yu\" Kaitaku-ki: Around 40 Onsen Mania no Tensei Saki wa, Nonbiri Onsen Tengoku Deshita","Isekai Onsen Paradise"]}
+,{"name":"Meitou \"Isekai no Yu\" Kaitaku-ki: Around 40 Onsen Mania no Tensei Saki wa, Nonbiri Onsen Tengoku Deshita","shortcut":"d 4","allnames":["Meitou \"Isekai no Yu\" Kaitaku-ki: Around 40 Onsen Mania no Tensei Saki wa, Nonbiri Onsen Tengoku Deshita","Isekai Onsen Paradise"]}
 ,{"name":"Gekai Elise","shortcut":"i e","allnames":["Doctor Elise: The Royal Lady with the Lamp","Gekai Elise"]}
 ,{"name":"Mashle: Shinkakusha Kouho Senbatsu Shiken-hen","shortcut":"senb","allnames":["Mashle: Magic and Muscles - The Divine Visionary Candidate Exam Arc","Mashle: Shinkakusha Kouho Senbatsu Shiken-hen"]}
 ,{"name":"Snack Basue","shortcut":"sna","allnames":["Snack Basue"]}
@@ -206,7 +206,7 @@
 ,{"name":"Hime-sama, \"Goumon\" no Jikan desu","shortcut":"\"g","allnames":["'Tis Time for \"Torture,\" Princess","Hime-sama, \"Goumon\" no Jikan desu"]}
 ,{"name":"Gekkan Mousou Kagaku","shortcut":"agak","allnames":["Delusional Monthly Magazine","Gekkan Mousou Kagaku"]}
 ,{"name":"Shin no Nakama ja Nai to Yuusha no Party o Oidasareta node, Henkyou de Slow Life Suru Koto ni Shimashita 2nd","shortcut":"ta 2n","allnames":["Banished from the Hero's Party, I Decided to Live a Quiet Life in the Countryside Season 2","Shin no Nakama ja Nai to Yuusha no Party o Oidasareta node, Henkyou de Slow Life Suru Koto ni Shimashita 2nd"]}
-,{"name":"Jaku-Chara Tomozaki-kun 2nd Stage","shortcut":"n 2n","allnames":["Bottom-Tier Character Tomozaki 2nd Stage","Jaku-Chara Tomozaki-kun 2nd Stage"]}
+,{"name":"Bottom-Tier Character Tomozaki 2nd Stage","shortcut":"i 2n","allnames":["Bottom-Tier Character Tomozaki 2nd Stage","Jaku-Chara Tomozaki-kun 2nd Stage"]}
 ,{"name":"Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","shortcut":"of vi","allnames":["Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","30-sai Doutei dato Mahoutsukai ni Nareru Rashii"]}
 ,{"name":"Ishura","shortcut":"hu","allnames":["Ishura"]}
 ,{"name":"High Card","shortcut":"gh ","allnames":["High Card"]}
@@ -353,9 +353,9 @@
 ,{"name":"Seirei Gensouki 2","shortcut":"ki 2","allnames":["Seirei Gensouki 2", "Seirei Gensouki: Spirit Chronicles Season 2"]}
 ,{"name":"Shakugan no Shana Special: Off-Campus Class on Love and Onsen!","shortcut":"-ca","allnames":["Shakugan no Shana Tokubetsu-hen: Koi to Onsen no Kougai Gakushuu!", "Shakugan no Shana Special: Off-Campus Class on Love and Onsen!"]}
 ,{"name":"Bakemonogatari","shortcut":"akem","allnames":["Bakemonogatari"]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
-,{"name":"","shortcut":"","allnames":[]}
+,{"name":"As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World","shortcut":"l sk","allnames":["Tensei Kizoku, Kantei Skill de Nariagaru", "As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World"]}
+,{"name":"Chobin the Star Child","shortcut":"bin ","allnames":["Hoshi no Ko Chobin", "Chobin the Star Child"]}
+,{"name":"Shakugan no Shana S","shortcut":"aga s","allnames":["Shakugan no Shana S", "Shakugan no Shana S"]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
