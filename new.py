@@ -22,13 +22,21 @@ if fileLearned not in fileList:
     fileList.append(fileLearned)
 
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
-    songList = json.load(f)
+    rawSongList = json.load(f)
 with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     loadingList = json.load(f)
 with open("modifications.json", 'r', encoding = 'utf8') as f:
     equivalances = json.load(f)
 with open(fileDead+".json", 'r', encoding = 'utf8') as f:
     deadList = json.load(f)
+
+#rearrange elements in songList
+ordering = ["songType","songTypeNumber","animeVintage","songName","animeEnglishName","songArtist","altAnimeNames","altAnimeNamesAnswers","animeRomajiName","songDifficulty","animeType","annId","malId","kitsuId","aniListId","animeTags","animeGenre","startPoint","audio","video480","video720","correctGuess","incorrectGuess"]
+songList = []
+for index in range(len(rawSongList)):
+    songList.append({})
+    for key in ordering:
+        songList[index][key] = rawSongList[index][key]
 
 #load equivalence mapping
 equiv = dict()
