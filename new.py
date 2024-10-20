@@ -5,7 +5,7 @@ import shutil
 #Move downloaded file to local directory and delete previous version
 shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 #load songs from each list
-
+'''
 fileMerged = "merged"
 fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
 fileLoad = "loadingcutlist"
@@ -17,7 +17,7 @@ fileMerged = "dummyMerged"
 fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 fileDead = "dummyDead"
-'''
+
 if fileLearned not in fileList:
     fileList.append(fileLearned)
 
@@ -30,11 +30,15 @@ with open("modifications.json", 'r', encoding = 'utf8') as f:
 with open(fileDead+".json", 'r', encoding = 'utf8') as f:
     deadList = json.load(f)
 
-#rearrange elements in songList
+#put useful information at start of list
 ordering = ["songName","animeEnglishName","songArtist","altAnimeNames","altAnimeNamesAnswers","animeRomajiName","songType","songTypeNumber","songDifficulty","animeType","annId","malId","kitsuId","aniListId","animeTags","animeGenre","animeVintage","startPoint","audio","video480","video720","correctGuess","incorrectGuess"]
+shortHand = ["ST","STN","V","SN","EN","SA"]
+longHand = ["songType","songTypeNumber","animeVintage","songName","animeEnglishName","songArtist"]
 songList = []
 for index in range(len(rawSongList)):
     songList.append({})
+    for jindex in range(len(shortHand)):
+        songList[index][shortHand[jindex]] = rawSongList[index[longHand[jindex]]]
     for key in ordering:
         songList[index][key] = rawSongList[index][key]
 
