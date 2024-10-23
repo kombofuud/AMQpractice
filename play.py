@@ -134,3 +134,8 @@ for element in globalSongWeights:
 frequencyList[0] = learnedSize
 frequencyList[1] -= learnedSize
 print("songFrequencyDistribution: "+str(frequencyList))
+weightedCount = 0
+for i in range(len(frequencyList)):
+    weightedCount += i*frequencyList[i]
+print("Mean songs per list: "+str(weightedCount/len(frequencyList)))
+print("Mean lists per song: "+str(weightedCount/len(globalSongWeights)))
