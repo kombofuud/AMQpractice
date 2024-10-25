@@ -11,6 +11,7 @@ fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 fileLearned = "dummyLearned"
 '''
+filePrep = "_preplist"
 #read number of new songs (default 15)
 songCount = 0
 if len(sys.argv) > 1:
@@ -73,6 +74,15 @@ with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
 filedata = filedata.replace(", {","\n,{")
 filedata = filedata.replace("}]","}\n]")
 with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
+    f.write(filedata)
+
+with open(filePrep+".json", 'w', encoding = 'utf8') as f:
+    json.dump(newSongList, f, ensure_ascii=False)
+with open(filePrep+".json", 'r', encoding = 'utf8') as f:
+    filedata = f.read()
+filedata = filedata.replace(", {","\n,{")
+filedata = filedata.replace("}]","}\n]")
+with open(filePrep+".json", 'w', encoding = 'utf8') as f:
     f.write(filedata)
 
 #print added songlist
