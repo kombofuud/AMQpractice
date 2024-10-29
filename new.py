@@ -3,7 +3,7 @@ import json
 import shutil
 
 #Move downloaded file to local directory and delete previous version
-#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 #load songs from each list
 
 fileMerged = "merged"
@@ -88,6 +88,7 @@ mirrorSet = set()
 urlSet = set()
 vintageSet = set()
 pickedMap = dict()
+deadSongs = []
 for section in fileList:
     with open(section+"cutlist.json", 'r', encoding = 'utf8') as f:
         knownList = json.load(f)
