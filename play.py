@@ -106,11 +106,6 @@ for song in data1:
 #Weight all songs
 for i in range(len(globalSongWeights)):
     adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
-    '''
-    print(str(i)+"_________________________")
-    print(globalSongTally[i])
-    print(fullSongList[i])
-    '''
     adjustedGlobalSongWeights[i] = math.pow(1.8,adjustedGlobalSongWeights[i])
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):

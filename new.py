@@ -3,7 +3,7 @@ import json
 import shutil
 
 #Move downloaded file to local directory and delete previous version
-#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 #load songs from each list
 
 fileMerged = "merged"
@@ -69,8 +69,6 @@ for song in songList:
     if song["songArtist"]+song["songName"] in equiv:
         for name in song["altAnimeNames"]:
            altNames[equiv[song["songArtist"]+song["songName"]]].add(name)
-    if song["video720"] == '':
-        print(song)
     songCodes[song["video720"]] = index
     nameCodes[song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"]] = index
     index += 1
