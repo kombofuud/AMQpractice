@@ -3,7 +3,7 @@ import json
 import shutil
 
 #Move downloaded file to local directory and delete previous version
-shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 #load songs from each list
 
 fileMerged = "merged"
@@ -72,7 +72,7 @@ for song in songList:
     if song["video720"] == '':
         print(song)
     songCodes[song["video720"]] = index
-    nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]] = index
+    nameCodes[song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"]] = index
     index += 1
 for song in songList:
     if song["songArtist"]+song["songName"] in equiv:
@@ -104,11 +104,11 @@ for section in fileList:
         urlSet.add(song["video720"])
         nameSet.add(song["animeEnglishName"]+song["songName"])
         mirrorSet.add(song["songArtist"]+song["songName"])
-        vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
+        vintageSet.add(song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"])
         if song["video720"] in songCodes:
             knownList[index] = songList[songCodes[song["video720"]]]
-        elif song["songArtist"]+song["songName"]+song["animeVintage"] in nameCodes:
-            knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]]]
+        elif song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"] in nameCodes:
+            knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"]]]
         else:
             knownList.pop(index)
             if song["video720"] not in deadSongMap:
@@ -119,7 +119,7 @@ for section in fileList:
         urlSet.add(song["video720"])
         nameSet.add(song["animeEnglishName"]+song["songName"])
         mirrorSet.add(song["songArtist"]+song["songName"])
-        vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
+        vintageSet.add(song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"])
         index = index+1
     with open(section+"cutlist.json", 'w', encoding = 'utf8') as f:
         f.truncate(0)
@@ -137,11 +137,11 @@ while index<len(knownList):
     if song["animeVintage"] is None:
         song["animeVintage"] = ""
     urlSet.add(song["video720"])
-    vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
+    vintageSet.add(song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"])
     if song["video720"] in songCodes:
         knownList[index] = songList[songCodes[song["video720"]]]
-    elif song["songArtist"]+song["songName"]+song["animeVintage"] in nameCodes:
-        knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]]]
+    elif song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"] in nameCodes:
+        knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"]]]
     else:
         knownList.pop(index)
         if song["video720"] not in deadSongMap:
@@ -162,7 +162,7 @@ while index<len(knownList):
         continue
     song = knownList[index]
     urlSet.add(song["video720"])
-    vintageSet.add(song["songArtist"]+song["songName"]+song["animeVintage"])
+    vintageSet.add(song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"])
     index = index+1
 with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
     f.truncate(0)
@@ -174,7 +174,7 @@ newLoadingList = []
 newList = []
 
 for song in songList:
-    if song["video720"] not in urlSet and song["songArtist"]+song["songName"]+song["animeVintage"] not in vintageSet:
+    if song["video720"] not in urlSet and song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"] not in vintageSet:
         if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
             newKnownList.append(song)
         else:
