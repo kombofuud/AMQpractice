@@ -62,13 +62,15 @@ songCodes = dict()
 nameCodes = dict()
 index = 0
 for song in songList:
-    if song["video720"] is None:
+    if song["video720"] is None or song["video720"] == "":
         song["video720"] = song["video480"]
     if song["animeVintage"] is None:
         song["animeVintage"] = ""
     if song["songArtist"]+song["songName"] in equiv:
         for name in song["altAnimeNames"]:
            altNames[equiv[song["songArtist"]+song["songName"]]].add(name)
+    if song["video720"] == '':
+        print(song)
     songCodes[song["video720"]] = index
     nameCodes[song["songArtist"]+song["songName"]+song["animeVintage"]] = index
     index += 1
