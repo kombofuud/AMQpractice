@@ -1,8 +1,8 @@
 [{"name":"[Oshi no Ko]","shortcut":"]","allnames":["\"Oshi no Ko\"","[Oshi no Ko]"]}
 ,{"name":"Rent-a-Girlfriend","shortcut":"-a ","allnames":["Kanojo, Okarishimasu","Rent-a-Girlfriend"]}
-,{"name":"AkuLas","shortcut":"ku","allnames":["AkuLas","I'm the Villainess, So I'm Taming the Final Boss","Akuyaku Reijou Nanode Last Boss o Katte Mimashita"]}
+,{"name":"AkuLas","shortcut":"ul","allnames":["AkuLas","I'm the Villainess, So I'm Taming the Final Boss","Akuyaku Reijou Nanode Last Boss o Katte Mimashita"]}
 ,{"name":"The Angel Next Door Spoils Me Rotten","shortcut":"spoi","allnames":["Otonari no Tenshi-sama ni Itsu no Ma ni ka Dame Ningen ni Sareteita Ken","The Angel Next Door Spoils Me Rotten"]}
-,{"name":"Bibliophile Princess","shortcut":"iop","allnames":["Mushikaburi-hime","Bibliophile Princess"]}
+,{"name":"Bibliophile Princess","shortcut":"oph","allnames":["Mushikaburi-hime","Bibliophile Princess"]}
 ,{"name":"Bocchi the Rock!","shortcut":"i th","allnames":["Bocchi the Rock!","Bocchi the Rock!"]}
 ,{"name":"Chainsaw Man","shortcut":"insa","allnames":["Chainsaw Man","Chainsaw Man"]}
 ,{"name":"Dark Gathering","shortcut":"heri","allnames":["Dark Gathering","Dark Gathering"]}
@@ -10,8 +10,8 @@
 ,{"name":"Dead Mount Death Play","shortcut":"ont ","allnames":["Dead Mount Death Play","Dead Mount Death Play"]}
 ,{"name":"Death Note","shortcut":"ath","allnames":["Death Note","Death Note"]}
 ,{"name":"Kimetsu no Yaiba","shortcut":"on sl","allnames":["Kimetsu no Yaiba","Demon Slayer: Kimetsu no Yaiba"]}
-,{"name":"Kimetsu no Yaiba: Katanakaji no Sato-Hen","shortcut":"ato-","allnames":["Kimetsu no Yaiba: Katanakaji no Sato-Hen","Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc"]}
-,{"name":"Why Raeliana Ended Up at the Duke’s Mansion","shortcut":"na e","allnames":["Kanojo ga Koushaku-tei ni Itta Riyuu","Why Raeliana Ended Up at the Duke's Mansion","Why Raeliana Ended Up at the Duke’s Mansion"]}
+,{"name":"Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc","shortcut":"dsmi","allnames":["Kimetsu no Yaiba: Katanakaji no Sato-Hen","Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc"]}
+,{"name":"Why Raeliana Ended Up at the Duke’s Mansion","shortcut":"an e","allnames":["Kanojo ga Koushaku-tei ni Itta Riyuu","Why Raeliana Ended Up at the Duke's Mansion","Why Raeliana Ended Up at the Duke’s Mansion"]}
 ,{"name":"LasTame","shortcut":"stam","allnames":["Higeki no Genkyou to Naru Saikyou Gedou Last Boss Joou wa Tami no Tame ni Tsukushimasu.","The Most Heretical Last Boss Queen: From Villainess to Savior", "LasTame"]}
 ,{"name":"The Eminence in Shadow","shortcut":"nenc","allnames":["Kage no Jitsuryokusha ni Naritakute!","The Eminence in Shadow"]}
 ,{"name":"TsunLise","shortcut":"nl","allnames":["Tsundere Akuyaku Reijou Lieselotte to Jikkyou no Endou-kun to Kaisetsu no Kobayashi-san","Endo and Kobayashi Live! The Latest on Tsundere Villainess Lieselotte","TsunLise"]}
@@ -25,26 +25,26 @@
 ,{"name":"Isekai Quartet","shortcut":"i q","allnames":["Isekai Quartet","Isekai Quartet"]}
 ,{"name":"Isekai Quartet 2","shortcut":"tet ","allnames":["Isekai Quartet 2","Isekai Quartet 2"]}
 ,{"name":"Gekijouban Isekai Quartet: Another World","shortcut":"tet a","allnames":["Gekijouban Isekai Quartet: Another World","Isekai Quartet The Movie: Another World"]}
-,{"name":"Kaguya-sama: Love is War","shortcut":"ai-t","allnames":["Kaguya-sama wa Kokurasetai: Tensai-tachi no Renai Zunousen","Kaguya-sama: Love is War"]}
+,{"name":"Kaguya-sama: Love is War","shortcut":"is w","allnames":["Kaguya-sama wa Kokurasetai: Tensai-tachi no Renai Zunousen","Kaguya-sama: Love is War"]}
 ,{"name":"Kaguya-sama wa Kokurasetai?: Tensai-tachi no Renai Zunousen","shortcut":"? t","allnames":["Kaguya-sama wa Kokurasetai?: Tensai-tachi no Renai Zunousen","Kaguya-sama: Love is War Season 2"]}
-,{"name":"Kaguya-sama: Love is War - Ultra Romantic","shortcut":"ar u","allnames":["Kaguya-sama wa Kokurasetai: Ultra Romantic","Kaguya-sama: Love is War - Ultra Romantic"]}
+,{"name":"Kaguya-sama: Love is War - Ultra Romantic","shortcut":"- u","allnames":["Kaguya-sama wa Kokurasetai: Ultra Romantic","Kaguya-sama: Love is War - Ultra Romantic"]}
 ,{"name":"Kaguya-sama: Love Is War - The First Kiss That Never Ends","shortcut":"r en","allnames":["Kaguya-sama wa Kokurasetai: First Kiss wa Owaranai","Kaguya-sama: Love Is War - The First Kiss That Never Ends"]}
 ,{"name":"KONOSUBA: God's Blessing on This Wonderful World!","shortcut":"s ble","allnames":["Kono Subarashii Sekai ni Shukufuku o!","KONOSUBA: God's Blessing on This Wonderful World!"]}
 ,{"name":"KONOSUBA: God's Blessing on This Wonderful World! 2","shortcut":"d  2","allnames":["Kono Subarashii Sekai ni Shukufuku o! 2","KONOSUBA: God's Blessing on This Wonderful World! 2"]}
 ,{"name":"KONOSUBA: God's Blessing on This Wonderful World! - Legend of Crimson","shortcut":"- le","allnames":["Kono Subarashii Sekai ni Shukufuku o!: Kurenai Densetsu","KONOSUBA: God's Blessing on This Wonderful World! - Legend of Crimson"]}
 ,{"name":"KONOSUBA: An Explosion on This Wonderful World!","shortcut":"osio","allnames":["Kono Subarashii Sekai ni Bakuen o!","KONOSUBA: An Explosion on This Wonderful World!"]}
-,{"name":"The Reincarnation of the Strongest Exorcist in Another World","shortcut":"est e","allnames":["Saikyou Onmyouji no Isekai Tenseiki","The Reincarnation of the Strongest Exorcist in Another World"]}
+,{"name":"Saikyou Onmyouji no Isekai Tenseiki","shortcut":"est e","allnames":["Saikyou Onmyouji no Isekai Tenseiki","The Reincarnation of the Strongest Exorcist in Another World"]}
 ,{"name":"Liar Liar","shortcut":"iar","allnames":["Liar Liar","Liar Liar"]}
 ,{"name":"Reign of the Seven Spellblades","shortcut":"lbl","allnames":["Nanatsu no Maken ga Shihai Suru","Reign of the Seven Spellblades"]}
-,{"name":"Lycoris Recoil","shortcut":"is r","allnames":["Lycoris Recoil","Lycoris Recoil"]}
-,{"name":"Mashle","shortcut":"hl","allnames":["Mashle","Mashle: Magic and Muscles"]}
-,{"name":"Mob Psycho 100","shortcut":" ps","allnames":["Mob Psycho 100","Mob Psycho 100"]}
+,{"name":"Lycoris Recoil","shortcut":"lyc","allnames":["Lycoris Recoil","Lycoris Recoil"]}
+,{"name":"Mashle","shortcut":"shl","allnames":["Mashle","Mashle: Magic and Muscles"]}
+,{"name":"Mob Psycho 100","shortcut":"ob ","allnames":["Mob Psycho 100","Mob Psycho 100"]}
 ,{"name":"Mob Psycho 100 II","shortcut":"0 i","allnames":["Mob Psycho 100 II","Mob Psycho 100 II"]}
 ,{"name":"Mob Psycho 100 III","shortcut":"0 i","allnames":["Mob Psycho 100 III","Mob Psycho 100 III"]}
 ,{"name":"Mushoku Tensei: Jobless Reincarnation","shortcut":"jobl","allnames":["Mushoku Tensei: Isekai Ittara Honki Dasu","Mushoku Tensei: Jobless Reincarnation"]}
 ,{"name":"Mushoku Tensei II: Isekai Ittara Honki Dasu","shortcut":"ei ii","allnames":["Mushoku Tensei II: Isekai Ittara Honki Dasu","Mushoku Tensei: Jobless Reincarnation Season 2"]}
-,{"name":"My Happy Marriage","shortcut":" shia","allnames":["Watashi no Shiawase na Kekkon","My Happy Marriage"]}
-,{"name":"My Tiny Senpai","shortcut":" tin","allnames":["Uchi no Kaisha no Chiisai Senpai no Hanashi","My Tiny Senpai"]}
+,{"name":"My Happy Marriage","shortcut":"py m","allnames":["Watashi no Shiawase na Kekkon","My Happy Marriage"]}
+,{"name":"My Tiny Senpai","shortcut":"y ti","allnames":["Uchi no Kaisha no Chiisai Senpai no Hanashi","My Tiny Senpai"]}
 ,{"name":"NieR:Automata Ver1.1a","shortcut":":a","allnames":["NieR:Automata Ver1.1a","NieR:Automata Ver1.1a"]}
 ,{"name":"Toradora!","shortcut":"ora ","allnames":["Toradora!","Toradora!"]}
 ,{"name":"Phantom: Requiem for the Phantom","shortcut":"om:","allnames":["Phantom: Requiem for the Phantom","Phantom: Requiem for the Phantom"]}
@@ -58,10 +58,10 @@
 ,{"name":"Saihate no Paladin","shortcut":"adin","allnames":["Saihate no Paladin","The Faraway Paladin"]}
 ,{"name":"Shadows House","shortcut":"ws ","allnames":["Shadows House","Shadows House"]}
 ,{"name":"Shadows House 2nd Season","shortcut":"se 2","allnames":["Shadows House 2nd Season","Shadows House 2nd Season"]}
-,{"name":"The Rising of the Shield Hero","shortcut":" shie","allnames":["Tate no Yuusha no Nariagari","The Rising of the Shield Hero"]}
+,{"name":"Tate no Yuusha no Nariagari","shortcut":"iaga","allnames":["Tate no Yuusha no Nariagari","The Rising of the Shield Hero"]}
 ,{"name":"Kumo desu ga, Nani ka?","shortcut":"ga,","allnames":["Kumo desu ga, Nani ka?","So I'm a Spider, So What?"]}
 ,{"name":"Spy × Family","shortcut":"spy","allnames":["Spy × Family","Spy × Family"]}
-,{"name":"Synduality: Noir","shortcut":": n","allnames":["Synduality: Noir","Synduality: Noir"]}
+,{"name":"Synduality: Noir","shortcut":"alit","allnames":["Synduality: Noir","Synduality: Noir"]}
 ,{"name":"Bottom-Tier Character Tomozaki","shortcut":"m-t","allnames":["Jaku-Chara Tomozaki-kun","Bottom-Tier Character Tomozaki"]}
 ,{"name":"Tonikaku Kawaii","shortcut":"aii","allnames":["Tonikaku Kawaii","TONIKAWA: Over The Moon For You"]}
 ,{"name":"Undead Murder Farce","shortcut":"ad m","allnames":["Undead Girl Murder Farce","Undead Murder Farce"]}
@@ -72,15 +72,15 @@
 ,{"name":"Vinland Saga Season 2","shortcut":"vinl","allnames":["Vinland Saga Season 2","Vinland Saga Season 2"]}
 ,{"name":"Violet Evergarden","shortcut":"iol","allnames":["Violet Evergarden","Violet Evergarden"]}
 ,{"name":"Gekijouban Violet Evergarden","shortcut":"n vio","allnames":["Gekijouban Violet Evergarden","Violet Evergarden: The Movie"]}
-,{"name":"Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou","shortcut":"ien t","allnames":["Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou","Violet Evergarden: Eternity and the Auto Memories Doll"]}
+,{"name":"Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou","shortcut":"jido","allnames":["Violet Evergarden Gaiden: Eien to Jidou Shuki Ningyou","Violet Evergarden: Eternity and the Auto Memories Doll"]}
 ,{"name":"G-Witch","shortcut":" w","allnames":["G-Witch","Mobile Suit Gundam: The Witch From Mercury","Kidou Senshi Gundam: Suisei no Majo"]}
 ,{"name":"Saint Cecilia and Pastor Lawrence","shortcut":"wren","allnames":["Shiro Seijo to Kuro Bokushi","Saint Cecilia and Pastor Lawrence"]}
 ,{"name":"Yohane The Parhelion: Sunshine in the Mirror","shortcut":"arh","allnames":["Genjitsu no Yohane: Sunshine in the Mirror","Yohane The Parhelion: Sunshine in the Mirror"]}
 ,{"name":"Youjo Senki","shortcut":"jo ","allnames":["Youjo Senki","Saga of Tanya the Evil"]}
 ,{"name":"Saga of Tanya the Evil: The Movie","shortcut":"vil: t","allnames":["Gekijouban Youjo Senki","Saga of Tanya the Evil: The Movie"]}
 ,{"name":"KimiUso","shortcut":"uso","allnames":["KimiUso","Your Lie in April","Shigatsu wa Kimi no Uso"]}
-,{"name":"KimiUso: Moments","shortcut":"so m","allnames":["Shigatsu wa Kimi no Uso: Moments","Your Lie in April: Moments","KimiUso: Moments"]}
-,{"name":"The Dreaming Boy is A Realist","shortcut":"a rea","allnames":["Yumemiru Danshi wa Genjitsushugisha","The Dreaming Boy is A Realist"]}
+,{"name":"Your Lie in April: Moments","shortcut":"ril ","allnames":["Shigatsu wa Kimi no Uso: Moments","Your Lie in April: Moments","KimiUso: Moments"]}
+,{"name":"The Dreaming Boy is A Realist","shortcut":"g bo","allnames":["Yumemiru Danshi wa Genjitsushugisha","The Dreaming Boy is A Realist"]}
 ,{"name":"Zetsuen no Tempest","shortcut":"pes","allnames":["Zetsuen no Tempest","Blast of Tempest","Blast of Tempest: The Civilization Blaster","Zetsuen no Tempest: The Civilization Blaster"]}
 ,{"name":"Zom 100: Bucket List of the Dead","shortcut":"0 b","allnames":["Zom 100: Zombie ni Naru Made ni Shitai 100 no Koto","Zom 100: Bucket List of the Dead"]}
 ,{"name":"Lucky Star","shortcut":"luc","allnames":["Lucky Star","Lucky Star"]}
@@ -99,13 +99,13 @@
 ,{"name":"Sono Bisque Doll wa Koi o Suru","shortcut":"isq","allnames":["Sono Bisque Doll wa Koi o Suru","My Dress-Up Darling"]}
 ,{"name":"Cyberpunk: Edgerunners","shortcut":"k e","allnames":["Cyberpunk: Edgerunners","Cyberpunk: Edgerunners"]}
 ,{"name":"Yofukashi no Uta","shortcut":"yof","allnames":["Yofukashi no Uta","Call of the Night"]}
-,{"name":"Star Wars: Visions","shortcut":"s vi","allnames":["Star Wars: Visions","Star Wars: Visions"]}
+,{"name":"Star Wars: Visions","shortcut":"ar w","allnames":["Star Wars: Visions","Star Wars: Visions"]}
 ,{"name":"Slow Loop","shortcut":"ow ","allnames":["Slow Loop","Slow Loop"]}
 ,{"name":"Kimetsu no Yaiba: Mugen Ressha-hen","shortcut":"gen r","allnames":["Kimetsu no Yaiba: Mugen Ressha-hen","Demon Slayer: Kimetsu no Yaiba Mugen Train Arc"]}
 ,{"name":"The Melancholy of Haruhi Suzumiya","shortcut":"aruh","allnames":["Suzumiya Haruhi no Yuuutsu","The Melancholy of Haruhi Suzumiya"]}
 ,{"name":"Suzumiya Haruhi no Shoushitsu","shortcut":"sap","allnames":["Suzumiya Haruhi no Shoushitsu","The Disappearance of Haruhi Suzumiya"]}
 ,{"name":"Hamefura","shortcut":"ef","allnames":["Hamefura","My Next Life as a Villainess: All Routes Lead to Doom!","Otome Game no Hametsu Flag Shika Nai Akuyaku Reijou ni Tensei Shiteshimatta..."]}
-,{"name":"Initial D","shortcut":"l d","allnames":["Initial D","Initial D","Initial D: First Stage"]}
+,{"name":"Initial D","shortcut":"tia","allnames":["Initial D","Initial D","Initial D: First Stage"]}
 ,{"name":"Initial D: Second Stage","shortcut":" d s","allnames":["Initial D: Second Stage","Initial D: Second Stage"]}
 ,{"name":"Initial D: Extra Stage","shortcut":" d e","allnames":["Initial D: Extra Stage","Initial D: Extra Stage"]}
 ,{"name":"Initial D: Third Stage","shortcut":"d thi","allnames":["Initial D: Third Stage","Initial D: Third Stage"]}
@@ -121,12 +121,12 @@
 ,{"name":"Initial D: Battle Stage 3","shortcut":"ge 3","allnames":["Initial D: Battle Stage 3","Initial D: Battle Stage 3"]}
 ,{"name":"Shin Gekijouban Initial D: Battle Digest","shortcut":"iges","allnames":["Shin Gekijouban Initial D: Battle Digest","New Theatrical Movie Initial D: Battle Digest"]}
 ,{"name":"Arknights: Reimei Zensou/Prelude to Dawn","shortcut":"/pr","allnames":["Arknights: Reimei Zensou","Arknights: Prelude to Dawn","Arknights: Reimei Zensou/Prelude to Dawn"]}
-,{"name":"Arknights: Touin Kiro/Perish in Frost","shortcut":"sh i","allnames":["Arknights: Touin Kiro/Perish in Frost","Arknights: Perish in Frost"]}
+,{"name":"Arknights: Touin Kiro/Perish in Frost","shortcut":"/p","allnames":["Arknights: Touin Kiro/Perish in Frost","Arknights: Perish in Frost"]}
 ,{"name":"Berserk of Gluttony","shortcut":"glut","allnames":["Boushoku no Berserk","Berserk of Gluttony"]}
-,{"name":"Frieren: Beyond Journey's End","shortcut":"nd j","allnames":["Sousou no Frieren","Frieren: Beyond Journey's End"]}
+,{"name":"Sousou no Frieren","shortcut":"sous","allnames":["Sousou no Frieren","Frieren: Beyond Journey's End"]}
 ,{"name":"Good Night World","shortcut":"od n","allnames":["Good Night World","Good Night World"]}
-,{"name":"Watashi no Oshi wa Akuyaku Reijou.","shortcut":"reij","allnames":["Watashi no Oshi wa Akuyaku Reijou.","I'm in Love with the Villainess"]}
-,{"name":"Kawagoe Boys Sing","shortcut":"agoe","allnames":["Kawagoe Boys Sing: Now or Never","Kawagoe Boys Sing"]}
+,{"name":"I'm in Love with the Villainess","shortcut":"'m i","allnames":["Watashi no Oshi wa Akuyaku Reijou.","I'm in Love with the Villainess"]}
+,{"name":"Kawagoe Boys Sing","shortcut":"wago","allnames":["Kawagoe Boys Sing: Now or Never","Kawagoe Boys Sing"]}
 ,{"name":"My Daughter Left the Nest and Returned an S-Rank Adventurer","shortcut":"s-r","allnames":["Boukensha ni Naritai to Miyako ni Deteitta Musume ga S-rank ni Natteta","My Daughter Left the Nest and Returned an S-Rank Adventurer"]}
 ,{"name":"Paradox Live The Animation","shortcut":"x li","allnames":["Paradox Live The Animation","Paradox Live The Animation"]}
 ,{"name":"Ron Kamonohashi's Forbidden Deductions","shortcut":"ron k","allnames":["Kamonohashi Ron no Kindan Suiri","Ron Kamonohashi's Forbidden Deductions"]}
@@ -134,7 +134,7 @@
 ,{"name":"Hyakkano","shortcut":"kka","allnames":["Kimi no Koto ga Daidaidaidaidaisuki na 100-nin no Kanojo","The 100 Girlfriends Who Really, Really, Really, Really, REALLY Love You","Hyakkano"]}
 ,{"name":"Kage no Jitsuryokusha ni Naritakute! 2nd Season","shortcut":"ute 2","allnames":["Kage no Jitsuryokusha ni Naritakute! 2nd Season","The Eminence in Shadow Season 2"]}
 ,{"name":"Saihate no Paladin: Tetsusabi no Yama no Ou","shortcut":"din t","allnames":["Saihate no Paladin: Tetsusabi no Yama no Ou","The Faraway Paladin: The Lord of Rust Mountains"]}
-,{"name":"The Kingdoms of Ruin","shortcut":" rui","allnames":["Hametsu no Oukoku","The Kingdoms of Ruin"]}
+,{"name":"The Kingdoms of Ruin","shortcut":"f ru","allnames":["Hametsu no Oukoku","The Kingdoms of Ruin"]}
 ,{"name":"Migi&Dali","shortcut":"&","allnames":["Migi to Dali","Migi&Dali"]}
 ,{"name":"Firefighter Daigo: Rescuer in Orange","shortcut":"efi","allnames":["Me-gumi no Daigo: Kyuukoku no Orange","Firefighter Daigo: Rescuer in Orange"]}
 ,{"name":"I'm Giving the Disgraced Noble Lady I Rescued a Crash Course in Naughtiness","shortcut":"ued","allnames":["Konyaku Haki Sareta Reijou o Hirotta Ore ga, Ikenai Koto o Oshiekomu","I'm Giving the Disgraced Noble Lady I Rescued a Crash Course in Naughtiness","IkenaiKyo"]}
@@ -145,7 +145,7 @@
 ,{"name":"Ragna Crimson","shortcut":"ims","allnames":["Ragna Crimson","Ragna Crimson"]}
 ,{"name":"The Vexations of a Shut-In Vampire Princess","shortcut":"ut-","allnames":["Hikikomari Kyuuketsuki no Monmon","The Vexations of a Shut-In Vampire Princess"]}
 ,{"name":"Undead Unluck","shortcut":"d u","allnames":["Undead Unluck","Undead Unluck"]}
-,{"name":"Am I Actually the Strongest?","shortcut":"nges","allnames":["Jitsu wa Ore, Saikyou deshita?","Am I Actually the Strongest?"]}
+,{"name":"Am I Actually the Strongest?","shortcut":"rong","allnames":["Jitsu wa Ore, Saikyou deshita?","Am I Actually the Strongest?"]}
 ,{"name":"Miru Tights","shortcut":"hts","allnames":["Miru Tights","Miru Tights"]}
 ,{"name":"The Apothecary Diaries","shortcut":"hec","allnames":["Kusuriya no Hitorigoto","The Apothecary Diaries"]}
 ,{"name":"Nekketsu Jinmenken: Life Is Movie","shortcut":"jinm","allnames":["Nekketsu Jinmenken: Life Is Movie","Nekketsu Jinmenken: Life Is Movie"]}
@@ -174,7 +174,7 @@
 ,{"name":"MF Ghost","shortcut":"mf ","allnames":["MF Ghost","MF Ghost"]}
 ,{"name":"Overtake!","shortcut":"ke ","allnames":["Overtake!","Overtake!"]}
 ,{"name":"The Demon Sword Master of Excalibur Academy","shortcut":"ur a","allnames":["Seiken Gakuin no Makentsukai","The Demon Sword Master of Excalibur Academy"]}
-,{"name":"Sweet Reincarnation","shortcut":"arna","allnames":["Sweet Reincarnation","Sweet Reincarnation"]}
+,{"name":"Sweet Reincarnation","shortcut":"inca","allnames":["Sweet Reincarnation","Sweet Reincarnation"]}
 ,{"name":"Boku no Kokoro no Yabai Yatsu","shortcut":"abai","allnames":["Boku no Kokoro no Yabai Yatsu","The Dangers in My Heart"]}
 ,{"name":"Isekai de Mofumofu Nadenade Suru Tame ni Ganbattemasu","shortcut":"mofu","allnames":["Isekai de Mofumofu Nadenade Suru Tame ni Ganbattemasu","At the Isekai Fluffy Paradise I'm Trying to Do My Best"]}
 ,{"name":"Momochi-san Chi no Ayakashi Ouji","shortcut":"hi oj","allnames":["Momochi-san Chi no Ayakashi Ouji","The Demon Prince of Momochi House"]}
@@ -187,11 +187,11 @@
 ,{"name":"A Sign of Affection","shortcut":"gn ","allnames":["Yubisaki to Renren","A Sign of Affection"]}
 ,{"name":"The Legend of Super Normal Pref. Chiba","shortcut":"f.","allnames":["Chou Futsuu Ken Chiba Densetsu","The Legend of Super Normal Pref. Chiba"]}
 ,{"name":"Pon no Michi","shortcut":" mic","allnames":["Pon no Michi","Pon no Michi"]}
-,{"name":"My Instant Death Ability is Overpowered","shortcut":"h ab","allnames":["Sokushi Cheat ga Saikyou sugite, Isekai no Yatsura ga Marude Aite ni Naranain desu ga.","My Instant Death Ability is Overpowered"]}
+,{"name":"My Instant Death Ability is Overpowered","shortcut":"verp","allnames":["Sokushi Cheat ga Saikyou sugite, Isekai no Yatsura ga Marude Aite ni Naranain desu ga.","My Instant Death Ability is Overpowered"]}
 ,{"name":"Odd Taxi","shortcut":"xi","allnames":["Odd Taxi","Odd Taxi"]}
 ,{"name":"Hotaru no Haka","shortcut":"hota","allnames":["Hotaru no Haka","Grave of the Fireflies"]}
 ,{"name":"86 Eighty-Six","shortcut":"86","allnames":["86 Eighty-Six","86 Eighty-Six"]}
-,{"name":"Sentouin, Hakenshimasu!","shortcut":", h","allnames":["Sentouin, Hakenshimasu!","Combatants Will Be Dispatched!"]}
+,{"name":"Combatants Will Be Dispatched!","shortcut":"spat","allnames":["Sentouin, Hakenshimasu!","Combatants Will Be Dispatched!"]}
 ,{"name":"Rascal Does Not Dream of a Sister Venturing Out","shortcut":"turi","allnames":["Seishun Buta Yarou wa Odekake Sister no Yume o Minai","Rascal Does Not Dream of a Sister Venturing Out"]}
 ,{"name":"Sasaki and Peeps","shortcut":"d pe","allnames":["Sasaki and Peeps","Sasaki to Pi-chan"]}
 ,{"name":"The Wrong Way to Use Healing Magic","shortcut":"wro","allnames":["Chiyu Mahou no Machigatta Tsukaikata","The Wrong Way to Use Healing Magic"]}
@@ -204,15 +204,15 @@
 ,{"name":"Snack Basue","shortcut":"sna","allnames":["Snack Basue"]}
 ,{"name":"Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e 3rd Season","shortcut":" e 3","allnames":["Classroom of the Elite Season 3","Youkoso Jitsuryoku Shijou Shugi no Kyoushitsu e 3rd Season"]}
 ,{"name":"Hime-sama, \"Goumon\" no Jikan desu","shortcut":"\"g","allnames":["'Tis Time for \"Torture,\" Princess","Hime-sama, \"Goumon\" no Jikan desu"]}
-,{"name":"Gekkan Mousou Kagaku","shortcut":"so k","allnames":["Delusional Monthly Magazine","Gekkan Mousou Kagaku"]}
+,{"name":"Gekkan Mousou Kagaku","shortcut":"agak","allnames":["Delusional Monthly Magazine","Gekkan Mousou Kagaku"]}
 ,{"name":"Shin no Nakama ja Nai to Yuusha no Party o Oidasareta node, Henkyou de Slow Life Suru Koto ni Shimashita 2nd","shortcut":"ta 2n","allnames":["Banished from the Hero's Party, I Decided to Live a Quiet Life in the Countryside Season 2","Shin no Nakama ja Nai to Yuusha no Party o Oidasareta node, Henkyou de Slow Life Suru Koto ni Shimashita 2nd"]}
 ,{"name":"Bottom-Tier Character Tomozaki 2nd Stage","shortcut":"i 2n","allnames":["Bottom-Tier Character Tomozaki 2nd Stage","Jaku-Chara Tomozaki-kun 2nd Stage"]}
-,{"name":"30-sai Doutei dato Mahoutsukai ni Nareru Rashii","shortcut":" dot","allnames":["Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","30-sai Doutei dato Mahoutsukai ni Nareru Rashii"]}
+,{"name":"Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","shortcut":"of vi","allnames":["Cherry Magic! Thirty Years of Virginity Can Make You a Wizard?!","30-sai Doutei dato Mahoutsukai ni Nareru Rashii"]}
 ,{"name":"Ishura","shortcut":"hu","allnames":["Ishura"]}
 ,{"name":"High Card","shortcut":"gh ","allnames":["High Card"]}
 ,{"name":"Oroka na Tenshi wa Akuma to Odoru","shortcut":"roka ","allnames":["Oroka na Tenshi wa Akuma to Odoru","The Foolish Angel Dances with the Devil"]}
 ,{"name":"Tsukimichi: Moonlit Fantasy Season 2","shortcut":"sy se","allnames":["Tsukimichi: Moonlit Fantasy Season 2","Tsuki ga Michibiku Isekai Douchuu Dai Ni Shou"]}
-,{"name":"7th Time Loop: The Villainess Enjoys a Carefree Life Married to Her Worst Enemy!","shortcut":"fe m","allnames":["7th Time Loop: The Villainess Enjoys a Carefree Life Married to Her Worst Enemy!","Loop 7-kaime no Akuyaku Reijou wa, Moto Tekikoku de Jiyuu Kimama na Hanayome Seikatsu o Mankitsu Suru"]}
+,{"name":"Loop 7-kaime no Akuyaku Reijou wa, Moto Tekikoku de Jiyuu Kimama na Hanayome Seikatsu o Mankitsu Suru","shortcut":"p 7","allnames":["7th Time Loop: The Villainess Enjoys a Carefree Life Married to Her Worst Enemy!","Loop 7-kaime no Akuyaku Reijou wa, Moto Tekikoku de Jiyuu Kimama na Hanayome Seikatsu o Mankitsu Suru"]}
 ,{"name":"Yami Shibai","shortcut":"bai","allnames":["Yami Shibai","Theatre of Darkness: Yamishibai"]}
 ,{"name":"Blue Exorcist: Shimane Illuminati Saga","shortcut":"ti s","allnames":["Ao no Exorcist: Shimane Illuminati-hen","Blue Exorcist: Shimane Illuminati Saga"]}
 ,{"name":"Sai-Kyo-Oh! Zukan: The Ultimate Battles","shortcut":"sai-","allnames":["Sai-Kyo-Oh! Zukan: The Ultimate Battles"]}
@@ -275,7 +275,7 @@
 ,{"name":"Saint Seiya: Knights of the Zodiac - Battle for Sanctuary","shortcut":"- ba","allnames":["Saint Seiya: Knights of the Zodiac - Battle for Sanctuary"]}
 ,{"name":"Yoru no Kurage wa Oyogenai","shortcut":"gena","allnames":["Yoru no Kurage wa Oyogenai","Jellyfish Can't Swim in the Night"]}
 ,{"name":"Shadowverse Flame: Arc-hen","shortcut":"c h","allnames":["Shadowverse Flame: Arc-hen"]}
-,{"name":"Lv2 Cheat","shortcut":"che","allnames":["Chillin' in Another World with Level 2 Super Cheat Powers","Lv2 kara Cheat datta Moto Yuusha Kouho no Mattari Isekai Life","Lv2 Cheat"]}
+,{"name":"Lv2 Cheat","shortcut":"v2","allnames":["Chillin' in Another World with Level 2 Super Cheat Powers","Lv2 kara Cheat datta Moto Yuusha Kouho no Mattari Isekai Life","Lv2 Cheat"]}
 ,{"name":"Seiyuu Radio no Uraomote","shortcut":"aom","allnames":["Seiyuu Radio no Uraomote","The Many Sides of Voice Actor Radio"]}
 ,{"name":"Rinkai!","shortcut":"nka","allnames":["Rinkai!"]}
 ,{"name":"Tonbo","shortcut":"nb","allnames":["Ooi! Tonbo","Tonbo"]}
@@ -321,14 +321,14 @@
 ,{"name":"Black Butler II","shortcut":"r ii","allnames":["Kuroshitsuji II","Black Butler II"]}
 ,{"name":"Urusei Yatsura OVA","shortcut":"ura o","allnames":["Urusei Yatsura OVA"]}
 ,{"name":"Sword Art Online: Extra Edition","shortcut":"ne e","allnames":["Sword Art Online: Extra Edition"]}
-,{"name":"Dungeon ni Deai o Motomeru no wa Machigatteiru Darou ka","shortcut":"eai ","allnames":["DanMachi","Is It Wrong to Try to Pick Up Girls in a Dungeon?","Dungeon ni Deai o Motomeru no wa Machigatteiru Darou ka"]}
+,{"name":"DanMachi","shortcut":"anm","allnames":["DanMachi","Is It Wrong to Try to Pick Up Girls in a Dungeon?","Dungeon ni Deai o Motomeru no wa Machigatteiru Darou ka"]}
 ,{"name":"Dororo","shortcut":"do","allnames":["Dororo"]}
 ,{"name":"DanMachi III","shortcut":"i iii","allnames":["Dungeon ni Deai o Motomeru no wa Machigatteiru Darou ka III","Is It Wrong to Try to Pick Up Girls in a Dungeon? III","DanMachi III"]}
 ,{"name":"Shingeki no Kyojin Zenpen: Guren no Yumiya","shortcut":"pen g","allnames":["Shingeki no Kyojin Zenpen: Guren no Yumiya","Attack on Titan: Crimson Arrows"]}
 ,{"name":"Gekijouban Mahou Shoujo Madoka★Magica Shinpen: Hangyaku no Monogatari","shortcut":"ca sh","allnames":["Gekijouban Mahou Shoujo Madoka★Magica Shinpen: Hangyaku no Monogatari","Puella Magi Madoka Magica The Movie Part 3: Rebellion"]}
 ,{"name":"Shingeki! Kyojin Chuugakkou","shortcut":"huga","allnames":["Shingeki! Kyojin Chuugakkou","Attack on Titan: Junior High"]}
 ,{"name":"Urusei Yatsura Movie 2: Beautiful Dreamer","shortcut":"ie 2 ","allnames":["Urusei Yatsura Movie 2: Beautiful Dreamer"]}
-,{"name":"The Ancient Magus' Bride","shortcut":"agus","allnames":["Mahoutsukai no Yome","The Ancient Magus' Bride"]}
+,{"name":"The Ancient Magus' Bride","shortcut":"s' b","allnames":["Mahoutsukai no Yome","The Ancient Magus' Bride"]}
 ,{"name":"Maarui Kanojo to Zannen na Kareshi","shortcut":"aaru","allnames":["Maarui Kanojo to Zannen na Kareshi"]}
 ,{"name":"Laid-Back Camp","shortcut":"d-b","allnames":["Yuru Camp△","Laid-Back Camp"]}
 ,{"name":"Tasuuketsu","shortcut":"tasu","allnames":["Tasuuketsu", "TASUKETSU: Fate of the Majority"]}
@@ -359,10 +359,10 @@
 ,{"name":"Narenare: Cheer for You!","shortcut":"enar","allnames":["Na-Nare Hana-Nare", "Narenare: Cheer for You!"]}
 ,{"name":"Code Geass: Rozé of the Recapture","shortcut":"oze ","allnames":["Code Geass: Rozé of the Recapture", "Code Geass: Dakkan no Rozé"]}
 ,{"name":"Bye Bye, Earth","shortcut":"ye ","allnames":["Bye Bye, Earth"]}
-,{"name":"Tensei Kizoku, Kantei Skill de Nariagaru 2nd Season","shortcut":"ru 2n","allnames":["Tensei Kizoku, Kantei Skill de Nariagaru 2nd Season", "As a Reincarnated Aristocrat, I'll Use My Appraisal Skill to Rise in the World Season 2"]}
-,{"name":"Tadaima, Okaeri","shortcut":"a,","allnames":["Tadaima, Okaeri"]}
-,{"name":"YoHaji","shortcut":"oha","allnames":["YoHaji", "A Terrified Teacher at Ghoul School!", "Youkai Gakkou no Sensei Hajimemashita!"]}
-,{"name":"Senpai wa Otokonoko","shortcut":"a ot","allnames":["Senpai is an Otokonoko", "Senpai wa Otokonoko"]}
+,{"name":"","shortcut":"","allnames":[]}
+,{"name":"","shortcut":"","allnames":[]}
+,{"name":"","shortcut":"","allnames":[]}
+,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
 ,{"name":"","shortcut":"","allnames":[]}
