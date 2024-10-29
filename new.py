@@ -31,7 +31,6 @@ with open(fileDead+".json", 'r', encoding = 'utf8') as f:
     deadList = json.load(f)
 
 #put useful information at start of list
-ordering = ["songName","animeEnglishName","songArtist","altAnimeNames","altAnimeNamesAnswers","animeRomajiName","songType","songTypeNumber","songDifficulty","animeType","annId","malId","kitsuId","aniListId","animeTags","animeGenre","animeVintage","startPoint","audio","video480","video720","correctGuess","incorrectGuess"]
 shortHand = ["ST","STN","V","SN","EN","SA"]
 longHand = ["songType","songTypeNumber","animeVintage","songName","animeEnglishName","songArtist"]
 songList = []
@@ -39,7 +38,7 @@ for index in range(len(rawSongList)):
     songList.append({})
     for jindex in range(len(shortHand)):
         songList[index][shortHand[jindex]] = rawSongList[index][longHand[jindex]]
-    for key in ordering:
+    for key in rawSongList[0]:
         songList[index][key] = rawSongList[index][key]
 
 #load equivalence mapping
