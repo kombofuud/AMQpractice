@@ -59,6 +59,7 @@ for song in deadList:
 #add missing info to songs
 songCodes = dict()
 nameCodes = dict()
+equivList = set()
 index = 0
 for song in songList:
     if song["video720"] is None or song["video720"] == "":
@@ -66,6 +67,7 @@ for song in songList:
     if song["animeVintage"] is None:
         song["animeVintage"] = ""
     if song["songArtist"]+song["songName"] in equiv:
+        equivList.add(song["songArtist"]+song["songName"])
         for name in song["altAnimeNames"]:
            altNames[equiv[song["songArtist"]+song["songName"]]].add(name)
     songCodes[song["video720"]] = index
@@ -166,6 +168,11 @@ with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
     f.seek(0)
     json.dump(knownList, f)
 
+#check to see if any name in equivalences was changed
+for relation in equivalances:
+    for name in relation["equiv"]:
+        if name not in equivList:
+            print("Equivalence missing for: "+name)
 #add new songs to respective lists depending on if it's similar to other practiced ones
 newLoadingList = []
 newList = []
