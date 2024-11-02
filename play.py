@@ -84,6 +84,9 @@ songmean = statistics.mean(zScores)
 songmax = max(zScores)
 songmin = min(zScores)
 songtotal = sum(zScores)
+songCountList = []
+for score in zScores:
+    songCountList.append(score)
 stdev = statistics.pstdev(zScores)
 for i in range(len(zScores)):
     zScores[i] = (zScores[i]-songmean)/stdev
@@ -91,6 +94,8 @@ targetWeights = []
 for score in zScores:
     targetWeights.append(math.exp(score))
 r = random.choices(range(len(lists1)), weights = targetWeights)[0]
+for i in range(len(targetWeights)):
+    targetWeights[i] = round(targetWeights[i],5)
 'r = random.choices(range(len(lists1)))[0]'
 
 #Create modify the song frequency based on picked list
@@ -134,6 +139,8 @@ for element in globalSongWeights:
 frequencyList[0] = learnedSize
 frequencyList[1] -= learnedSize
 print("songFrequencyDistribution: "+str(frequencyList))
+print("songCountDistribution: "+str(songCountList))
+print("listWeights: "+str(targetWeights))
 weightedCount = 0
 for i in range(len(frequencyList)):
     weightedCount += i*frequencyList[i]
