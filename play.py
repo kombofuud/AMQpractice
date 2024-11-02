@@ -90,8 +90,8 @@ for i in range(len(zScores)):
 targetWeights = []
 for score in zScores:
     targetWeights.append(math.exp(score))
-'''r = random.choices(range(len(lists1)), weights = targetWeights)[0]'''
-r = random.choices(range(len(lists1)))[0]
+r = random.choices(range(len(lists1)), weights = targetWeights)[0]
+'r = random.choices(range(len(lists1)))[0]'
 
 #Create modify the song frequency based on picked list
 localSongList = set()
@@ -126,7 +126,7 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("]")
 
 #print the practice list and song statistics
-print("Test "+str(lists[r])+" section\nMeanCount: "+str(int(sum(globalSongWeights)/len(lists1)))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" Learned: "+str(learnedSize))
+print("Test "+str(lists[r])+" section\nMeanCount: "+str(round(sum(globalSongWeights)/len(lists1),5))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" SongMax: "+str(songmax))
 
 frequencyList = [0]*len(filelist)
 for element in globalSongWeights:
