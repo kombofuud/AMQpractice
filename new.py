@@ -5,7 +5,7 @@ import shutil
 #Move downloaded file to local directory and delete previous version
 shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 #load songs from each list
-
+'''
 fileMerged = "merged"
 fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
 fileLoad = "loadingcutlist"
@@ -17,7 +17,7 @@ fileMerged = "dummyMerged"
 fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 fileDead = "dummyDead"
-'''
+
 if fileLearned not in fileList:
     fileList.append(fileLearned)
 
@@ -89,6 +89,7 @@ mirrorSet = set()
 urlSet = set()
 vintageSet = set()
 pickedMap = dict()
+changedSet = set()
 deadSongs = []
 for section in fileList:
     with open(section+"cutlist.json", 'r', encoding = 'utf8') as f:
@@ -107,6 +108,8 @@ for section in fileList:
         if song["video720"] in songCodes:
             knownList[index] = songList[songCodes[song["video720"]]]
         elif song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"] in nameCodes:
+            if knownList[index]["video720"] not in changedSet:
+                changedSet.add(songList[nameCodes[song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"]]]["video720"])
             knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"]]]
         else:
             knownList.pop(index)
@@ -237,6 +240,9 @@ with open(fileMerged+".json", "r+", encoding = 'utf8') as f:
     f.write(fileData)
 
 #Print out new songs
+print("changedURLs:-----------------------------------")
+for url in changedSet:
+    print(songList[songCodes[url]]["animeEnglishName"]+": "+songList[songCodes[url]]["songName"]+" by "+songList[songCodes[url]]["songArtist"])
 print("newLearning:-----------------------------------")
 for song in newKnownList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
