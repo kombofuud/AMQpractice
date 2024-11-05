@@ -139,8 +139,8 @@ for element in globalSongWeights:
 frequencyList[0] = learnedSize
 frequencyList[1] -= learnedSize
 print("songFrequencyDistribution: "+str(frequencyList))
-print("songCountDistribution: "+str(songCountList))
-print("listWeights: "+str(targetWeights))
+#print("songCountDistribution: "+str(songCountList))
+#print("listWeights: "+str(targetWeights))
 weightedCount = 0
 for i in range(len(frequencyList)):
     weightedCount += i*frequencyList[i]
