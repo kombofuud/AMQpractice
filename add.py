@@ -12,7 +12,9 @@ fileLoad = "dummyLoad"
 fileLearned = "dummyLearned"
 '''
 filePrep = "_preplist"
-#read number of new songs (default 15)
+prepListSize = 50
+
+#read number of new songs (default 0)
 songCount = 0
 if len(sys.argv) > 1:
     songCount = int(sys.argv[1])
@@ -23,6 +25,8 @@ mirrorSet = set()
 urlSet = set()
 with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     loadingList = json.load(f)
+with open(filePrep+".json", 'r', encoding = 'utf8') as f:
+    prepList = json.load(f)
 for file in fileList+[fileLearned]:
     with open(file+"cutlist.json", 'r', encoding = 'utf8') as f:
         tempList = json.load(f)
@@ -32,22 +36,25 @@ for file in fileList+[fileLearned]:
             urlSet.add(song["video720"])
 
 #get song samples
-newSongs = random.sample(loadingList, min(songCount,len(loadingList)))
+newPrep = random.sample(loadingList, max(0,min(songCount+prepListSize-len(prepList),len(loadingList),prepListSize)))
+newSongs = prepList[:min(len(prepList),songCount)]
+newPrepList = prepList[min(len(prepList),songCount):].extend(newPrep)
 for song in newSongs:
-    nameSet.add(song["animeEnglishName"]+song["songName"])
-    mirrorSet.add(song["songArtist"]+song["songName"])
+    '''nameSet.add(song["animeEnglishName"]+song["songName"])
+    mirrorSet.add(song["songArtist"]+song["songName"])'''
+    urlSet.add(song["video720"])
 
-#get all songs similar to the songs in sample
-newSongList = []
+#get all songs similar to the songs in sample (deprecated)
+'newSongList = []'
 loadingSongList = []
 duplicateSet = set()
 for song in loadingList:
     if song["video720"] in duplicateSet:
         print(song["songName"])
         continue
-    if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
-        newSongList.append(song)
-    else:
+    '''if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
+        newSongList.append(song)'''
+    if song["video720"] not in urlSet:
         loadingSongList.append(song)
     duplicateSet.add(song["video720"])
 
@@ -56,7 +63,7 @@ for section in fileList:
     with open(section+"cutlist.json", 'r+', encoding = 'utf8') as f:
         if section != fileLearned:
             knownList = json.load(f)
-            knownList.extend(newSongList)
+            knownList.extend(newSongs)
             f.truncate(0)
             f.seek(0)
             json.dump(knownList,f,ensure_ascii=False)
@@ -77,7 +84,7 @@ with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
     f.write(filedata)
 
 with open(filePrep+".json", 'w', encoding = 'utf8') as f:
-    json.dump(newSongList, f, ensure_ascii=False)
+    json.dump(newPrepList, f, ensure_ascii=False)
 with open(filePrep+".json", 'r', encoding = 'utf8') as f:
     filedata = f.read()
 filedata = filedata.replace(", {","\n,{")
@@ -87,6 +94,6 @@ with open(filePrep+".json", 'w', encoding = 'utf8') as f:
 
 #print added songlist
 print("Added Songs:")
-for song in newSongList:
+for song in newSongs:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
-print(str(len(loadingSongList))+" songs in Loading. "+ str(len(urlSet)+len(newSongList))+" songs in circulation.")
+print(str(len(loadingSongList))+" songs in Loading. "+ str(len(urlSet)+len(newSongList))+" songs in circulation. "+str(len(newPrepList))+" songs on standby.")
