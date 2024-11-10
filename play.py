@@ -62,13 +62,14 @@ for file in lists:
     zScores.append(0)
     for song in data1:
         zScores[-1] += 1
+        if song["video720"] is None or song["video720"] =="":
+            song["video720"] = song["video480"]
         if song["video720"] in traversedSongs:
             globalSongTally[songListMap[song["video720"]]] += 1
             continue
-        if song["video720"] is None:
-            song["video720"] = song["video480"]
         traversedSongs.add(song["video720"])
         if song["video720"] in songListMap:
+            globalSongTally[songListMap[song["video720"]]] += 1
             globalSongWeights[songListMap[song["video720"]]] += 1
         else:
             songListMap[song["video720"]] = len(fullSongList)
@@ -108,6 +109,8 @@ for song in data1:
 
 #Weight all songs
 for i in range(len(globalSongWeights)):
+    if globalSongTally[i] > 13:
+        print(str(globalSongTally[i])+" "+str(fullSongList[i]["SN"]))
     adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
     adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
 totalWeight = sum(adjustedGlobalSongWeights)
