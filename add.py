@@ -11,7 +11,7 @@ fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 fileLearned = "dummyLearned"
 '''
-filePrep = "_preplist"
+filePrep = "preplist"
 prepListSize = 50
 
 #read number of new songs (default 0)
@@ -38,7 +38,7 @@ for file in fileList+[fileLearned]:
 #get song samples
 newPrep = random.sample(loadingList, max(0,min(songCount+prepListSize-len(prepList),len(loadingList),prepListSize)))
 newSongs = prepList[:min(len(prepList),songCount)]
-newPrepList = prepList[min(len(prepList),songCount):].extend(newPrep)
+newPrepList = prepList[min(len(prepList),songCount):]+newPrep
 for song in newSongs:
     '''nameSet.add(song["animeEnglishName"]+song["songName"])
     mirrorSet.add(song["songArtist"]+song["songName"])'''
@@ -96,4 +96,4 @@ with open(filePrep+".json", 'w', encoding = 'utf8') as f:
 print("Added Songs:")
 for song in newSongs:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
-print(str(len(loadingSongList))+" songs in Loading. "+ str(len(urlSet)+len(newSongList))+" songs in circulation. "+str(len(newPrepList))+" songs on standby.")
+print(str(len(loadingSongList))+" songs in Loading. "+ str(len(urlSet)+len(newSongs))+" songs in circulation. "+str(len(newPrepList))+" songs on standby.")
