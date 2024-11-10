@@ -107,12 +107,16 @@ for song in data1:
     adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 1.5
     localSongList.add(song["video720"])
 
-#Weight all songs
+#Weight all songs and mark hard songs for removal
+hardSongSet = set()
+hardSongList = []
 for i in range(len(globalSongWeights)):
-    if globalSongTally[i] > 13:
-        print(str(globalSongTally[i])+" "+str(fullSongList[i]["SN"]))
     adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
     adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
+    if globalSongTally[i] > 15:
+        adjustedGlobalSongWeights[i] = 0
+        hardSongSet.add(fullSongList[i]["video720"])
+        hardSongList.append(fullSongList[i])
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):
     adjustedGlobalSongWeights[i] /= totalWeight
@@ -123,13 +127,36 @@ practicesonglist = []
 songCount = min(30,len(localSongList))
 practicesonglist = numpy.append(practicesonglist, numpy.random.choice(fullSongList, size = songCount, p = adjustedGlobalSongWeights, replace = False))
 
+#remove hard songs from lists (if applicable)
+if len(hardSongSet) > 0:
+    for section in lists1:
+        filteredFile = []
+        with open(section+"cutlist.json", 'r+', encoding = 'utf8') as f:
+            unfilteredFile = json.load(f)
+            for song in unfilteredFile:
+                if song["video720"] not in hardSongSet:
+                    filteredFile.append(song)
+            f.truncate(0)
+            f.seek(0)
+            json.dump(filteredFile,f,ensure_ascii=False)
+            f.seek(0)
+            fileData = f.read()
+            fileData = fileData.replace(", {","\n,{")
+            fileData = fileData.replace("}]","}\n]")
+            f.seek(0)
+            f.write(fileData)
+    print("Songs returned to preplist:________________________________")
+    for song in hardSongList:
+        print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
+
+
 #write to _quiz.json
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
     json.dump(practicesonglist.tolist(), f)
 
 #clear practice list
 with open("_practice.json", 'w', encoding = 'utf8') as f:
-    f.write("]")
+    f.write("[{}\n]")
 
 #print the practice list and song statistics
 print("Test "+str(lists[r])+" section\nMeanCount: "+str(round(sum(globalSongWeights)/len(lists1),5))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" SongMin: "+str(songmin)+" SongMax: "+str(songmax))
