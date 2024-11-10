@@ -113,7 +113,7 @@ hardSongList = []
 for i in range(len(globalSongWeights)):
     adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
     adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
-    if globalSongTally[i] > 15:
+    if globalSongTally[i]-globalSongWeights[i]*2/3 > 4:
         adjustedGlobalSongWeights[i] = 0
         hardSongSet.add(fullSongList[i]["video720"])
         hardSongList.append(fullSongList[i])
