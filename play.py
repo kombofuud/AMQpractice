@@ -131,7 +131,7 @@ practicesonglist = numpy.append(practicesonglist, numpy.random.choice(fullSongLi
 if len(hardSongSet) > 0:
     for section in lists1:
         filteredFile = []
-        with open(section+"cutlist.json", 'r+', encoding = 'utf8') as f:
+        with open(str(section)+"cutlist.json", 'r+', encoding = 'utf8') as f:
             unfilteredFile = json.load(f)
             for song in unfilteredFile:
                 if song["video720"] not in hardSongSet:
@@ -145,12 +145,12 @@ if len(hardSongSet) > 0:
             fileData = fileData.replace("}]","}\n]")
             f.seek(0)
             f.write(fileData)
-    with open("_preplist.json", 'r+', encoding = 'utf8') as f:
+    with open("preplist.json", 'r+', encoding = 'utf8') as f:
         prepdata = json.load(f)
         prepdata.extend(hardSongList)
         f.truncate(0)
         f.seek(0)
-        json.dump(knownList,f,ensure_ascii=False)
+        json.dump(prepdata,f,ensure_ascii=False)
         f.seek(0)
         fileData = f.read()
         fileData = fileData.replace(", {","\n,{")
@@ -160,6 +160,7 @@ if len(hardSongSet) > 0:
     print("Songs returned to preplist:________________________________")
     for song in hardSongList:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
+    print()
 
 
 #write to _quiz.json
