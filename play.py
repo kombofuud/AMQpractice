@@ -94,8 +94,6 @@ targetWeights = []
 for score in zScores:
     targetWeights.append(math.exp(score))
 r = random.choices(range(len(lists1)), weights = targetWeights)[0]
-for i in range(len(targetWeights)):
-    targetWeights[i] = round(targetWeights[i],5)
 'r = random.choices(range(len(lists1)))[0]'
 
 #Create modify the song frequency based on picked list
@@ -105,7 +103,7 @@ with open(str(lists1[r])+"cutlist.json", 'r', encoding = 'utf8') as f:
 for song in data1:
     if song["video720"] is None:
         song["video720"] = song["video480"]
-    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 2
+    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 1.5
     localSongList.add(song["video720"])
 
 #Weight all songs
@@ -131,7 +129,7 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("]")
 
 #print the practice list and song statistics
-print("Test "+str(lists[r])+" section\nMeanCount: "+str(round(sum(globalSongWeights)/len(lists1),5))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" SongMax: "+str(songmax))
+print("Test "+str(lists[r])+" section\nMeanCount: "+str(round(sum(globalSongWeights)/len(lists1),5))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" SongMin: "+str(songmin)+" SongMax: "+str(songmax))
 
 frequencyList = [0]*len(filelist)
 for element in globalSongWeights:
@@ -139,8 +137,12 @@ for element in globalSongWeights:
 frequencyList[0] = learnedSize
 frequencyList[1] -= learnedSize
 print("songFrequencyDistribution: "+str(frequencyList))
-#print("songCountDistribution: "+str(songCountList))
-#print("listWeights: "+str(targetWeights))
+print("songCountDistribution: "+str(songCountList))
+targetWeightSum = sum(targetWeights)
+for i in range(len(targetWeights)):
+    targetWeights[i]/=targetWeightSum
+    targetWeights[i] = round(targetWeights[i],5)
+print("listWeights: "+str(targetWeights))
 weightedCount = 0
 for i in range(len(frequencyList)):
     weightedCount += i*frequencyList[i]
