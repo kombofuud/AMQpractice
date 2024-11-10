@@ -145,6 +145,18 @@ if len(hardSongSet) > 0:
             fileData = fileData.replace("}]","}\n]")
             f.seek(0)
             f.write(fileData)
+    with open("_preplist.json", 'r+', encoding = 'utf8') as f:
+        prepdata = json.load(f)
+        prepdata.extend(hardSongList)
+        f.truncate(0)
+        f.seek(0)
+        json.dump(knownList,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
     print("Songs returned to preplist:________________________________")
     for song in hardSongList:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
