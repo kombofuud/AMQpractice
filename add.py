@@ -27,13 +27,21 @@ with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     loadingList = json.load(f)
 with open(filePrep+".json", 'r', encoding = 'utf8') as f:
     prepList = json.load(f)
+songCounter = 0
+uniqueSongCounter = 0
 for file in fileList+[fileLearned]:
     with open(file+"cutlist.json", 'r', encoding = 'utf8') as f:
         tempList = json.load(f)
+        countingSet = set()
         for song in tempList:
             nameSet.add(song["animeEnglishName"]+song["songName"])
             mirrorSet.add(song["songArtist"]+song["songName"])
             urlSet.add(song["video720"])
+            if file != fileLearned:
+                songCounter += 1
+                if song["video720"] not in countingSet:
+                    countingSet.add(song["video720"])
+                    uniqueSongCounter += 1
 
 #get song samples
 newPrep = random.sample(loadingList, max(0,min(songCount+prepListSize-len(prepList),len(loadingList),prepListSize)))
@@ -96,4 +104,5 @@ with open(filePrep+".json", 'w', encoding = 'utf8') as f:
 print("Added Songs:")
 for song in newSongs:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
+print("Raw average songCount: "+str(round(songCounter/len(fileList)+len(newSongs),4))+". Unique average SongCount: "+str(round(uniqueSongCounter/len(fileList)+len(newSongs),4))+".")
 print(str(len(loadingSongList))+" songs in Loading. "+ str(len(urlSet)+len(newSongs))+" songs in circulation. "+str(len(newPrepList))+" songs on standby.")

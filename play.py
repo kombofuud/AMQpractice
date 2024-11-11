@@ -110,13 +110,15 @@ for song in data1:
 #Weight all songs and mark hard songs for removal
 hardSongSet = set()
 hardSongList = []
+lostCount = 0
 for i in range(len(globalSongWeights)):
     adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
     adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
-    if globalSongTally[i]-globalSongWeights[i]*2/3 > 4:
+    if globalSongTally[i]-globalSongWeights[i] > 6:
         adjustedGlobalSongWeights[i] = 0
         hardSongSet.add(fullSongList[i]["video720"])
         hardSongList.append(fullSongList[i])
+        lostCount += globalSongTally[i]
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):
     adjustedGlobalSongWeights[i] /= totalWeight
@@ -172,7 +174,7 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("[{}\n]")
 
 #print the practice list and song statistics
-print("Test "+str(lists[r])+" section\nMeanCount: "+str(round(sum(globalSongWeights)/len(lists1),5))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" SongMin: "+str(songmin)+" SongMax: "+str(songmax))
+print("Test "+str(lists[r])+" section\nMeanCount: "+str(round((sum(globalSongWeights)-lostCount)/len(lists1),5))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" SongMin: "+str(songmin)+" SongMax: "+str(songmax))
 
 frequencyList = [0]*len(filelist)
 for element in globalSongWeights:
