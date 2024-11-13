@@ -9,13 +9,15 @@ shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 fileMerged = "merged"
 fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
 fileLoad = "loadingcutlist"
+filePrep = "preplist"
 fileLearned = "learned"
-fileDead = "Dead"
+fileDead = "dead"
 '''
 fileLearned = "dummyLearned"
 fileMerged = "dummyMerged"
 fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
+filePrep = "dummyPreplist"
 fileDead = "dummyDead"
 '''
 if fileLearned not in fileList:
@@ -150,6 +152,7 @@ while index<len(knownList):
             deadSongMap.add(song["video720"])
             deadSongs.append(song)
         continue
+    '''
     if song["animeEnglishName"]+song["songName"] in nameSet:
         knownList.pop(index)
         newKnownList.append(song)
@@ -162,6 +165,7 @@ while index<len(knownList):
         nameSet.add(song["animeEnglishName"]+song["songName"])
         mirrorSet.add(song["songArtist"]+song["songName"])
         continue
+    '''
     song = knownList[index]
     urlSet.add(song["video720"])
     vintageSet.add(song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"])
@@ -171,11 +175,42 @@ with open(fileLoad+".json", 'w', encoding = 'utf8') as f:
     f.seek(0)
     json.dump(knownList, f)
 
+with open(filePrep+".json", 'r', encoding = 'utf8') as f:
+    knownList = json.load(f)
+index = 0
+while index<len(knownList):
+    song = knownList[index]
+    if song["video720"] is None:
+        song["video720"] = song["video480"]
+    if song["animeVintage"] is None:
+        song["animeVintage"] = ""
+    urlSet.add(song["video720"])
+    vintageSet.add(song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"])
+    if song["video720"] in songCodes:
+        knownList[index] = songList[songCodes[song["video720"]]]
+    elif song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"] in nameCodes:
+        knownList[index] = songList[nameCodes[song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"]]]
+    else:
+        knownList.pop(index)
+        if song["video720"] not in deadSongMap:
+            deadSongMap.add(song["video720"])
+            deadSongs.append(song)
+        continue
+    song = knownList[index]
+    urlSet.add(song["video720"])
+    vintageSet.add(song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"])
+    index = index+1
+with open(filePrep+".json", 'w', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(knownList, f)
+
 #check to see if any name in equivalences was changed
 for relation in equivalances:
     for name in relation["equiv"]:
         if name not in equivList:
             print("Equivalence missing for: "+name)
+
 #add new songs to respective lists depending on if it's similar to other practiced ones
 newLoadingList = []
 newList = []
