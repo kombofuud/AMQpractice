@@ -19,6 +19,10 @@ for filename in filelist:
             includedSongs.add(entry["video720"])
             if filename == "loading":
                 uniqueSongCount += 1
+with open("preplist.json",'r', encoding='utf8') as f:
+    data = json.load(f)
+    for entry in data:
+        includedSongs.add(entry["video720"])
 uniqueSongCount = len(includedSongs)-uniqueSongCount
 
 #read list of all songs
@@ -99,13 +103,15 @@ r = random.choices(range(len(lists1)), weights = targetWeights)[0]
 
 #Create modify the song frequency based on picked list
 localSongList = set()
+localSongCount = 0
 with open(str(lists1[r])+"cutlist.json", 'r', encoding = 'utf8') as f:
     data1 = json.load(f)
 for song in data1:
     if song["video720"] is None:
         song["video720"] = song["video480"]
-    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 1.5
+    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 2
     localSongList.add(song["video720"])
+    localSongCount += 1
 
 #Weight all songs and mark hard songs for removal
 hardSongSet = set()
@@ -114,7 +120,7 @@ lostCount = 0
 for i in range(len(globalSongWeights)):
     adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
     adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
-    if globalSongTally[i]-globalSongWeights[i] > 6:
+    if globalSongTally[i]-globalSongWeights[i] > 7:
         adjustedGlobalSongWeights[i] = 0
         hardSongSet.add(fullSongList[i]["video720"])
         hardSongList.append(fullSongList[i])
@@ -174,7 +180,7 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("[{}\n]")
 
 #print the practice list and song statistics
-print("Test "+str(lists[r])+" section\nMeanCount: "+str(round((sum(globalSongWeights)-lostCount)/len(lists1),5))+" LocalCount: "+str(len(localSongList))+" PoolSize: "+str(len(fullSongList)-learnedSize)+" SongMin: "+str(songmin)+" SongMax: "+str(songmax))
+print("Test "+str(lists[r])+" section\nMeanCount: "+str(round((sum(globalSongTally)-lostCount-learnedSize)/len(lists1),5))+" LocalCount: "+str(localSongCount)+" PoolSize: "+str(len(fullSongList)-learnedSize)+" SongMin: "+str(songmin)+" SongMax: "+str(songmax))
 
 frequencyList = [0]*len(filelist)
 for element in globalSongWeights:
