@@ -92,6 +92,8 @@ urlSet = set()
 vintageSet = set()
 pickedMap = dict()
 changedSet = set()
+nameChangeSet = set()
+nameChangeList = []
 deadSongs = []
 for section in fileList:
     with open(section+"cutlist.json", 'r', encoding = 'utf8') as f:
@@ -119,6 +121,11 @@ for section in fileList:
                 deadSongMap.add(song["video720"])
                 deadSongs.append(song)
             continue
+        if set(song["animeAltNames"]) != set(knownList[index]["animeAltNames"]) and song["animeEnglishName"]+song["animeVintage"] not in nameChangeSet:
+            nameChangeSet.add(song["animeEnglishName"]+song["animeVintage"])
+            lostNames = set(song["animeAltNames"])-set(knownList[index]["animeAltNames"])
+            gainedNames = set(knownList[index]["animeAltNames"])-set(song["animeAltNames"])
+            nameChangeList.append([song["animeVintage"],song["animeEnglishName"],lostnames,gainedNames)
         song = knownList[index]
         urlSet.add(song["video720"])
         nameSet.add(song["animeEnglishName"]+song["songName"])
@@ -278,9 +285,9 @@ with open(fileMerged+".json", "r+", encoding = 'utf8') as f:
 print("changedURLs:-----------------------------------")
 for url in changedSet:
     print(songList[songCodes[url]]["animeEnglishName"]+": "+songList[songCodes[url]]["songName"]+" by "+songList[songCodes[url]]["songArtist"])
-print("newLearning:-----------------------------------")
-for song in newKnownList:
-    print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
+print("changedNames:-----------------------------------")
+for song in nameChangeList:
+    print(nameChangeList[0]+" "+nameChangeList[1]+"-> Names Lost: "+nameChangeList[2]+" Names Gained: "+nameChangeList[3])
 print("newLoading:-----------------------------------")
 for song in newLoadingList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
