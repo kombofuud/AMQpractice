@@ -121,11 +121,11 @@ for section in fileList:
                 deadSongMap.add(song["video720"])
                 deadSongs.append(song)
             continue
-        if set(song["animeAltNames"]) != set(knownList[index]["animeAltNames"]) and song["animeEnglishName"]+song["animeVintage"] not in nameChangeSet:
+        if set(song["altAnimeNames"]) != set(knownList[index]["altAnimeNames"]) and song["animeEnglishName"]+song["animeVintage"] not in nameChangeSet:
             nameChangeSet.add(song["animeEnglishName"]+song["animeVintage"])
-            lostNames = set(song["animeAltNames"])-set(knownList[index]["animeAltNames"])
-            gainedNames = set(knownList[index]["animeAltNames"])-set(song["animeAltNames"])
-            nameChangeList.append([song["animeVintage"],song["animeEnglishName"],lostnames,gainedNames)
+            lostNames = set(song["altAnimeNames"])-set(knownList[index]["altAnimeNames"])
+            gainedNames = set(knownList[index]["altAnimeNames"])-set(song["altAnimeNames"])
+            nameChangeList.append([song["animeVintage"],song["animeEnglishName"],lostNames,gainedNames])
         song = knownList[index]
         urlSet.add(song["video720"])
         nameSet.add(song["animeEnglishName"]+song["songName"])
@@ -286,8 +286,8 @@ print("changedURLs:-----------------------------------")
 for url in changedSet:
     print(songList[songCodes[url]]["animeEnglishName"]+": "+songList[songCodes[url]]["songName"]+" by "+songList[songCodes[url]]["songArtist"])
 print("changedNames:-----------------------------------")
-for song in nameChangeList:
-    print(nameChangeList[0]+" "+nameChangeList[1]+"-> Names Lost: "+nameChangeList[2]+" Names Gained: "+nameChangeList[3])
+for show in nameChangeList:
+    print(show[0]+" "+show[1]+"-> Names Lost: "+str(show[2])+" Names Gained: "+str(show[3]))
 print("newLoading:-----------------------------------")
 for song in newLoadingList:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
