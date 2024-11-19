@@ -50,7 +50,8 @@ for file in fileList+[fileLearned]:
 newPrep = random.sample(loadingList, max(0,min(songCount+prepListSize-len(prepList),len(loadingList),prepListSize)))
 newSongs = prepList[:min(len(prepList),songCount)]
 newPrepList = prepList[min(len(prepList),songCount):]+newPrep
-for song in newSongs:
+prepList.extend(newSongs)
+for song in prepList:
     '''nameSet.add(song["animeEnglishName"]+song["songName"])
     mirrorSet.add(song["songArtist"]+song["songName"])'''
     urlSet.add(song["video720"])
