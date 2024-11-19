@@ -224,10 +224,10 @@ newList = []
 
 for song in songList:
     if song["video720"] not in urlSet and song["songArtist"]+song["songName"]+str(song["songType"])+song["animeVintage"] not in vintageSet:
-        if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
+        '''if song["animeEnglishName"]+song["songName"] in nameSet or song["songArtist"]+song["songName"] in mirrorSet:
             newKnownList.append(song)
-        else:
-            newLoadingList.append(song)
+        else:'''
+        newLoadingList.append(song)
         newList.append(song)
 
 for section in fileList:
