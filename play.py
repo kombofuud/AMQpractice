@@ -92,6 +92,9 @@ for i in range(len(globalSongWeights)):
         lostCount += globalSongTally[i]
 
 #add new songs if the current number of songs is less than a specified average.
+with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
+    data1 = json.load(f)
+    learnedSize = len(data1)
 globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
 minMean = 525
 if globalMean < minMean:
@@ -137,11 +140,10 @@ if globalMean < minMean:
 
 #Pick the practice list and get song statistics
 zScores = []
-for file in lists:
+for file in lists1:
     with open(str(file)+"cutlist.json", 'r', encoding = 'utf8') as f:
         data1 = json.load(f)
         zScores.append(len(data1))
-learnedSize = zScores.pop()
 songmean = statistics.mean(zScores)
 songmax = max(zScores)
 songmin = min(zScores)
