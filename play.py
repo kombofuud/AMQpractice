@@ -107,6 +107,8 @@ if globalMean < minMean:
 
         newCount = min(newCount,len(prepData))
         newSongs = prepData[:newCount]
+        for i in range(newCount):
+            songListMap[newSongs[i]["video720"]] = len(fullSongList)+i
         fullSongList.extend(newSongs)
         adjustedGlobalSongWeights.extend([len(lists1)+songMultiplier]*newCount)
         globalSongTally.extend([len(lists1)]*newCount)
