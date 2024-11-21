@@ -95,6 +95,7 @@ for i in range(len(globalSongWeights)):
 with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
     data1 = json.load(f)
     learnedSize = len(data1)
+songMultiplier = 2
 globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
 minMean = 525
 if globalMean < minMean:
@@ -163,7 +164,6 @@ r = random.choices(range(len(lists1)), weights = targetWeights)[0]
 #Create modify the song frequency based on picked list
 localSongList = set()
 localSongCount = 0
-songMultiplier = 2
 with open(str(lists1[r])+"cutlist.json", 'r', encoding = 'utf8') as f:
     data1 = json.load(f)
 for song in data1:
