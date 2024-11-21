@@ -97,7 +97,7 @@ with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
     learnedSize = len(data1)
 songMultiplier = 2
 globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
-minMean = 525
+minMean = 526
 if globalMean < minMean:
     newCount = math.ceil(minMean-globalMean)
     with open("loadingcutlist.json", 'r', encoding = 'utf8') as f:
@@ -140,6 +140,10 @@ if globalMean < minMean:
             fileData = fileData.replace("}]","}\n]")
             f.seek(0)
             f.write(fileData)
+    print("Songs added to pool:________________________________")
+    for song in newSongs:
+        print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
+    print()
 
 #Pick the practice list and get song statistics
 zScores = []
