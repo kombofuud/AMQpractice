@@ -57,15 +57,12 @@ songListMap = dict()
 globalSongWeights = []
 globalSongTally = []
 adjustedGlobalSongWeights = []
-zScores = []
 
 for file in lists:
     with open(str(file)+"cutlist.json", 'r', encoding = 'utf8') as f:
         data1 = json.load(f)
     traversedSongs = set()
-    zScores.append(0)
     for song in data1:
-        zScores[-1] += 1
         if song["video720"] is None or song["video720"] =="":
             song["video720"] = song["video480"]
         if song["video720"] in traversedSongs:
@@ -83,7 +80,67 @@ for file in lists:
 for i in range(len(globalSongWeights)):
     adjustedGlobalSongWeights.append(1)
 
+#Weight all songs and mark hard songs for removal
+hardSongSet = set()
+hardSongList = []
+lostCount = 0
+for i in range(len(globalSongWeights)):
+    if globalSongTally[i]-globalSongWeights[i] > 8:
+        adjustedGlobalSongWeights[i] = 0
+        hardSongSet.add(fullSongList[i]["video720"])
+        hardSongList.append(fullSongList[i])
+        lostCount += globalSongTally[i]
+
+#add new songs if the current number of songs is less than a specified average.
+globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
+minMean = 525
+if globalMean < minMean:
+    newCount = math.ceil(minMean-globalMean)
+    with open("loadingcutlist.json", 'r', encoding = 'utf8') as f:
+        newPrep = json.load(f)
+    with open("preplist.json", 'r+', encoding = 'utf8') as f:
+        prepData = json.load(f)
+
+        newCount = min(newCount,len(prepData))
+        newSongs = prepData[:newCount]
+        fullSongList.extend(newSongs)
+        adjustedGlobalSongWeights.extend([len(lists1)+songMultiplier]*newCount)
+        globalSongTally.extend([len(lists1)]*newCount)
+        globalSongWeights.extend([len(lists1)]*newCount)
+
+        prepData = prepData[newCount:]
+        newPrep = random.sample(newPrep,min(len(newPrep),newCount))
+        prepData.extend(newPrep)
+
+        f.truncate(0)
+        f.seek(0)
+        json.dump(prepData,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
+    for section in lists1:
+        with open(str(section)+"cutlist.json", 'r+', encoding = 'utf8') as f:
+            songList = json.load(f)
+            songList.extend(newSongs)
+            f.truncate(0)
+            f.seek(0)
+            json.dump(songList,f,ensure_ascii=False)
+            f.seek(0)
+            fileData = f.read()
+            fileData = fileData.replace(", {","\n,{")
+            fileData = fileData.replace("}]","}\n]")
+            f.seek(0)
+            f.write(fileData)
+
 #Pick the practice list and get song statistics
+zScores = []
+for file in lists:
+    with open(str(file)+"cutlist.json", 'r', encoding = 'utf8') as f:
+        data1 = json.load(f)
+        zScores.append(len(data1))
 learnedSize = zScores.pop()
 songmean = statistics.mean(zScores)
 songmax = max(zScores)
@@ -104,34 +161,27 @@ r = random.choices(range(len(lists1)), weights = targetWeights)[0]
 #Create modify the song frequency based on picked list
 localSongList = set()
 localSongCount = 0
+songMultiplier = 2
 with open(str(lists1[r])+"cutlist.json", 'r', encoding = 'utf8') as f:
     data1 = json.load(f)
 for song in data1:
     if song["video720"] is None:
         song["video720"] = song["video480"]
-    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= 2
+    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= songMultiplier
     localSongList.add(song["video720"])
     localSongCount += 1
 
-#Weight all songs and mark hard songs for removal
-hardSongSet = set()
-hardSongList = []
-lostCount = 0
+#create random song selection for the selected list
+practicesonglist = []
 for i in range(len(globalSongWeights)):
+    if adjustedGlobalSongWeights[i] == 0:
+        continue
     adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
     adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
-    if globalSongTally[i]-globalSongWeights[i] > 8:
-        adjustedGlobalSongWeights[i] = 0
-        hardSongSet.add(fullSongList[i]["video720"])
-        hardSongList.append(fullSongList[i])
-        lostCount += globalSongTally[i]
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):
     adjustedGlobalSongWeights[i] /= totalWeight
-
-#create random song selection for the selected list
-practicesonglist = []
-    #songCount = int(math.sqrt(len(localSongList)))
+#songCount = int(math.sqrt(len(localSongList)))
 songCount = min(30,len(localSongList))
 practicesonglist = numpy.append(practicesonglist, numpy.random.choice(fullSongList, size = songCount, p = adjustedGlobalSongWeights, replace = False))
 
@@ -170,6 +220,7 @@ if len(hardSongSet) > 0:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
     print()
 
+    
 
 #write to _quiz.json
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
