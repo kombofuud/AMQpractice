@@ -101,7 +101,7 @@ minMean = 527
 if globalMean < minMean:
     newCount = math.ceil(minMean-globalMean)
     with open("loadingcutlist.json", 'r', encoding = 'utf8') as f:
-        newPrep = json.load(f)
+        newLoad = json.load(f)
     with open("preplist.json", 'r+', encoding = 'utf8') as f:
         prepData = json.load(f)
 
@@ -115,7 +115,7 @@ if globalMean < minMean:
         globalSongWeights.extend([len(lists1)]*newCount)
 
         prepData = prepData[newCount:]
-        newPrep = random.sample(newPrep,min(len(newPrep),newCount))
+        newPrep = random.sample(newLoad,min(len(newLoad),newCount))
         prepData.extend(newPrep)
 
         f.truncate(0)
@@ -127,6 +127,16 @@ if globalMean < minMean:
         fileData = fileData.replace("}]","}\n]")
         f.seek(0)
         f.write(fileData)
+    newLoad = [song for song in newLoad if song not in newPrep]
+    with open("loadingcutlist.json", 'w', encoding = 'utf8') as f:
+        json.dump(newLoad,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
+
     for section in lists1:
         with open(str(section)+"cutlist.json", 'r+', encoding = 'utf8') as f:
             songList = json.load(f)
