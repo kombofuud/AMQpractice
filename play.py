@@ -85,7 +85,7 @@ hardSongSet = set()
 hardSongList = []
 lostCount = 0
 for i in range(len(globalSongWeights)):
-    if globalSongTally[i]-globalSongWeights[i] > 8:
+    if globalSongTally[i]-globalSongWeights[i] > 7:
         adjustedGlobalSongWeights[i] = 0
         hardSongSet.add(fullSongList[i]["video720"])
         hardSongList.append(fullSongList[i])
@@ -97,7 +97,7 @@ with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
     learnedSize = len(data1)
 songMultiplier = 2
 globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
-minMean = 537
+minMean = 527
 if globalMean < minMean:
     newCount = math.ceil(minMean-globalMean)
     with open("loadingcutlist.json", 'r', encoding = 'utf8') as f:
