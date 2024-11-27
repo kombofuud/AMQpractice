@@ -97,7 +97,7 @@ with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
     learnedSize = len(data1)
 songMultiplier = 2
 globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
-minMean = 527
+minMean = 537
 if globalMean < minMean:
     newCount = math.ceil(minMean-globalMean)
     with open("loadingcutlist.json", 'r', encoding = 'utf8') as f:
@@ -128,7 +128,9 @@ if globalMean < minMean:
         f.seek(0)
         f.write(fileData)
     newLoad = [song for song in newLoad if song not in newPrep]
-    with open("loadingcutlist.json", 'w', encoding = 'utf8') as f:
+    with open("loadingcutlist.json", 'r+', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
         json.dump(newLoad,f,ensure_ascii=False)
         f.seek(0)
         fileData = f.read()
