@@ -131,6 +131,7 @@ if globalMean < minMean:
         with open(str(section)+"cutlist.json", 'r+', encoding = 'utf8') as f:
             songList = json.load(f)
             songList.extend(newSongs)
+            random.shuffle(songList)
             f.truncate(0)
             f.seek(0)
             json.dump(songList,f,ensure_ascii=False)
