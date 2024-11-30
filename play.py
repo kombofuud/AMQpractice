@@ -98,6 +98,7 @@ with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
 songMultiplier = 2
 globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
 minMean = 528
+prepTargetSize = 50
 if globalMean < minMean:
     newCount = math.ceil(minMean-globalMean)
     with open("loadingcutlist.json", 'r', encoding = 'utf8') as f:
@@ -115,7 +116,7 @@ if globalMean < minMean:
         globalSongWeights.extend([len(lists1)]*newCount)
 
         prepData = prepData[newCount:]
-        newPrep = random.sample(newLoad,min(len(newLoad),newCount))
+        newPrep = random.sample(newLoad,max(0,min(len(newLoad),prepTargetSize-len(prepData))))
         prepData.extend(newPrep)
 
         f.truncate(0)
