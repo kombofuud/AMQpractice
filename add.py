@@ -109,4 +109,4 @@ print("Added Songs:")
 for song in newSongs:
     print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 print("Raw average songCount: "+str(round(songCounter/len(fileList)+len(newSongs),4))+". Unique average SongCount: "+str(round(uniqueSongCounter/len(fileList)+len(newSongs),4))+".")
-print(str(len(loadingSongList))+" songs in Loading. "+ str(len(urlSet)+len(newSongs)-learnedCounter)+" songs in circulation. "+str(len(newPrepList))+" songs on standby.")
+print(str(len(loadingSongList))+" songs in Loading. "+ str(len(urlSet)+len(newSongs)-learnedCounter-len(newPrepList))+" songs in circulation. "+str(len(newPrepList))+" songs on standby.")
