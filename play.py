@@ -97,7 +97,7 @@ with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
     learnedSize = len(data1)
 songMultiplier = 2
 globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
-minMean = 529
+minMean = 530
 prepTargetSize = 70
 if globalMean < minMean:
     newCount = math.ceil(minMean-globalMean)
