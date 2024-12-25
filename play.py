@@ -95,7 +95,7 @@ for i in range(len(globalSongWeights)):
 with open("learnedcutlist.json", 'r', encoding = 'utf8') as f:
     data1 = json.load(f)
     learnedSize = len(data1)
-songMultiplier = 2
+songAdder = 1
 globalMean = (sum(globalSongTally)-lostCount-learnedSize)/len(lists1)
 minMean = 530
 prepTargetSize = 70
@@ -111,7 +111,7 @@ if globalMean < minMean:
         for i in range(newCount):
             songListMap[newSongs[i]["video720"]] = len(fullSongList)+i
         fullSongList.extend(newSongs)
-        adjustedGlobalSongWeights.extend([len(lists1)+songMultiplier]*newCount)
+        adjustedGlobalSongWeights.extend([len(lists1)+songAdder]*newCount)
         globalSongTally.extend([len(lists1)]*newCount)
         globalSongWeights.extend([len(lists1)]*newCount)
 
@@ -189,7 +189,7 @@ with open(str(lists1[r])+"cutlist.json", 'r', encoding = 'utf8') as f:
 for song in data1:
     if song["video720"] is None:
         song["video720"] = song["video480"]
-    adjustedGlobalSongWeights[songListMap[song["video720"]]] *= songMultiplier
+    adjustedGlobalSongWeights[songListMap[song["video720"]]] += songAdder
     localSongList.add(song["video720"])
     localSongCount += 1
 
@@ -198,7 +198,7 @@ practicesonglist = []
 for i in range(len(globalSongWeights)):
     if adjustedGlobalSongWeights[i] == 0:
         continue
-    adjustedGlobalSongWeights[i] += max(globalSongWeights[i], globalSongTally[i]-globalSongWeights[i])
+    adjustedGlobalSongWeights[i] += globalSongTally[i]
     adjustedGlobalSongWeights[i] = math.pow(2,adjustedGlobalSongWeights[i])
 totalWeight = sum(adjustedGlobalSongWeights)
 for i in range(len(adjustedGlobalSongWeights)):
