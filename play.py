@@ -87,6 +87,7 @@ lostCount = 0
 for i in range(len(globalSongWeights)):
     if globalSongTally[i]-globalSongWeights[i] > 8:
         adjustedGlobalSongWeights[i] = 0
+        globalSongTally[i] = 0
         hardSongSet.add(fullSongList[i]["video720"])
         hardSongList.append(fullSongList[i])
         lostCount += globalSongTally[i]
