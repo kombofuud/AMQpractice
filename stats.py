@@ -3,6 +3,7 @@
 #give mean per list
 #average song progress
 #instance frequencies
+#rewrites learnedlist
 
 import json
 
@@ -25,6 +26,7 @@ loadingSize += len(localList)
 #get list statistics
 listDistribution = []
 progressCounter = map()
+learnedList = []
 songWeight = map()
 weightMax = -99
 weightMin = 99
@@ -41,6 +43,8 @@ for file in fileList:
                 progressCounter[song["annSongId"]] = (song["D"] <= 0)
             elif song["D"] <= 0:
                 progressCounter[song["annSongId"]] += 1
+                if progressCounter[song["annSongId"]] == len(fileList):
+                    learnedList.append(song)
             if song["annSongId"] not in songMean:
                 songMean[song["annSongId"]] = song["D"]
             else:
@@ -54,6 +58,18 @@ for file in fileList:
                 instanceMin = min(song["D"],instanceMin)
             else:
                 instanceCount[song["D"]] += 1
+learnedList = sorted(learnedList, key = lambda song: song["annSongId"])
+with open("learnedcutlist.json", 'w', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(learnedList,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
+    
 #get frequency of various statistics
 progressFrequency = [0]*len(fileList)
 #weightCounter = [0]*(weightMax-weightMin+1)
