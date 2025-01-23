@@ -55,7 +55,7 @@ for index in range(len(rawSongList)):
     songList.append({"D": 1})
     for jindex in range(len(shortHand)):
         songList[index][shortHand[jindex]] = rawSongList[index][longHand[jindex]]
-    for key in rawSongList[0]:
+    for key in rawSongList[index]:
         songList[index][key] = rawSongList[index][key]
 
 #map song ID's and broken URL's to equivalences
