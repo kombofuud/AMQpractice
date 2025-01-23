@@ -1,15 +1,15 @@
 #THINGS TO TEST
-#adds information to start of the json files including the D value
-#correctly adds alt names to alt answers
-#correctly fixes broken urls
-#removes fixed urls from broken urls
-#replaces old instances of songs in each list with new ones while keeping the old D value
-#adds dead songs to dead song list
-#adds new songs to loading list
-#adds updated songs to merged.json
+#adds information to start of the json files including the D value                                 - start from merged without D values, change 1 url
+#correctly adds alt names to alt answers                                                           - include oddtaxi (remove alt names)
+#correctly fixes broken urls                                                                       - change a url change to broken.json
+#removes fixed urls from broken urls                                                               - add an included url to broken.json
+#replaces old instances of songs in each list with new ones while keeping the old D value          - keep current D values outside of merged
+#adds dead songs to dead song list                                                                 - add dummy dead song
+#adds new songs to loading list                                                                    - add a new song to merged
+#adds updated songs to merged.json                                                                 - check that merged has D values
 #prints dead songs
 #prints new songs
-#prints modified songs
+#prints modified songs                                                                             - check print statements
 
 import json
 import shutil
@@ -66,7 +66,7 @@ for index, entry in enumerate(equivalances):
     altNames.append([])
 brokenMap = {}
 for index, URL in enumerate(brokenURLs):
-    brokenMap[brokenURLs["annSongId"]] = index
+    brokenMap[URL["annSongId"]] = index
 
 for song in songList:
     if song["annSongId"] in equivMap:

@@ -75,20 +75,21 @@ with open("learnedcutlist.json", 'r+', encoding = 'utf8') as f:
     f.write(fileData)
     
 #get frequency of various statistics
-progressFrequency = [0]*len(fileList)
+progressFrequency = [0]*(len(fileList)+1)
 #weightCounter = [0]*(weightMax-weightMin+1)
 #instanceCounter = [0]*(instanceMax-instanceMin+1)
 for key in progressCounter.keys():
     progressFrequency[progressCounter[key]] += 1
 #    weightCounter[songMean[key]-weightMin] += 1
 #    instanceCounter[instanceCount[key]-instanceMin] += 1
+progressFrequency.reverse()
 
 #print statistics
-print("Pool Size: "+str(poolSize)+" LoadingSize: "+str(loadingSize)+" MeanSize: "+str(round(sum(listDistribution)/len(fileList),2)))
+print("\nPool Size: "+str(poolSize)+" LoadingSize: "+str(loadingSize)+" MeanSize: "+str(round(sum(listDistribution)/len(fileList),2)))
 print()
 print(" 0   10  20  30  40  50  60  70  80  90  100 Last")
 print(listDistribution)
 print()
-print(progressFrequency)
+print("SongProgress:\n" + str(progressFrequency))
 print()
 print("MinWeight: "+str(weightMin)+" MaxWeight: "+str(weightMax)+" LocalMinWeight: "+str(instanceMin)+" LocalWeightMax: "+str(instanceMax))
