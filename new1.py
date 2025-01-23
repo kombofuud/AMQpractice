@@ -1,5 +1,4 @@
 #THINGS TO TEST
-#moves merged.json to local directory
 #adds information to start of the json files including the D value
 #correctly adds alt names to alt answers
 #correctly fixes broken urls

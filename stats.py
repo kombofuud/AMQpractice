@@ -6,10 +6,14 @@
 #rewrites learnedlist
 
 import json
-
+'''
 fileList = ["0cutlist.json", "10cutlist.json", "20cutlist.json", "30cutlist.json", "40cutlist.json", "50cutlist.json", "60cutlist.json", "70cutlist.json", "80cutlist.json", "90cutlist.json", "100cutlist.json", "lastcutlist.json"]
 filePrep = "preplist.json"
 fileLoad = "loadingcutlist.json"
+'''
+fileList = ["dummy0cutlist.json", "dummy1cutlist.json"]
+fileLoad = "dummyLoad.json"
+filePrep = "dummyPreplist.json"
 
 #getting list sizes
 with open(fileList[0], 'r', encoding = 'utf8') as f:
@@ -25,18 +29,18 @@ loadingSize += len(localList)
 
 #get list statistics
 listDistribution = []
-progressCounter = map()
+progressCounter = {}
 learnedList = []
-songWeight = map()
+songMean = {}
 weightMax = -99
 weightMin = 99
-instanceCount = map()
+instanceCount = {}
 instanceMax = -99
 instanceMin = 99
 for file in fileList:
     with open(file, 'r', encoding = 'utf8') as f:
         localList = json.load(f)
-        listDistribution.append([0])
+        listDistribution.append(0)
         for song in localList:
             listDistribution[-1] += song["D"]
             if song["annSongId"] not in progressCounter:
@@ -59,7 +63,7 @@ for file in fileList:
             else:
                 instanceCount[song["D"]] += 1
 learnedList = sorted(learnedList, key = lambda song: song["annSongId"])
-with open("learnedcutlist.json", 'w', encoding = 'utf8') as f:
+with open("learnedcutlist.json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
     json.dump(learnedList,f,ensure_ascii=False)
@@ -76,15 +80,15 @@ progressFrequency = [0]*len(fileList)
 #instanceCounter = [0]*(instanceMax-instanceMin+1)
 for key in progressCounter.keys():
     progressFrequency[progressCounter[key]] += 1
-#    weightCounter[songWeight[key]-weightMin] += 1
+#    weightCounter[songMean[key]-weightMin] += 1
 #    instanceCounter[instanceCount[key]-instanceMin] += 1
 
 #print statistics
-print("Pool Size: "+poolSize+" LoadingSize: "+loadingSize+" MeanSize: "+round(sum(listDistribution)/len(fileList),2)
+print("Pool Size: "+str(poolSize)+" LoadingSize: "+str(loadingSize)+" MeanSize: "+str(round(sum(listDistribution)/len(fileList),2)))
 print()
 print(" 0   10  20  30  40  50  60  70  80  90  100 Last")
 print(listDistribution)
 print()
 print(progressFrequency)
 print()
-print("MinWeight: "+weightMin+" MaxWeight: "+weightMax+"LocalMinWeight: "+instanceMin+"LocalWeightMax: "+instanceMax)
+print("MinWeight: "+str(weightMin)+" MaxWeight: "+str(weightMax)+" LocalMinWeight: "+str(instanceMin)+" LocalWeightMax: "+str(instanceMax))
