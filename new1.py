@@ -16,7 +16,7 @@ import json
 import shutil
 
 #Move downloaded file to local directory and delete previous version
-shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 
 '''
 fileMerged = "merged"
@@ -62,7 +62,7 @@ for index in range(len(rawSongList)):
 equivMap = map()
 altNames = []
 for index, entry in enumerate(equivalances):
-    for ID in entry:
+    for ID in entry["equiv"]:
         equivMap[ID] = index
     altNames.append([])
 brokenMap = map()
