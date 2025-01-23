@@ -21,7 +21,7 @@ fileLoad = "dummyLoad.json"
 fileList = ["dummy0cutlist.json", "dummy1cutlist.json"]
 
 #Get list of songs in pool
-songWeightMap = map()
+songWeightMap = {}
 listWeights = [0]
 songCounter = 0
 with open(fileList[0], "r", encoding="utf-8") as file:
