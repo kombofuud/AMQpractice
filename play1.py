@@ -7,7 +7,7 @@ import copy
 import numpy
 
 #Read ALL Files
-'''
+
 fileMerged = "merged.json"
 filePrep = "preplist.json"
 fileLoad = "loadingcutlist.json"
@@ -23,6 +23,7 @@ fileList = ["dummy0cutlist.json", "dummy1cutlist.json"]
 targetSongMean = 2
 targetPrepCount = 2
 desiredQuizSize = 2
+'''
 
 #Get list of songs in pool
 songWeightMap = {}
