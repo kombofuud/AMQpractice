@@ -39,6 +39,7 @@ with open(filePrep+".json", 'r', encoding = 'utf8') as f:
     prepList = json.load(f)
 with open(fileDead+".json", 'r', encoding = 'utf8') as f:
     deadList = json.load(f)
+    deadListInit = len(deadList)
 with open("modifications.json", 'r', encoding = 'utf8') as f:
     equivalances = json.load(f)
 with open("broken.json", 'r', encoding = 'utf8') as f:
@@ -70,7 +71,7 @@ for index, URL in enumerate(brokenURLs):
 
 for song in songList:
     if song["annSongId"] in equivMap:
-        altNames[equivMap[song["annSongId"]]].append(song["altAnimeNames"]+song["altAnimeNamesAnswers"])
+        altNames[equivMap[song["annSongId"]]].extend(song["altAnimeNames"]+song["altAnimeNamesAnswers"])
 
 fixedList = []
 for index, song in enumerate(songList):
@@ -88,13 +89,13 @@ if len(fixedList):
     #print any fixed urls
     print("Fixed URLs______________________________________")
     for index in fixedList:
-        print(songList[idMap[index]]["songName"]+"__from__"+songList[idMap[index]]["animeEnglishName"])
+        print(songList[index]["songName"]+"__from__"+songList[index]["animeEnglishName"])
 
     #remove fixed urls from broken list
     fixedList.reverse()
     for index in fixedList:
-        brokenURLs.pop(index)
-    with open("broken.json", 'w', encoding = 'utf8') as f:
+        brokenURLs.pop(brokenMap[songList[index]["annSongId"]])
+    with open("broken.json", 'r+', encoding = 'utf8') as f:
         f.truncate(0)
         f.seek(0)
         json.dump(brokenURLs,f,ensure_ascii=False)
@@ -104,23 +105,38 @@ if len(fixedList):
         fileData = fileData.replace("}]","}\n]")
         f.seek(0)
         f.write(fileData)
-    
 
 #replace songs in each list 1 by 1, but keep the old "D" value for songs in pool. Eliminate dead songs
+with open(fileMerged+".json", 'r+', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        json.dump(songList,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
+    
 deadCount = set()
 oldSongs = set()
 for file in fileList:
     with open(file+"cutlist.json", 'r+', encoding = 'utf8') as f:
         knownList = json.load(f)
+        deadIndices = []
         for index, song in enumerate(knownList):
             if song["annSongId"] not in idMap:
-                if song not in deadCount:
+                deadIndices.append(index)
+                if song["annSongId"] not in deadCount:
                     deadList.append(song)
-                    deadCount.add(song)
+                    deadCount.add(song["annSongId"])
                 continue
             oldSongs.add(song["annSongId"])
             knownList[index] = songList[idMap[song["annSongId"]]]
             knownList[index]["D"] = song["D"]
+        deadIndices.reverse()
+        for index in deadIndices:
+            knownList.pop(index)
 
         f.truncate(0)
         f.seek(0)
@@ -134,14 +150,19 @@ for file in fileList:
 
 with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
+    deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
-            if song not in deadCount:
+            deadIndices.append(index)
+            if song["annSongId"] not in deadCount:
                 deadList.append(song)
-                deadCount.add(song)
+                deadCount.add(song["annSongId"])
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
+    deadIndices.reverse()
+    for index in deadIndices:
+        knownList.pop(index)
 
     f.truncate(0)
     f.seek(0)
@@ -155,14 +176,19 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
 
 with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
+    deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
-            if song not in deadCount:
+            deadIndices.append(index)
+            if song["annSongId"] not in deadCount:
                 deadList.append(song)
-                deadCount.add(song)
+                deadCount.add(song["annSongId"])
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
+    deadIndices.reverse()
+    for index in deadIndices:
+        knownList.pop(index)
 
     f.truncate(0)
     f.seek(0)
@@ -176,7 +202,10 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
 
 #add dead songs to dead song list if there are any
 if len(deadCount):
-    with open(fileDead+".json", 'w', encoding = 'utf8') as f:
+    print("DeadSongs:_______________________")
+    for index in range(deadListInit, len(deadList)):
+        print(deadList[index]["songName"]+"__from__"+deadList[index]["animeEnglishName"])
+    with open(fileDead+".json", 'r+', encoding = 'utf8') as f:
         f.truncate(0)
         f.seek(0)
         json.dump(deadList,f,ensure_ascii=False)
