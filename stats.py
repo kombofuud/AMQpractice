@@ -6,7 +6,6 @@
 #rewrites learnedlist
 
 import json
-'''
 fileList = ["0cutlist.json", "10cutlist.json", "20cutlist.json", "30cutlist.json", "40cutlist.json", "50cutlist.json", "60cutlist.json", "70cutlist.json", "80cutlist.json", "90cutlist.json", "100cutlist.json", "lastcutlist.json"]
 filePrep = "preplist.json"
 fileLoad = "loadingcutlist.json"
@@ -16,6 +15,7 @@ fileList = ["dummy0cutlist.json", "dummy1cutlist.json"]
 fileLoad = "dummyLoad.json"
 filePrep = "dummyPreplist.json"
 fileLearned = "dummyLearnedcutlist.json"
+'''
 
 #getting list sizes
 with open(fileList[0], 'r', encoding = 'utf8') as f:

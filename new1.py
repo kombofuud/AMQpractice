@@ -17,7 +17,6 @@ import shutil
 #Move downloaded file to local directory and delete previous version
 #shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 
-'''
 fileMerged = "merged"
 fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
 fileLoad = "loadingcutlist"
@@ -29,6 +28,7 @@ fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 filePrep = "dummyPreplist"
 fileDead = "dummyDead"
+'''
 
 #get list of all songs
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
