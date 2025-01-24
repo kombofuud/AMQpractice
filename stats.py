@@ -89,7 +89,7 @@ progressFrequency.reverse()
 #print statistics
 print("\nPool Size: "+str(poolSize)+" LoadingSize: "+str(loadingSize)+" MeanSize: "+str(round(sum(listDistribution)/len(fileList),2)))
 print()
-print(" 0   10  20  30  40  50  60  70  80  90  100 Last")
+print(" 0    10   20   30   40   50   60   70   80   90   100  Last")
 print(listDistribution)
 print()
 print("SongProgress:\n" + str(progressFrequency))

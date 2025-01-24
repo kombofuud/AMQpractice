@@ -47,7 +47,7 @@ for file in fileList[1:]:
             listWeights[-1] += song["D"]
 
 #Get new songs from preplist
-songMean = (sum(listWeights))/songCounter
+songMean = (sum(listWeights))/len(fileList)
 
 if songMean < targetSongMean:
     newCount = max(0,math.ceil(targetSongMean-songMean))
