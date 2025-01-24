@@ -13,12 +13,18 @@ fileDead = "dead.json"
 filePrep = "preplist.json"
 fileLoad = "loadingcutlist.json"
 fileList = ["0cutlist.json", "10cutlist.json", "20cutlist.json", "30cutlist.json", "40cutlist.json", "50cutlist.json", "60cutlist.json", "70cutlist.json", "80cutlist.json", "90cutlist.json", "100cutlist.json", "lastcutlist.json"]
+targetSongMean = 530
+targetPrepCount = 2
+desiredQuizSize = 30
 '''
 fileMerged = "dummyMerged.json"
 fileDead = "dummyDead.json"
 filePrep = "dummyPreplist.json"
 fileLoad = "dummyLoad.json"
 fileList = ["dummy0cutlist.json", "dummy1cutlist.json"]
+targetSongMean = 2
+targetPrepCount = 2
+desiredQuizSize = 2
 
 #Get list of songs in pool
 songWeightMap = {}
@@ -43,8 +49,6 @@ for file in fileList[1:]:
 
 #Get new songs from preplist
 songMean = (sum(listWeights))/songCounter
-targetSongMean = 530
-targetPrepCount = 2
 
 if songMean < targetSongMean:
     newCount = max(0,math.ceil(targetSongMean-songMean))
@@ -87,6 +91,7 @@ if songMean < targetSongMean:
         fileData = fileData.replace("}]","}\n]")
         f.seek(0)
         f.write(fileData)
+
 #add new songs to practice lists
     for file in fileList:
         with open(file, "r+", encoding="utf-8") as file:
@@ -102,7 +107,7 @@ if songMean < targetSongMean:
             fileData = fileData.replace("}]","}\n]")
             f.seek(0)
             f.write(fileData)
-        
+
 #Pick List and Calculate Song Probabilities
 
 #picking list
@@ -111,6 +116,7 @@ zScores = []
 for val in listWeights:
     zScores.append(exp((val-songMean)/songDeviation))
 quizList = random.choices(fileList, weights = zScores)[0]
+print(zScores)
 
 #adjusting song probabilities
 weightList = []
@@ -124,7 +130,7 @@ weightListSum = sum(weightList)
 weightList = [weight/weightListSum for weight in weightList]
 
 #Pick Songs, write _quiz, and erase _practice
-songCount = min(30,len(poolSongList))
+songCount = min(desiredQuizSize,len(poolSongList))
 randomSongList = numpy.random.choice(poolSongList, size = songCount, p = weightList, replace = False)
 
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
