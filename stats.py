@@ -10,10 +10,12 @@ import json
 fileList = ["0cutlist.json", "10cutlist.json", "20cutlist.json", "30cutlist.json", "40cutlist.json", "50cutlist.json", "60cutlist.json", "70cutlist.json", "80cutlist.json", "90cutlist.json", "100cutlist.json", "lastcutlist.json"]
 filePrep = "preplist.json"
 fileLoad = "loadingcutlist.json"
+fileLearned = "learnedcutlist.json"
 '''
 fileList = ["dummy0cutlist.json", "dummy1cutlist.json"]
 fileLoad = "dummyLoad.json"
 filePrep = "dummyPreplist.json"
+fileLearned = "dummyLearnedcutlist.json"
 
 #getting list sizes
 with open(fileList[0], 'r', encoding = 'utf8') as f:
@@ -63,7 +65,7 @@ for file in fileList:
             else:
                 instanceCount[song["D"]] += 1
 learnedList = sorted(learnedList, key = lambda song: song["annSongId"])
-with open("learnedcutlist.json", 'r+', encoding = 'utf8') as f:
+with open(fileLearned, 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
     json.dump(learnedList,f,ensure_ascii=False)
@@ -92,4 +94,4 @@ print(listDistribution)
 print()
 print("SongProgress:\n" + str(progressFrequency))
 print()
-print("MinWeight: "+str(weightMin)+" MaxWeight: "+str(weightMax)+" LocalMinWeight: "+str(instanceMin)+" LocalWeightMax: "+str(instanceMax))
+print("MinSongWeight: "+str(weightMin)+" MaxSongWeight: "+str(weightMax)+" InstanceMinWeight: "+str(instanceMin)+" InstanceMaxWeight: "+str(instanceMax))
