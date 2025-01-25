@@ -58,6 +58,7 @@ for index in range(len(rawSongList)):
     for key in rawSongList[index]:
         songList[index][key] = rawSongList[index][key]
     songList[index]["D"] = 1
+    songList[index]["altAnimeNames"].extend(songList[index]["altAnimeNamesAnswers"])
 
 #map song ID's and broken URL's to equivalences
 equivMap = {}
