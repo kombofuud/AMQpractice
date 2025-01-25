@@ -58,7 +58,6 @@ for index in range(len(rawSongList)):
     for key in rawSongList[index]:
         songList[index][key] = rawSongList[index][key]
     songList[index]["D"] = 1
-    songList[index]["altAnimeNames"].extend(songList[index]["altAnimeNamesAnswers"])
 
 #map song ID's and broken URL's to equivalences
 equivMap = {}
@@ -79,7 +78,7 @@ fixedList = []
 for index, song in enumerate(songList):
     if song["annSongId"] in equivMap:
         song["altAnimeNames"] = altNames[equivMap[song["annSongId"]]]
-    song["altAnimeNames"] = list(set(song["altAnimeNames"]))
+    song["altAnimeNames"] = list(set(song["altAnimeNames"]+song["altAnimeNamesAnswers"]))
     if song["annSongId"] in brokenMap:
         if song["video720"] == brokenURLs[brokenMap[song["annSongId"]]]["video720"]:
             fixedList.append(index)
