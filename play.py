@@ -5,11 +5,13 @@ import json
 import fileinput
 import copy
 import numpy
+import shutil
 
 #Read ALL Files
 
 fileMerged = "merged.json"
 filePrep = "preplist.json"
+filePrevPractice = "_prevPractice.json"
 fileLoad = "loadingcutlist.json"
 fileList = ["0cutlist.json", "10cutlist.json", "20cutlist.json", "30cutlist.json", "40cutlist.json", "50cutlist.json", "60cutlist.json", "70cutlist.json", "80cutlist.json", "90cutlist.json", "100cutlist.json", "lastcutlist.json"]
 targetSongMean = 530
@@ -18,6 +20,7 @@ desiredQuizSize = 30
 '''
 fileMerged = "dummyMerged.json"
 filePrep = "dummyPreplist.json"
+filePrevPractice = "dummyPrevPractice.json"
 fileLoad = "dummyLoad.json"
 fileList = ["dummy0cutlist.json", "dummy1cutlist.json"]
 targetSongMean = 2
@@ -48,6 +51,7 @@ for file in fileList[1:]:
 
 #Get new songs from preplist
 songMean = (sum(listWeights))/len(fileList)
+newSongList = []
 
 if songMean < targetSongMean:
     newCount = max(0,math.ceil(targetSongMean-songMean))
@@ -135,6 +139,7 @@ randomSongList = list(numpy.random.choice(poolSongList, size = songCount, p = we
 
 with open("_quiz.json", 'w', encoding = 'utf8') as f:
     json.dump(randomSongList, f)
+shutil.move("_practice.json", filePrevPractice)
 with open("_practice.json", 'w', encoding = 'utf8') as f:
     f.write("[{}\n]")
 
