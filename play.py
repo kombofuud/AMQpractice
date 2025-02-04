@@ -14,6 +14,7 @@ filePrep = "preplist.json"
 filePrevPractice = "_prevPractice.json"
 fileLoad = "loadingcutlist.json"
 fileList = ["0cutlist.json", "10cutlist.json", "20cutlist.json", "30cutlist.json", "40cutlist.json", "50cutlist.json", "60cutlist.json", "70cutlist.json", "80cutlist.json", "90cutlist.json", "100cutlist.json", "lastcutlist.json"]
+fileAdd = "addThese.json"
 targetSongMean = 530
 targetPrepCount = 2
 desiredQuizSize = 30
@@ -23,6 +24,7 @@ filePrep = "dummyPreplist.json"
 filePrevPractice = "dummyPrevPractice.json"
 fileLoad = "dummyLoad.json"
 fileList = ["dummy0cutlist.json", "dummy1cutlist.json"]
+fileAdd = "dummyAddThese.json"
 targetSongMean = 2
 targetPrepCount = 2
 desiredQuizSize = 2
@@ -96,6 +98,20 @@ if songMean < targetSongMean:
         file.seek(0)
         file.write(fileData)
 
+#add new songs to special list
+    with open(fileAdd, "r+", encoding="utf-8") as file:
+        knownList = json.load(file)
+        knownList.extend(newSongList)
+        file.truncate(0)
+        file.seek(0)
+        json.dump(knownList,file,ensure_ascii=False)
+        file.seek(0)
+        fileData = file.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        file.seek(0)
+        file.write(fileData)
+
 #add new songs to practice lists
     for file in fileList:
         with open(file, "r+", encoding="utf-8") as file:
@@ -146,8 +162,8 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
 #Text Output
 print()
 print(quizList)
-print()
 if len(newSongList):
+    print()
     print("Added Songs-----------------------")
     for song in newSongList:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
