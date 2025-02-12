@@ -78,11 +78,11 @@ with open(fileLearned, 'r+', encoding = 'utf8') as f:
     
 #get frequency of various statistics
 progressFrequency = [0]*(len(fileList)+1)
-#weightCounter = [0]*(weightMax-weightMin+1)
+weightCounter = [0]*(weightMax-weightMin+1)
 #instanceCounter = [0]*(instanceMax-instanceMin+1)
 for key in progressCounter.keys():
     progressFrequency[progressCounter[key]] += 1
-#    weightCounter[songMean[key]-weightMin] += 1
+    weightCounter[songMean[key]-weightMin] += 1
 #    instanceCounter[instanceCount[key]-instanceMin] += 1
 progressFrequency.reverse()
 
@@ -92,6 +92,6 @@ print()
 print(" 0    10   20   30   40   50   60   70   80   90   100  Last")
 print(listDistribution)
 print()
-print("SongProgress:\n" + str(progressFrequency))
+print("SongProgress:\n" + str(weightCounter))
 print()
 print("MinSongWeight: "+str(weightMin)+" MaxSongWeight: "+str(weightMax)+" InstanceMinWeight: "+str(instanceMin)+" InstanceMaxWeight: "+str(instanceMax))
