@@ -17,7 +17,7 @@ fileList = ["0cutlist.json", "10cutlist.json", "20cutlist.json", "30cutlist.json
 fileAdd = "addThese.json"
 targetSongMean = 530
 targetPrepCount = 2
-desiredQuizSize = 30
+desiredQuizSize = 24
 '''
 fileMerged = "dummyMerged.json"
 filePrep = "dummyPreplist.json"
