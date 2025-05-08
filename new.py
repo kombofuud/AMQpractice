@@ -87,6 +87,8 @@ for index, song in enumerate(songList):
             song["video720"] = brokenURLs[brokenMap[song["annSongId"]]]["video720"]
 
 if len(fixedList):
+    #sort fixedList descending
+    fixedList = sorted(fixedList, key=lambda index: brokenMap[songList[index]["annSongId"]], reverse = True)
 
     #print any fixed urls
     print("Fixed URLs______________________________________")
@@ -94,7 +96,6 @@ if len(fixedList):
         print(songList[index]["songName"]+"__from__"+songList[index]["animeEnglishName"])
 
     #remove fixed urls from broken list
-    fixedList.reverse()
     for index in fixedList:
         brokenURLs.pop(brokenMap[songList[index]["annSongId"]])
     with open("broken.json", 'r+', encoding = 'utf8') as f:
