@@ -46,8 +46,8 @@ with open("broken.json", 'r', encoding = 'utf8') as f:
     brokenURLs = json.load(f)
 
 #put useful information at start of list
-shortHand = ["ST","STN","V","SN","EN","SA"]
-longHand = ["songType","songTypeNumber","animeVintage","songName","animeEnglishName","songArtist"]
+shortHand = ["ST","STN","ID","SN","EN","SA"]
+longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","songArtist"]
 songList = []
 idMap = {}
 for index in range(len(rawSongList)):
@@ -58,6 +58,7 @@ for index in range(len(rawSongList)):
     for key in rawSongList[index]:
         songList[index][key] = rawSongList[index][key]
     songList[index]["D"] = 1
+    songList[index]["annId"] = songList[index]["annSongId"]
     songList[index]["SN"] = "`"+songList[index]["SN"]+"`"
 
 #map song ID's and broken URL's to equivalences
