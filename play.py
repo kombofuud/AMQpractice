@@ -162,7 +162,7 @@ with open("_practice.json", 'w', encoding = 'utf8') as f:
 #Text Output
 print()
 print(quizList)
-if len(newSongList):
+if len(newSongList and False):
     print()
     print("Added Songs-----------------------")
     for song in newSongList:
