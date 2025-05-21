@@ -1,16 +1,3 @@
-#THINGS TO TEST
-#adds information to start of the json files including the D value                                 - start from merged without D values, change 1 url
-#correctly adds alt names to alt answers                                                           - include oddtaxi (remove alt names)
-#correctly fixes broken urls                                                                       - change a url change to broken.json
-#removes fixed urls from broken urls                                                               - add an included url to broken.json
-#replaces old instances of songs in each list with new ones while keeping the old D value          - keep current D values outside of merged
-#adds dead songs to dead song list                                                                 - add dummy dead song
-#adds new songs to loading list                                                                    - add a new song to merged
-#adds updated songs to merged.json                                                                 - check that merged has D values
-#prints dead songs
-#prints new songs
-#prints modified songs                                                                             - check print statements
-
 import json
 import shutil
 
