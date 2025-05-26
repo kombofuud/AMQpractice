@@ -11,9 +11,9 @@ import shutil
 import math
 
 #Move downloaded file to local directory and delete previous version
-#shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 
 '''
+shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 fileMerged = "merged"
 filePool = "pool.json"
 fileLoad = "loadingcutlist"
@@ -22,8 +22,9 @@ fileDead = "dead"
 filePractice = "_practice"
 fileQuiz = "_quiz"
 '''
+shutil.copy("dummyDownload.json", "dummyMerged.json")
 fileMerged = "dummyMerged"
-filePool = "dummy0"
+filePool = "dummyPool"
 fileLoad = "dummyLoad"
 filePrep = "dummyPreplist"
 fileDead = "dummyDead"
