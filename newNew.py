@@ -6,11 +6,9 @@
 #update _practice.json and _quiz.json
 #change fileList to filePool
 
-#TODO
-#make dummyquiz and dummypractice files.
-
 import json
 import shutil
+import math
 
 #Move downloaded file to local directory and delete previous version
 #shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
@@ -48,8 +46,8 @@ with open("broken.json", 'r', encoding = 'utf8') as f:
     brokenURLs = json.load(f)
 
 #put useful information at start of list
-shortHand = ["ST","STN","ID","SN","EN","SA"]
-longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","songArtist"]
+shortHand = ["ST","STN","ID","SN","EN","SA","SID"]
+longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","songArtist","annId"]
 songList = []
 idMap = {}
 for index in range(len(rawSongList)):
@@ -124,7 +122,33 @@ with open(fileMerged+".json", 'r+', encoding = 'utf8') as f:
         fileData = fileData.replace("}]","}\n]")
         f.seek(0)
         f.write(fileData)
-    
+
+def translateLength(oldList, size):
+    if size is None:
+        return oldList
+    elif math.ceil((size-15)/7.5) == len(oldList)+2:
+        return oldList
+    else:
+        start = oldList.pop(0)
+        end = oldList.pop(-1)
+        oldSize = len(oldList)
+        newSize = math.ceil((size-15)/7.5)
+        newList = [None]*newSize
+        for i in range(newSize):
+            low = int(math.floor(i*oldSize/newSize))
+            high = int(math.ceil((i+1)*oldSize/newSize)-1)
+            if low==high:
+                newList[i] = oldList[low]
+            else:
+                val = oldList[low]*((low+1)/oldSize-i/newSize)+oldList[high]*((i+1)/newSize-high/oldSize)
+                low += 1
+                while low < high:
+                    val += oldList[low]/oldSize
+                    low += 1
+                val *= newSize
+                val = round(val,2)
+                newList[i] = val
+
 deadCount = set()
 oldSongs = set()
 with open(filePool+"cutlist.json", 'r+', encoding = 'utf8') as f:
@@ -140,7 +164,7 @@ with open(filePool+"cutlist.json", 'r+', encoding = 'utf8') as f:
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["D"] = song["D"]
-        knownList[index]["sampleWeights"] = song["sampleWeights"]
+        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"])
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
@@ -203,6 +227,7 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
+        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"])
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
@@ -231,6 +256,7 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
+        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"])
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
