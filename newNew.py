@@ -13,7 +13,7 @@ import math
 #Move downloaded file to local directory and delete previous version
 
 '''
-shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
+shutil.move(r"..\\..\\..\\Downloads\\merged.json","merged.json")
 fileMerged = "merged"
 filePool = "pool.json"
 fileLoad = "loadingcutlist"
@@ -47,7 +47,7 @@ with open("broken.json", 'r', encoding = 'utf8') as f:
     brokenURLs = json.load(f)
 
 #put useful information at start of list
-shortHand = ["ST","STN","ID","SN","EN","SA","SID"]
+shortHand = ["ST","STN","ID","SN","EN","SA","AID"]
 longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","songArtist","annId"]
 songList = []
 idMap = {}
@@ -59,7 +59,7 @@ for index in range(len(rawSongList)):
     for key in rawSongList[index]:
         songList[index][key] = rawSongList[index][key]
     songList[index]["sampleWeights"] = None
-    songList[index]["D"] = 1
+    songList[index]["D"] = 12
     songList[index]["annId"] = songList[index]["annSongId"]
     songList[index]["SN"] = "`"+songList[index]["SN"]+"`"
 
@@ -124,12 +124,22 @@ with open(fileMerged+".json", 'r+', encoding = 'utf8') as f:
         f.seek(0)
         f.write(fileData)
 
-def translateLength(oldList, size):
+def translateLength(oldList, oldSize, size, annId):
     if size is None:
+        if oldList is None:
+            return [1]*12
+        print("Size lost for ANNID: "+annId)
         return oldList
-    elif math.ceil((size-15)/7.5) == len(oldList)+2:
-        return oldList
-    else:
+    elif oldList is None:
+        if oldSize is not None:
+            print("SongWeights for ANNID="+str(annId)+" previously uninitialized")
+        return [1]*int(math.ceil((size-15)/7.5)+2)
+    elif oldSize is not None and oldList is not None:
+        if math.ceil((size-15)/7.5) == len(oldList)-2:
+            return oldList
+        print("SongWeights for ANNID="+str(annId)+" reinitialized")
+        return [1]*int(math.ceil((size-15)/7.5)+2)
+    elif oldSize is None:
         start = oldList.pop(0)
         end = oldList.pop(-1)
         oldSize = len(oldList)
@@ -147,12 +157,15 @@ def translateLength(oldList, size):
                     val += oldList[low]/oldSize
                     low += 1
                 val *= newSize
-                val = round(val,2)
+                val = int(round(val,0))
                 newList[i] = val
+        return [start]+newList+[end]
+    print("ANNID: "+annId+" avoided all checks")
+    return oldList
 
 deadCount = set()
 oldSongs = set()
-with open(filePool+"cutlist.json", 'r+', encoding = 'utf8') as f:
+with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
     deadIndices = []
     for index, song in enumerate(knownList):
@@ -165,7 +178,10 @@ with open(filePool+"cutlist.json", 'r+', encoding = 'utf8') as f:
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["D"] = song["D"]
-        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"])
+        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], knownList[index]["annId"])
+        if song["length"] is not None and knownList[index]["length"] is not None:
+            if abs(song["length"]-knownList[index]["length"]) > 1:
+                knownList[index]["D"] = 12
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
@@ -183,10 +199,11 @@ with open(filePool+"cutlist.json", 'r+', encoding = 'utf8') as f:
 with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
     for index, song in enumerate(knownList):
-        knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["D"] = song["D"]
-        knownList[index]["startPoint"] = song["startPoint"]
-        knownList[index]["sampleWeights"] = song["sampleWeights"]
+        if song["annSongId"] in idMap:
+            knownList[index] = songList[idMap[song["annSongId"]]]
+            knownList[index]["D"] = song["D"]
+            knownList[index]["startPoint"] = song["startPoint"]
+            knownList[index]["sampleWeights"] = song["sampleWeights"]
     
     f.truncate(0)
     f.seek(0)
@@ -201,10 +218,11 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
 with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
     for index, song in enumerate(knownList):
-        knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["D"] = song["D"]
-        knownList[index]["startPoint"] = song["startPoint"]
-        knownList[index]["sampleWeights"] = song["sampleWeights"]
+        if song["annSongId"] in idMap:
+            knownList[index] = songList[idMap[song["annSongId"]]]
+            knownList[index]["D"] = song["D"]
+            knownList[index]["startPoint"] = song["startPoint"]
+            knownList[index]["sampleWeights"] = song["sampleWeights"]
     
     f.truncate(0)
     f.seek(0)
@@ -228,7 +246,6 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"])
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
@@ -257,13 +274,14 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"])
+        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], song["annSongId"])
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
 
     for song in songList:
         if song["annSongId"] not in oldSongs:
+            song["sampleWeights"] = translateLength(None, None, song["length"], song["annSongId"])
             newSongs.append(song)
             knownList.append(song)
 
