@@ -128,18 +128,18 @@ with open(fileMerged+".json", 'r+', encoding = 'utf8') as f:
 def translateLength(oldList, oldSize, size, annId):
     if size is None:
         if oldList is None:
-            return [1]*12
+            return [0]*12
         print("Size lost for ANNID: "+annId)
         return oldList
     elif oldList is None:
         if oldSize is not None:
             print("SongWeights for ANNID="+str(annId)+" previously uninitialized")
-        return [1]*int(math.ceil((size-15)/7.5)+2)
+        return [0]*int(math.ceil((size-15)/7.5)+2)
     elif oldSize is not None and oldList is not None:
         if math.ceil((size-15)/7.5) == len(oldList)-2:
             return oldList
         print("SongWeights for ANNID="+str(annId)+" reinitialized")
-        return [1]*int(math.ceil((size-15)/7.5)+2)
+        return [0]*int(math.ceil((size-15)/7.5)+2)
     elif oldSize is None:
         start = oldList.pop(0)
         end = oldList.pop(-1)
