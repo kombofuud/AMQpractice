@@ -1,22 +1,6 @@
 #TODO
-#Read quiz.json
-    #extract list of songs from game
-    #store as a list of annSongIds
-
-#Read practice.json
-    #extract songs missed and extra songs. Update accordingly. Check to see if list was scrapped.
-    #first element contains a number that is incremented every time that a hit, miss, skip, occurs (but not confusion). Number counts the number of songs played in the game.
-#Read pool.json
-    #ensure that the right number of songs in quiz is properly accounted for. (hit, miss, skip, scrapped) when compared to number in practice.json
-    #(adjust is null by default)
-    #Hit - set adjust=1
-    #Miss - set adjust=-1
-    #skip - set adjust=0
-    #confusion - handled like a miss
-    #scrapped - set first element of _practice to number of adjusted songs. (This should be equivalent to the count of adjusted songs)
-     
-    #For songs in list, adjust both D value and instance distribution, reset adjust
-    #For confusion, increment only D
+#Read pool.json (replacing reading all files)
+    #ensure all "X" == 0
 
 #Sample only based on pool
     #Don't select random list, always select pool
