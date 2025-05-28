@@ -54,6 +54,7 @@ idMap = {}
 for index in range(len(rawSongList)):
     idMap[rawSongList[index]["annSongId"]] = index
     songList.append({})
+    songList[index]["X"] = 0
     for jindex in range(len(shortHand)):
         songList[index][shortHand[jindex]] = rawSongList[index][longHand[jindex]]
     for key in rawSongList[index]:
