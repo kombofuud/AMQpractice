@@ -1,9 +1,8 @@
 #TODO
-#read quiz
-#read play
-#ensure that the right number of things from quiz got updated
-#update things that need to be updated
-#write missed songs to play.py
+#test that compile works as intended
+#correctly updates misses, hits, extra songs
+#tests cause program to crash prematurely
+#practice is properly created
 
 import json
 import sys
@@ -68,31 +67,39 @@ for song in quizSongs:
     else:
         ignoredKeys.add(song["ID"])
 
-if countedKeys != argVal:
-    print("Updated SongCount Error")
+if countedKeys < argVal:
+    print("Insufficient songs updated: "+str(countedKeys)+"/"+str(argVal))
     print("Missing Keys:")
     print("_____________")
     for key in ignoredKeys:
-        song = quizIds[idIndices[key]]
-        print("ANNID="+song["ID"]+", "+song["SN"]+" _from_ "+song["EN"])
+        song = songPool[idIndices[key]]
+        print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
     print("\nExtra Keys:")
     print("___________")
     for key in extraIds:
-        song = quizIds[extraIndices[key]]
-        print("ANNID="+song["ID"]+", "+song["SN"]+" _from_ "+song["EN"])
+        song = songPool[extraIndices[key]]
+        print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
     sys.exit(1)
+if countedKeys > argVal:
+    print("More updates than expected."+str(countedKeys)+"/"+str(argVal))
+    for key,update in quizIds.items():
+        if update != 0:
+            song = songPool[key]
+            print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
 
 #Update all keys and generate practice json
 for ID, index in idIndices.items():
-    songPool[index]["D"] += 3-2*quizIds[ID] #maps 1,2 to 1,-1
+    songPool[index]["D"] += (1+quizIds[ID])%3-1 #maps 0,1,2 to 0,1,-1
+    songPool[index]["X"] = 0
     if quizIds[ID] == 2:
-for ID, index in extraIndices:
-    quizSongs[index]["D"] = max(quizSongs[index]["D"], int(countedTotalWeight/countedKeys))
+for ID, index in extraIndices.items():
+    songPool[index]["D"] = max(songPool[index]["D"], int(countedTotalWeight/countedKeys))
+    songPool[index]["X"] = 0
 
-with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
+with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
-    json.dump(quizSongs,f,ensure_ascii=False)
+    json.dump(practice,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
     fileData = fileData.replace(", {","\n,{")
@@ -100,5 +107,17 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
+with open(filePool+".json", 'r+', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(songPool,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
+
+
 #Print sucess statement
-print("Practice List Compiled without Issue")
+print("Practice List Compiled without Issue. Len = "+str(len(practice)))
