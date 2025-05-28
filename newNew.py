@@ -31,6 +31,8 @@ fileDead = "dummyDead"
 filePractice = "dummyPractice"
 fileQuiz = "dummyQuiz"
 
+startingD = 12
+
 #get list of all songs
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
     rawSongList = json.load(f)
@@ -247,6 +249,8 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
+        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], song["annSongId"])
+        knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
@@ -276,6 +280,7 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], song["annSongId"])
+        knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
