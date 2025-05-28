@@ -44,9 +44,16 @@ extraIndices = dict()
 errorQ = 0
 for i, song in enumerate(songPool):
     if song["X"] != 0:
+        #alter amount added to songId. 1 -> -1, 2 -> ???
         if song["ID"] in quizIds:
-            quizIds[song["ID"]] = song["X"]
             idIndices[song["ID"]] = i
+            if song["X"] == 1:
+                quizIds[song["ID"]] = -1
+            elif song["X"] == 2:
+                quizIds[song["ID"]] = 3-int(song["D"]/6) #increase penalty the more you know the song
+            else:
+                print("QuizSong Status Val Undefined: ANNID="+song["ID"]+", "+song["SN"]+ " _from_ "+song["EN"])
+                errorQ = 1
         elif song["X"] != 2:
             print("Extra Song was Incremented: ANNID="+song["ID"]+", "+song["SN"]+ " _from_ "+song["EN"])
             errorQ = 1
@@ -89,7 +96,7 @@ if countedKeys > argVal:
 
 #Update all keys and generate practice json
 for ID, index in idIndices.items():
-    songPool[index]["D"] += (1+quizIds[ID])%3-1 #maps 0,1,2 to 0,1,-1
+    songPool[index]["D"] += quizIds[ID] #maps 0,1,2 to 0,-1,1
     songPool[index]["X"] = 0
     if quizIds[ID] == 2:
 for ID, index in extraIndices.items():
