@@ -1,4 +1,4 @@
-#TODO
+#TODO: test all the following
 #Read pool.json (replacing reading all files)
     #ensure all "X" == 0
 
@@ -27,7 +27,6 @@ import sys
 
 #Read ALL Files
 
-'''
 fileMerged = "merged"
 filePrep = "preplist"
 fileLoad = "loadingcutlist"
@@ -45,6 +44,7 @@ fileAdd = "dummyAddThese"
 fileQuiz = "dummyQuiz"
 targetDSum = 96
 desiredQuizSize = 4
+'''
 
 #Index all songs in pool, get their total weight and check that compile doesn't need to be run
 DList = []
@@ -198,9 +198,11 @@ if len(newSongList) > 0:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 '''
 print()
-print(f"Pool Size: {len(poolSongList)} LoadingSize: {len(loadingList)+len(prepList)-1} Min D: {DMin}")
+print(f"Pool Size: {len(poolSongList)} LoadingSize: {len(loadingList)+len(prepList)-1} TotalD: {totalDWeight} Min D: {DMin}")
 DList = [0]*(19-DMin)
 for song in poolSongList:
+    if song["D"] > 18:
+        song["D"] = 18
     DList[18-song["D"]] += 1
 print("DValue distribution")
 for index in range(len(DList)):

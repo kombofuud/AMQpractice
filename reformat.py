@@ -1,7 +1,7 @@
 import json
 
 fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
-fileTarget = "filePool"
+fileTarget = "pool"
 '''
 fileList = ["dummy0", "dummy1"]
 fileTarget = "dummyPool"
