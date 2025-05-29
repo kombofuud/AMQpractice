@@ -6,6 +6,7 @@
 
 import json
 import sys
+import math
 
 '''
 fileQuiz = "_quiz"
@@ -22,30 +23,28 @@ with open(filePool+".json", 'r', encoding = 'utf8') as f:
 
 quizIds = dict()
 quizSamples = dict()
-practice = []
 with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
     quizSongs = json.load(f)
     for song in quizSongs:
         quizIds[song["ID"]] = 0
         quizSamples[song["ID"]] = song["startPoint"]
-        if song["X"] == 2:
-            practice.append(song)
 
 #assume all songs must be accounted for unless user says otherwise. If user types a negative number, that indicates the number of skipped songs.
 if len(sys.argv) > 1:
-    argVal = int(sys.argv[1][1])
+    argVal = int(sys.argv[1])
     if argVal < 0:
-        argVal += len(quiz)
+        argVal += len(quizSongs)
 else:
-    argVal = len(quiz)
+    argVal = len(quizSongs)
 
 #Run through list of quizSongs and check for songs which are marked for an update. 1 is a correct, 2 is a miss
 extraIds = set()
 idIndices = dict()
 extraIndices = dict()
+practice = []
 errorQ = 0
 for i, song in enumerate(songPool):
-    if song["X"] != 0:
+    if song["X"] != 0 or song["ID"] in quizIds:
         #alter amount added to songId. 1 -> -1, 2 -> ???
         if song["ID"] in quizIds:
             idIndices[song["ID"]] = i
@@ -53,11 +52,13 @@ for i, song in enumerate(songPool):
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
                 quizIds[song["ID"]] = 3-int(song["D"]/6) #increase penalty the more you know the song
-            else:
-                print("QuizSong Status Val Undefined: ANNID="+song["ID"]+", "+song["SN"]+ " _from_ "+song["EN"])
+                song["startPoint"] = quizSamples[song["ID"]]
+                practice.append(song)
+            elif song["X"] != 0:
+                print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
                 errorQ = 1
         elif song["X"] != 2:
-            print("Extra Song was Incremented: ANNID="+song["ID"]+", "+song["SN"]+ " _from_ "+song["EN"])
+            print(f"Extra Song was Incremented: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
             errorQ = 1
         else:
             extraIds.add(song["ID"])
@@ -70,7 +71,7 @@ countedKeys = 0
 countedTotalWeight = 0
 ignoredKeys = set()
 for song in quizSongs:
-    if quizIds[song["ID"] != 0:
+    if quizIds[song["ID"]] != 0:
         countedKeys += 1
         countedTotalWeight += song["D"]
     else:
@@ -100,12 +101,12 @@ if countedKeys > argVal:
 for ID, index in idIndices.items():
     songPool[index]["D"] += quizIds[ID] 
     if quizSamples[ID] == 0:
-        songPool[index]["sampleWeights"][0] += (1+songPool[index]["X"])%3-1
+        songPool[index]["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
     if quizSamples[ID] == 100:
-        songPool[index]["sampleWeights"][-1] += (1+songPool[index]["X"])%3-1
+        songPool[index]["sampleWeights"][-1] += 1-(1+songPool[index]["X"])%3
     else:
         sectionCount = len(songPool[index]["sampleWeights"])-2
-        songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += (1+songPool[index]["X"])%3-1
+        songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += 1-(1+songPool[index]["X"])%3
     songPool[index]["X"] = 0
 for ID, index in extraIndices.items():
     songPool[index]["D"] = max(songPool[index]["D"], int(countedTotalWeight/countedKeys))
