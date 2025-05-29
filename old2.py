@@ -1,37 +1,21 @@
-#UNTESTED
-
-#fileList replaced with pool.json
-#add a sampleDistribution variable set to null
-#Keep D value and song distribution (and song sample for _quiz/_practice)
-#update _practice.json and _quiz.json
-#change fileList to filePool
-
 import json
 import shutil
-import math
 
 #Move downloaded file to local directory and delete previous version
+shutil.move(r"..\..\..\Downloads\merged.json","merged.json")
 
-shutil.move(r"..\\..\\..\\Downloads\\merged.json","merged.json")
 fileMerged = "merged"
-filePool = "pool"
+fileList = ["0","10","20","30","40","50","60","70","80","90","100","last"]
 fileLoad = "loadingcutlist"
 filePrep = "preplist"
 fileDead = "dead"
-filePractice = "_practice"
-fileQuiz = "_quiz"
 '''
-shutil.copy("dummyDownload.json", "dummyMerged.json")
 fileMerged = "dummyMerged"
-filePool = "dummyPool"
+fileList = ["dummy0", "dummy1"]
 fileLoad = "dummyLoad"
 filePrep = "dummyPreplist"
 fileDead = "dummyDead"
-filePractice = "dummyPractice"
-fileQuiz = "dummyQuiz"
 '''
-
-startingD = 12
 
 #get list of all songs
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
@@ -49,20 +33,18 @@ with open("broken.json", 'r', encoding = 'utf8') as f:
     brokenURLs = json.load(f)
 
 #put useful information at start of list
-shortHand = ["ST","STN","ID","SN","EN","SA","AID"]
-longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","songArtist","annId"]
+shortHand = ["ST","STN","ID","SN","EN","SA"]
+longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","songArtist"]
 songList = []
 idMap = {}
 for index in range(len(rawSongList)):
     idMap[rawSongList[index]["annSongId"]] = index
     songList.append({})
-    songList[index]["X"] = 0
     for jindex in range(len(shortHand)):
         songList[index][shortHand[jindex]] = rawSongList[index][longHand[jindex]]
     for key in rawSongList[index]:
         songList[index][key] = rawSongList[index][key]
-    songList[index]["sampleWeights"] = None
-    songList[index]["D"] = 12
+    songList[index]["D"] = 1
     songList[index]["annId"] = songList[index]["annSongId"]
     songList[index]["SN"] = "`"+songList[index]["SN"]+"`"
 
@@ -126,121 +108,39 @@ with open(fileMerged+".json", 'r+', encoding = 'utf8') as f:
         fileData = fileData.replace("}]","}\n]")
         f.seek(0)
         f.write(fileData)
-
-def translateLength(oldList, oldSize, size, annId):
-    if size is None:
-        if oldList is None:
-            return [0]*12
-        elif oldSize is not None:
-            print(f"Size lost for ANNID: {annId}")
-        return oldList
-    elif oldList is None:
-        if oldSize is not None:
-            print("SongWeights for ANNID="+str(annId)+" previously uninitialized")
-        return [0]*int(max(math.ceil((size-15)/7.5)+2, 1))
-    elif oldSize is not None and oldList is not None:
-        if math.ceil((size-15)/7.5) == len(oldList)-2:
-            return oldList
-        print("SongWeights for ANNID="+str(annId)+" reinitialized")
-        return [0]*int(max(math.ceil((size-15)/7.5)+2, 1))
-    elif oldSize is None:
-        start = oldList.pop(0)
-        end = oldList.pop(-1)
-        oldSize = len(oldList)
-        newSize = math.ceil((size-15)/7.5)
-        newList = [None]*newSize
-        for i in range(newSize):
-            low = int(math.floor(i*oldSize/newSize))
-            high = int(math.ceil((i+1)*oldSize/newSize)-1)
-            if low==high:
-                newList[i] = oldList[low]
-            else:
-                val = oldList[low]*((low+1)/oldSize-i/newSize)+oldList[high]*((i+1)/newSize-high/oldSize)
-                low += 1
-                while low < high:
-                    val += oldList[low]/oldSize
-                    low += 1
-                val *= newSize
-                val = int(round(val,0))
-                newList[i] = val
-        return [start]+newList+[end]
-    print("ANNID: "+annId+" avoided all checks")
-    return oldList
-
+    
 deadCount = set()
 oldSongs = set()
-with open(filePool+".json", 'r+', encoding = 'utf8') as f:
-    knownList = json.load(f)
-    deadIndices = []
-    for index, song in enumerate(knownList):
-        if song["annSongId"] not in idMap:
-            deadIndices.append(index)
-            if song["annSongId"] not in deadCount:
-                deadList.append(song)
-                deadCount.add(song["annSongId"])
-            continue
-        oldSongs.add(song["annSongId"])
-        knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["D"] = song["D"]
-        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], knownList[index]["annId"])
-        if song["length"] is not None and knownList[index]["length"] is not None:
-            if abs(song["length"]-knownList[index]["length"]) > 1:
-                knownList[index]["D"] = 12
-    deadIndices.reverse()
-    for index in deadIndices:
-        knownList.pop(index)
-
-    f.truncate(0)
-    f.seek(0)
-    json.dump(knownList,f,ensure_ascii=False)
-    f.seek(0)
-    fileData = f.read()
-    fileData = fileData.replace(", {","\n,{")
-    fileData = fileData.replace("}]","}\n]")
-    f.seek(0)
-    f.write(fileData)
-
-with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
-    knownList = json.load(f)
-    for index, song in enumerate(knownList):
-        if song["annSongId"] in idMap:
+for file in fileList:
+    with open(file+"cutlist.json", 'r+', encoding = 'utf8') as f:
+        knownList = json.load(f)
+        deadIndices = []
+        for index, song in enumerate(knownList):
+            if song["annSongId"] not in idMap:
+                deadIndices.append(index)
+                if song["annSongId"] not in deadCount:
+                    deadList.append(song)
+                    deadCount.add(song["annSongId"])
+                continue
+            oldSongs.add(song["annSongId"])
             knownList[index] = songList[idMap[song["annSongId"]]]
             knownList[index]["D"] = song["D"]
-            knownList[index]["startPoint"] = song["startPoint"]
-            knownList[index]["sampleWeights"] = song["sampleWeights"]
-    
-    f.truncate(0)
-    f.seek(0)
-    json.dump(knownList,f,ensure_ascii=False)
-    f.seek(0)
-    fileData = f.read()
-    fileData = fileData.replace(", {","\n,{")
-    fileData = fileData.replace("}]","}\n]")
-    f.seek(0)
-    f.write(fileData)
+        deadIndices.reverse()
+        for index in deadIndices:
+            knownList.pop(index)
 
-with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
-    knownList = json.load(f)
-    for index, song in enumerate(knownList):
-        if song["annSongId"] in idMap:
-            knownList[index] = songList[idMap[song["annSongId"]]]
-            knownList[index]["D"] = song["D"]
-            knownList[index]["startPoint"] = song["startPoint"]
-            knownList[index]["sampleWeights"] = song["sampleWeights"]
-    
-    f.truncate(0)
-    f.seek(0)
-    json.dump(knownList,f,ensure_ascii=False)
-    f.seek(0)
-    fileData = f.read()
-    fileData = fileData.replace(", {","\n,{")
-    fileData = fileData.replace("}]","}\n]")
-    f.seek(0)
-    f.write(fileData)
+        f.truncate(0)
+        f.seek(0)
+        json.dump(knownList,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
 
 with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
-    elementNull = knownList.pop(0)
     deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
@@ -251,15 +151,12 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["sampleWeights"] = translateLength(None, None, knownList[index]["length"], song["annSongId"])
-        knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
 
     f.truncate(0)
     f.seek(0)
-    knownList.insert(0, elementNull)
     json.dump(knownList,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
@@ -268,8 +165,6 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
-#swap old songs from fileLoad out and add any new songs to it.
-newSongs = []
 with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
     deadIndices = []
@@ -282,17 +177,9 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["sampleWeights"] = translateLength(None, None, knownList[index]["length"], song["annSongId"])
-        knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
-
-    for song in songList:
-        if song["annSongId"] not in oldSongs:
-            song["sampleWeights"] = translateLength(None, None, song["length"], song["annSongId"])
-            newSongs.append(song)
-            knownList.append(song)
 
     f.truncate(0)
     f.seek(0)
@@ -320,7 +207,23 @@ if len(deadCount):
         f.seek(0)
         f.write(fileData)
 
-#print new songs
+#add new songs to file Load, and print new songs
+newSongs = []
+with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
+    knownList = json.load(f)
+    for song in songList:
+        if song["annSongId"] not in oldSongs:
+            newSongs.append(song)
+            knownList.append(song)
+    f.truncate(0)
+    f.seek(0)
+    json.dump(knownList,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
 print("NewSongs:_______________________")
 for song in newSongs:
     print(song["songName"]+"__from__"+song["animeEnglishName"])
