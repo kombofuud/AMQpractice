@@ -1,23 +1,3 @@
-#TODO: test all the following
-#Read pool.json (replacing reading all files)
-    #ensure all "X" == 0
-
-#Sample songs from pool
-    #Don't select random list, always select pool
-
-#Song Selection
-    #Set Song Sample based on distribution
-    #Distribution Section Weight = (offby2/2+offby1+self)/sumofWeights (not always 4 near endpoints)
-    #Distribution is a sample point. Endpoints are start and end. Anything in the middle covers a range of length 100/ceil((n-15)/7).
-        #At index 0<i<n-1, sample should be uniformly random between 100/ceil((n-15)/7)*(i-1) and 100/ceil((n-15)/7)*i
-
-#Adding song update
-    #Check number of sections in a song one-by-one to see if it takes mean over threshold (initial weight = 12)
-    #Create song distribution when adding song to pool.json
-    #Always randomize pool
-
-#print information: poolSize, loadingsize, songdistribution
-
 import random
 import math
 import json
