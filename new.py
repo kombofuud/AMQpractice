@@ -1,11 +1,3 @@
-#UNTESTED
-
-#fileList replaced with pool.json
-#add a sampleDistribution variable set to null
-#Keep D value and song distribution (and song sample for _quiz/_practice)
-#update _practice.json and _quiz.json
-#change fileList to filePool
-
 import json
 import shutil
 import math

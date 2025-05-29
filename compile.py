@@ -1,9 +1,3 @@
-#TODO
-#test that compile works as intended
-#correctly updates misses, hits, extra songs
-#tests cause program to crash prematurely
-#practice is properly created
-
 import json
 import sys
 import math
@@ -136,4 +130,4 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
 
 
 #Print sucess statement
-print("Practice List Compiled without Issue. Len = "+str(len(practice)))
+print("Practice List Compiled: Len = "+str(len(practice)))
