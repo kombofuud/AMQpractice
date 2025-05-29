@@ -239,6 +239,7 @@ with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
 
 with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
+    elementNull = knownList.pop(0)
     deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
@@ -249,7 +250,7 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], song["annSongId"])
+        knownList[index]["sampleWeights"] = translateLength(None, None, knownList[index]["length"], song["annSongId"])
         knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
@@ -257,6 +258,7 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
 
     f.truncate(0)
     f.seek(0)
+    knownList.insert(0, elementNull)
     json.dump(knownList,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
@@ -279,7 +281,7 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
             continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
-        knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], song["annSongId"])
+        knownList[index]["sampleWeights"] = translateLength(None, None, knownList[index]["length"], song["annSongId"])
         knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
