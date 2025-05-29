@@ -12,10 +12,9 @@ import math
 
 #Move downloaded file to local directory and delete previous version
 
-'''
 shutil.move(r"..\\..\\..\\Downloads\\merged.json","merged.json")
 fileMerged = "merged"
-filePool = "pool.json"
+filePool = "pool"
 fileLoad = "loadingcutlist"
 filePrep = "preplist"
 fileDead = "dead"
@@ -30,6 +29,7 @@ filePrep = "dummyPreplist"
 fileDead = "dummyDead"
 filePractice = "dummyPractice"
 fileQuiz = "dummyQuiz"
+'''
 
 startingD = 12
 
@@ -131,7 +131,8 @@ def translateLength(oldList, oldSize, size, annId):
     if size is None:
         if oldList is None:
             return [0]*12
-        print("Size lost for ANNID: "+annId)
+        elif oldSize is not None:
+            print(f"Size lost for ANNID: {annId}")
         return oldList
     elif oldList is None:
         if oldSize is not None:
