@@ -63,8 +63,6 @@ for i, song in enumerate(songPool):
         else:
             extraIds.add(song["ID"])
             extraIndices[song["ID"]] = i
-if errorQ:
-    sys.exit(1)
 
 #Ensure that the correct number of songs were accounted for
 countedKeys = 0
@@ -96,6 +94,8 @@ if countedKeys > argVal:
         if update != 0:
             song = songPool[key]
             print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
+if errorQ:
+    sys.exit(1)
 
 #Update all keys and generate practice json
 for ID, index in idIndices.items():
