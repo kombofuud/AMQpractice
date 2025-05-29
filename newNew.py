@@ -136,12 +136,12 @@ def translateLength(oldList, oldSize, size, annId):
     elif oldList is None:
         if oldSize is not None:
             print("SongWeights for ANNID="+str(annId)+" previously uninitialized")
-        return [0]*int(math.ceil((size-15)/7.5)+2)
+        return [0]*int(max(math.ceil((size-15)/7.5)+2, 1))
     elif oldSize is not None and oldList is not None:
         if math.ceil((size-15)/7.5) == len(oldList)-2:
             return oldList
         print("SongWeights for ANNID="+str(annId)+" reinitialized")
-        return [0]*int(math.ceil((size-15)/7.5)+2)
+        return [0]*int(max(math.ceil((size-15)/7.5)+2, 1))
     elif oldSize is None:
         start = oldList.pop(0)
         end = oldList.pop(-1)

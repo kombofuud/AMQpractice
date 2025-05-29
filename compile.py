@@ -21,11 +21,13 @@ with open(filePool+".json", 'r', encoding = 'utf8') as f:
     songPool = json.load(f)
 
 quizIds = dict()
+quizSamples = dict()
 practice = []
 with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
     quizSongs = json.load(f)
     for song in quizSongs:
         quizIds[song["ID"]] = 0
+        quizSamples[song["ID"]] = song["startPoint"]
         if song["X"] == 2:
             practice.append(song)
 
@@ -96,9 +98,15 @@ if countedKeys > argVal:
 
 #Update all keys and generate practice json
 for ID, index in idIndices.items():
-    songPool[index]["D"] += quizIds[ID] #maps 0,1,2 to 0,-1,1
+    songPool[index]["D"] += quizIds[ID] 
+    if quizSamples[ID] == 0:
+        songPool[index]["sampleWeights"][0] += (1+songPool[index]["X"])%3-1
+    if quizSamples[ID] == 100:
+        songPool[index]["sampleWeights"][-1] += (1+songPool[index]["X"])%3-1
+    else:
+        sectionCount = len(songPool[index]["sampleWeights"])-2
+        songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += (1+songPool[index]["X"])%3-1
     songPool[index]["X"] = 0
-    if quizIds[ID] == 2:
 for ID, index in extraIndices.items():
     songPool[index]["D"] = max(songPool[index]["D"], int(countedTotalWeight/countedKeys))
     songPool[index]["X"] = 0

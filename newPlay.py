@@ -51,24 +51,26 @@ desiredQuizSize = 4
 
 #Index all songs in pool, get their total weight and check that compile doesn't need to be run
 DList = []
+DMin = 18
 indexMap = dict()
 totalDWeight = 0
 songCounter = 0
 with open(filePool+".json", "r", encoding="utf-8") as file:
     poolSongList = json.load(file)
-    for index, song in enumerate(poolSongList):
-        if song["X"] != 0:
-            print("Error: Previous quiz not compiled")
-            sys.exit(1)
-        totalDWeight += song["D"]
-        indexMap[song["ID"]] = index
-        DList.append(song["D"])
-        songCounter += 1
+for index, song in enumerate(poolSongList):
+    if song["X"] != 0:
+        print("Error: Previous quiz not compiled")
+        sys.exit(1)
+    totalDWeight += song["D"]
+    indexMap[song["ID"]] = index
+    DList.append(song["D"])
+    DMin = min(DMin, song["D"])
+    songCounter += 1
 
 #Get new songs if applicable
 newSongList = []
 if totalDWeight < targetDSum:
-
+    
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
     with open(filePrep+".json", "r", encoding="utf-8") as file:
         prepList = json.load(file)
@@ -85,6 +87,7 @@ if totalDWeight < targetDSum:
             newSongList.append(newSong)
             totalDWeight += newSong["D"]
             DList.append(newSong["D"])
+            DMin = min(newSong["D"], DMin)
             indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
             continue
         elif len(loadingList) > 0:
@@ -92,6 +95,7 @@ if totalDWeight < targetDSum:
             newSongList.append(newSong)
             totalDWeight += newSong["D"]
             DList.append(newSong["D"])
+            DMin = min(newSong["D"], DMin)
             indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
             continue
         elif len(prepList) > 0:
@@ -99,12 +103,12 @@ if totalDWeight < targetDSum:
             newSongList.append(newSong)
             totalDWeight += newSong["D"]
             DList.append(newSong["D"])
+            DMin = min(newSong["D"], DMin)
             indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
             continue
         else:
             print("Insufficient new songs:")
             break
-            
 
     #rewrite fileLoad/prep without the added songs
     with open(fileLoad+".json", "r+", encoding="utf-8") as file:
@@ -146,24 +150,48 @@ if totalDWeight < targetDSum:
 poolSongList.extend(newSongList)
 
 
-#Pick List and Calculate Song Probabilities
+#Pick Songs and Generate Song Section
 
 #Pick Songs
 songCount = min(desiredQuizSize,len(poolSongList))
 randomSongList = list(numpy.random.choice(poolSongList, size = songCount, p = DList, replace = False))
 
 #For each song, pick sample point
-
+for index, song in enumerate(randomSongList):
+    distribution = song["sampleWeights"]   
+    for i in range(len(distribution)):
+        distribution[i] = math.exp(distribution[i])
+    section = random.choices(range(len(distribution)), weights=distribution, k=1)[0]
+    if section == 0:
+        samplePoint = 0
+    elif section == len(distribution)-1:
+        samplePoint = 100
+    else:
+        samplePoint = 100/(len(distribution)-2)*(section+random.random()-1)
+    if samplePoint < 0 or samplePoint > 100:
+        print("Error: Sample point out of range. S="+str(samplePoint))
+    randomSongList[index]["startPoint"] = samplePoint
 
 #Write quiz list
-with open("_quiz.json", 'w', encoding = 'utf8') as f:
+with open(fileQuiz+".json", 'w', encoding = 'utf8') as f:
     json.dump(randomSongList, f)
 
 #Write new songs to pool and shuffle
+with open(filePool+".json", 'w', encoding = 'utf8') as f:
+        file.truncate(0)
+        file.seek(0)
+        random.shuffle(poolSongList)
+        json.dump(poolSongList,f,ensure_ascii=False)
+        file.seek(0)
+        fileData = file.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        file.seek(0)
+        file.write(fileData)
 
 #Output D distribution, poolSize, loadingSize
-print()
 '''
+print()
 if len(newSongList) > 0:
     print()
     print("Added Songs-----------------------")
@@ -171,4 +199,13 @@ if len(newSongList) > 0:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 '''
 print()
-print("Pool Size: "+str(songCounter))
+print("Pool Size: "+str(len(poolSongList)+". LoadingSize: "+str(len(loadingList)+len(prepList)-1)+". Min D: "+str(DMin))
+DList = [0]*(19-DMin)
+for song in poolSongList:
+    DList[18-song["D"]] += 1
+for index in len(DList):
+    if index%6==0:
+        print(f"\033[31m{DList[index]}\033[0m", end = " ")
+    else:
+        print(DList[index], end = " ")
+print()
