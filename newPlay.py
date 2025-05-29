@@ -20,12 +20,9 @@
 
 import random
 import math
-import statistics
 import json
-import fileinput
 import copy
 import numpy
-import shutil
 import sys
 
 #Read ALL Files
@@ -33,19 +30,19 @@ import sys
 '''
 fileMerged = "merged"
 filePrep = "preplist"
-filePrevPractice = "_prevPractice"
 fileLoad = "loadingcutlist"
 filePool = "pool"
 fileAdd = "addThese"
+fileQuiz = "_quiz"
 targetDSum = 530
 desiredQuizSize = 30
 '''
 fileMerged = "dummyMerged"
 filePrep = "dummyPreplist"
-filePrevPractice = "dummyPrevPractice"
 fileLoad = "dummyLoad"
 filePool = "dummyPool"
 fileAdd = "dummyAddThese"
+fileQuiz = "dummyQuiz"
 targetDSum = 96
 desiredQuizSize = 4
 
@@ -63,20 +60,22 @@ for index, song in enumerate(poolSongList):
         sys.exit(1)
     totalDWeight += song["D"]
     indexMap[song["ID"]] = index
-    DList.append(song["D"])
+    DList.append(math.exp(song["D"]))
     DMin = min(DMin, song["D"])
     songCounter += 1
+
+#read prep and loadingLists
+with open(filePrep+".json", "r", encoding="utf-8") as file:
+    prepList = json.load(file)
+    elementNull = prepList.pop(0)
+with open(fileLoad+".json", "r", encoding="utf-8") as file:
+    loadingList = json.load(file)
 
 #Get new songs if applicable
 newSongList = []
 if totalDWeight < targetDSum:
     
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
-    with open(filePrep+".json", "r", encoding="utf-8") as file:
-        prepList = json.load(file)
-        buffer = prepList.pop(0)
-    with open(fileLoad+".json", "r", encoding="utf-8") as file:
-        loadingList = json.load(file)
     random.shuffle(loadingList)
     while totalDWeight < targetDSum:
         if len(prepList) > 0 and len(loadingList) > 0:
@@ -125,7 +124,7 @@ if totalDWeight < targetDSum:
     with open(filePrep+".json", "r+", encoding="utf-8") as file:
         file.truncate(0)
         file.seek(0)
-        prepList.insert(0, buffer)
+        prepList.insert(0, elementNull)
         json.dump(prepList,file,ensure_ascii=False)
         file.seek(0)
         fileData = file.read()
@@ -154,11 +153,11 @@ poolSongList.extend(newSongList)
 
 #Pick Songs
 songCount = min(desiredQuizSize,len(poolSongList))
-randomSongList = list(numpy.random.choice(poolSongList, size = songCount, p = DList, replace = False))
+randomSongList = list(numpy.random.choice(poolSongList, size = songCount, p = DList/numpy.sum(DList), replace = False))
 
 #For each song, pick sample point
 for index, song in enumerate(randomSongList):
-    distribution = song["sampleWeights"]   
+    distribution = copy.copy(song["sampleWeights"])
     for i in range(len(distribution)):
         distribution[i] = math.exp(distribution[i])
     section = random.choices(range(len(distribution)), weights=distribution, k=1)[0]
@@ -173,15 +172,15 @@ for index, song in enumerate(randomSongList):
     randomSongList[index]["startPoint"] = samplePoint
 
 #Write quiz list
-with open(fileQuiz+".json", 'w', encoding = 'utf8') as f:
-    json.dump(randomSongList, f)
+with open(fileQuiz+".json", 'w', encoding = 'utf8') as file:
+    json.dump(randomSongList, file)
 
 #Write new songs to pool and shuffle
-with open(filePool+".json", 'w', encoding = 'utf8') as f:
+with open(filePool+".json", 'r+', encoding = 'utf8') as file:
         file.truncate(0)
         file.seek(0)
         random.shuffle(poolSongList)
-        json.dump(poolSongList,f,ensure_ascii=False)
+        json.dump(poolSongList,file,ensure_ascii=False)
         file.seek(0)
         fileData = file.read()
         fileData = fileData.replace(", {","\n,{")
@@ -199,11 +198,12 @@ if len(newSongList) > 0:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 '''
 print()
-print("Pool Size: "+str(len(poolSongList)+". LoadingSize: "+str(len(loadingList)+len(prepList)-1)+". Min D: "+str(DMin))
+print(f"Pool Size: {len(poolSongList)} LoadingSize: {len(loadingList)+len(prepList)-1} Min D: {DMin}")
 DList = [0]*(19-DMin)
 for song in poolSongList:
     DList[18-song["D"]] += 1
-for index in len(DList):
+print("DValue distribution")
+for index in range(len(DList)):
     if index%6==0:
         print(f"\033[31m{DList[index]}\033[0m", end = " ")
     else:
