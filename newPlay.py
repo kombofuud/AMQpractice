@@ -33,7 +33,7 @@ fileLoad = "loadingcutlist"
 filePool = "pool"
 fileAdd = "addThese"
 fileQuiz = "_quiz"
-targetDSum = 530
+targetDSum = 6370
 desiredQuizSize = 30
 '''
 fileMerged = "dummyMerged"
@@ -79,7 +79,7 @@ if totalDWeight < targetDSum:
     random.shuffle(loadingList)
     while totalDWeight < targetDSum:
         if len(prepList) > 0 and len(loadingList) > 0:
-            if random.randInt(0,1):
+            if random.randint(0,1):
                 newSong = loadingList.pop(0)
             else:
                 newSong = prepList.pop(0)
@@ -154,6 +154,7 @@ poolSongList.extend(newSongList)
 #Pick Songs
 songCount = min(desiredQuizSize,len(poolSongList))
 randomSongList = list(numpy.random.choice(poolSongList, size = songCount, p = DList/numpy.sum(DList), replace = False))
+randomSongList = copy.deepcopy(randomSongList)
 
 #For each song, pick sample point
 for index, song in enumerate(randomSongList):
