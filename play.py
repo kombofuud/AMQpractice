@@ -61,6 +61,7 @@ if songMean < targetSongMean:
 #pick new preplist songs
     with open(filePrep, "r", encoding="utf-8") as file:
         prepList = json.load(file)
+        elementNull = prepList.pop(0)
         newCount = min(newCount,len(prepList))
         newSongList = prepList[:newCount]
         prepList = prepList[newCount:]
@@ -90,6 +91,7 @@ if songMean < targetSongMean:
     with open(filePrep, "r+", encoding="utf-8") as file:
         file.truncate(0)
         file.seek(0)
+        prepList.insert(0, elementNull)
         json.dump(prepList,file,ensure_ascii=False)
         file.seek(0)
         fileData = file.read()
