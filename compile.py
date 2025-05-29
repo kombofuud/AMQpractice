@@ -8,14 +8,14 @@ import json
 import sys
 import math
 
-'''
 fileQuiz = "_quiz"
 filePractice = "_practice"
-filePool = "filePool"
+filePool = "pool"
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
 filePool = "dummyPool"
+'''
 
 #read files and create dict containing quiz songs and create practice list
 with open(filePool+".json", 'r', encoding = 'utf8') as f:
