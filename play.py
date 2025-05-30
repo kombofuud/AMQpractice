@@ -13,7 +13,7 @@ fileLoad = "loadingcutlist"
 filePool = "pool"
 fileAdd = "addThese"
 fileQuiz = "_quiz"
-targetDSum = 6370
+targetDSum = 6400
 desiredQuizSize = 30
 '''
 fileMerged = "dummyMerged"
@@ -65,7 +65,7 @@ if totalDWeight < targetDSum:
                 newSong = prepList.pop(0)
             newSongList.append(newSong)
             totalDWeight += newSong["D"]
-            DList.append(newSong["D"])
+            DList.append(math.exp(newSong["D"]))
             DMin = min(newSong["D"], DMin)
             indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
             continue
@@ -73,7 +73,7 @@ if totalDWeight < targetDSum:
             newSong = loadingList.pop(0)
             newSongList.append(newSong)
             totalDWeight += newSong["D"]
-            DList.append(newSong["D"])
+            DList.append(math.exp(newSong["D"]))
             DMin = min(newSong["D"], DMin)
             indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
             continue
@@ -81,7 +81,7 @@ if totalDWeight < targetDSum:
             newSong = prepList.pop(0)
             newSongList.append(newSong)
             totalDWeight += newSong["D"]
-            DList.append(newSong["D"])
+            DList.append(math.exp(newSong["D"]))
             DMin = min(newSong["D"], DMin)
             indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
             continue
@@ -127,7 +127,6 @@ if totalDWeight < targetDSum:
         file.seek(0)
         file.write(fileData)
 poolSongList.extend(newSongList)
-
 
 #Pick Songs and Generate Song Section
 
