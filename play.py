@@ -47,7 +47,6 @@ for index, song in enumerate(poolSongList):
 #read prep and loadingLists
 with open(filePrep+".json", "r", encoding="utf-8") as file:
     prepList = json.load(file)
-    elementNull = prepList.pop(0)
 with open(fileLoad+".json", "r", encoding="utf-8") as file:
     loadingList = json.load(file)
 
@@ -57,6 +56,7 @@ if totalDWeight < targetDSum:
     
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
     random.shuffle(loadingList)
+    elementNull = prepList.pop(0)
     while totalDWeight < targetDSum:
         if len(prepList) > 0 and len(loadingList) > 0:
             if random.randint(0,1):
