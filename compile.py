@@ -63,7 +63,7 @@ countedKeys = 0
 countedTotalWeight = 0
 ignoredKeys = set()
 for song in quizSongs:
-    if quizIds[song["ID"]] != 0:
+    if quizIds[song["X"]] != 0:
         countedKeys += 1
         countedTotalWeight += song["D"]
     else:
@@ -88,6 +88,7 @@ if countedKeys > argVal:
         if update != 0:
             song = songPool[key]
             print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
+    errorQ = 1
 if errorQ:
     sys.exit(1)
 
