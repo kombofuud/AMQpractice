@@ -81,7 +81,7 @@ if countedKeys < argVal:
     for key in extraIds:
         song = songPool[extraIndices[key]]
         print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
-    sys.exit(1)
+    errorQ = 1
 if countedKeys > argVal:
     print("More updates than expected."+str(countedKeys)+"/"+str(argVal))
     for key,update in quizIds.items():

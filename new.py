@@ -133,7 +133,7 @@ def translateLength(oldList, oldSize, size, annId):
     elif oldSize is not None and oldList is not None:
         if math.ceil((size-15)/7.5) == len(oldList)-2:
             return oldList
-        print("SongWeights for ANNID="+str(annId)+" reinitialized")
+        print("\033[0;36mSongWeights for ANNID="+str(annId)+" reinitialized\033[0m")
         return [0]*int(max(math.ceil((size-15)/7.5)+2, 1))
     elif oldSize is None:
         start = oldList.pop(0)
@@ -298,7 +298,7 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
 
 #add dead songs to dead song list if there are any
 if len(deadCount):
-    print("DeadSongs:_______________________")
+    print("\033[31mDeadSongs:\033[0m_______________________")
     for index in range(deadListInit, len(deadList)):
         print(deadList[index]["songName"]+"__from__"+deadList[index]["animeEnglishName"])
     with open(fileDead+".json", 'r+', encoding = 'utf8') as f:
@@ -313,6 +313,6 @@ if len(deadCount):
         f.write(fileData)
 
 #print new songs
-print("NewSongs:_______________________")
+print("\033[31mNewSongs:\033[0m_______________________")
 for song in newSongs:
     print(song["songName"]+"__from__"+song["animeEnglishName"])
