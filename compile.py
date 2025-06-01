@@ -63,7 +63,7 @@ countedKeys = 0
 countedTotalWeight = 0
 ignoredKeys = set()
 for song in quizSongs:
-    if quizIds[song["X"]] != 0:
+    if songPool[idIndices[song["ID"]]]["X"] != 0:
         countedKeys += 1
         countedTotalWeight += song["D"]
     else:
