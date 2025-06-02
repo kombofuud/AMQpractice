@@ -94,6 +94,9 @@ if errorQ:
 
 #Update all keys and generate practice json
 for ID, index in idIndices.items():
+    if songPool[index]["D"] >= 18 and songPool[index]["X"] >= 0:
+        songPool[index]["X"] = 0
+        continue
     songPool[index]["D"] += quizIds[ID] 
     if quizSamples[ID] == 0:
         songPool[index]["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
