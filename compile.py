@@ -1,6 +1,7 @@
 import json
 import sys
 import math
+import copy
 
 fileQuiz = "_quiz"
 filePractice = "_practice"
@@ -46,8 +47,9 @@ for i, song in enumerate(songPool):
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
                 quizIds[song["ID"]] = 3-int(song["D"]/6) #increase penalty the more you know the song
-                song["startPoint"] = quizSamples[song["ID"]]
-                practice.append(song)
+                pSong = copy.deepcopy(song)
+                pSong["startPoint"] = quizSamples[song["ID"]]
+                practice.append(pSong)
             elif song["X"] != 0:
                 print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
                 errorQ = 1
