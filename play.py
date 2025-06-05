@@ -137,9 +137,9 @@ randomSongList = copy.deepcopy(randomSongList)
 
 #For each song, pick sample point
 for index, song in enumerate(randomSongList):
-    distribution = copy.copy(song["sampleWeights"])
+    distribution = copy.deepcopy(song["sampleWeights"])
     for i in range(len(distribution)):
-        distribution[i] = math.pow(len(distribution),distribution[i]/4)
+        distribution[i] = math.pow(len(distribution),distribution[i]/3)
     section = random.choices(range(len(distribution)), weights=distribution, k=1)[0]
     if section == 0:
         samplePoint = 0
