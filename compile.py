@@ -48,7 +48,8 @@ for i, song in enumerate(songPool):
             elif song["X"] == 2:
                 quizIds[song["ID"]] = 3-int(song["D"]/6) #increase penalty the more you know the song
                 pSong = copy.deepcopy(song)
-                pSong["startPoint"] = quizSamples[song["ID"]]
+                if song["D"] < 13:
+                    pSong["startPoint"] = quizSamples[song["ID"]]
                 practice.append(pSong)
             elif song["X"] != 0:
                 print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
