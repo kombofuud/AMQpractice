@@ -48,7 +48,7 @@ for i, song in enumerate(songPool):
             elif song["X"] == 2:
                 quizIds[song["ID"]] = 3-int(song["D"]/6) #increase penalty the more you know the song
                 pSong = copy.deepcopy(song)
-                if song["D"] < 13:
+                if song["D"] < 12:
                     pSong["startPoint"] = quizSamples[song["ID"]]
                 practice.append(pSong)
             elif song["X"] != 0:
@@ -103,7 +103,7 @@ for ID, index in idIndices.items():
     songPool[index]["D"] += quizIds[ID] 
     if quizSamples[ID] == 0:
         songPool[index]["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
-    if quizSamples[ID] == 100:
+    elif quizSamples[ID] == 100:
         songPool[index]["sampleWeights"][-1] += 1-(1+songPool[index]["X"])%3
     else:
         sectionCount = len(songPool[index]["sampleWeights"])-2
