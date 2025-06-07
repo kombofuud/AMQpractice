@@ -66,8 +66,11 @@ for index, entry in enumerate(equivalances):
         equivMap[ID] = index
     altNames.append([])
 brokenMap = {}
+deadSongIdsQ = 0
 for index, URL in enumerate(brokenURLs):
     brokenMap[URL["annSongId"]] = index
+    if URL["annSongId"] not in idMap:
+        deadSongIdsQ = 1
 
 for song in songList:
     if song["annSongId"] in equivMap:
@@ -84,7 +87,7 @@ for index, song in enumerate(songList):
         else:
             song["video720"] = brokenURLs[brokenMap[song["annSongId"]]]["video720"]
 
-if len(fixedList):
+if len(fixedList) > 0 or deadSongIdsQ == 1:
     #sort fixedList descending
     fixedList = sorted(fixedList, key=lambda index: brokenMap[songList[index]["annSongId"]], reverse = True)
 
@@ -96,6 +99,11 @@ if len(fixedList):
     #remove fixed urls from broken list
     for index in fixedList:
         brokenURLs.pop(brokenMap[songList[index]["annSongId"]])
+    #remove fixes corresponding to non-existant songs
+    for index in reversed(range(2,len(brokenURLs))):
+        if brokenURLs[index]["annSongId"] not in idMap:
+            print(f"ANNID: {brokenURLs[index]["annSongId"]} no longer exists.")
+            brokenURLs.pop(index)
     with open("broken.json", 'r+', encoding = 'utf8') as f:
         f.truncate(0)
         f.seek(0)
