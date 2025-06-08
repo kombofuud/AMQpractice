@@ -69,7 +69,7 @@ brokenMap = {}
 deadSongIdsQ = 0
 for index, URL in enumerate(brokenURLs):
     brokenMap[URL["annSongId"]] = index
-    if URL["annSongId"] not in idMap:
+    if URL["annSongId"] not in idMap and index > 1:
         deadSongIdsQ = 1
 
 for song in songList:
