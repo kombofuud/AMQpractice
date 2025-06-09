@@ -50,6 +50,8 @@ for i, song in enumerate(songPool):
                 pSong = copy.deepcopy(song)
                 if song["D"] < 7:
                     pSong["startPoint"] = quizSamples[song["ID"]]
+                else:
+                    pSong["startPoint"] = song["sampleWeights"]
                 practice.append(pSong)
             elif song["X"] != 0:
                 print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
