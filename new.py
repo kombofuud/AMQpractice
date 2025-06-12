@@ -42,7 +42,7 @@ with open("broken.json", 'r', encoding = 'utf8') as f:
 
 #put useful information at start of list
 shortHand = ["ST","STN","ID","SN","EN","SA","AID"]
-longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","songArtist","annId"]
+longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","artist","annId"]
 songList = []
 idMap = {}
 for index in range(len(rawSongList)):
