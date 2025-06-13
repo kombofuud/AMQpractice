@@ -25,7 +25,7 @@ with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
         quizSamples[song["ID"]] = song["startPoint"]
 
 #assume all songs must be accounted for unless user says otherwise. If user types a negative number, that indicates the number of skipped songs.
-if len(sys.argv) > 1:
+if len(sys.argv) > 2:
     argVal = int(sys.argv[1])
     if argVal < 0:
         argVal += len(quizSongs)
@@ -48,6 +48,8 @@ for i, song in enumerate(songPool):
             elif song["X"] == 2:
                 quizIds[song["ID"]] = 3-int(song["D"]/6) #increase penalty the more you know the song
                 pSong = copy.deepcopy(song)
+                sectionCount = len(pSong["sampleWeights"])-2
+                pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.00000000000000001)] += 2-2*((1+pSong["X"])%3)
                 if song["D"] < 7:
                     pSong["startPoint"] = quizSamples[song["ID"]]
                 else:
