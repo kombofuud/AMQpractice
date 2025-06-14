@@ -6,10 +6,12 @@ import copy
 fileQuiz = "_quiz"
 filePractice = "_practice"
 filePool = "pool"
+filePrevPool = "prevPool"
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
 filePool = "dummyPool"
+filePrevPool = "dummyPrevPool"
 '''
 
 #read files and create dict containing quiz songs and create practice list
@@ -25,12 +27,29 @@ with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
         quizSamples[song["ID"]] = song["startPoint"]
 
 #assume all songs must be accounted for unless user says otherwise. If user types a negative number, that indicates the number of skipped songs.
-if len(sys.argv) > 2:
+if len(sys.argv) > 1:
     argVal = int(sys.argv[1])
     if argVal < 0:
         argVal += len(quizSongs)
 else:
     argVal = len(quizSongs)
+
+#if argument is 0, reset the pool list to before the update
+if argVal == 0 and len(quizSongs) > 0:
+    with open(filePrevPool+".json", 'r', encoding = 'utf8') as f:
+        prevSongs = json.load(f)
+    with open(filePool+".json", 'r+', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        json.dump(prevSongs,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
+    print("Pool Restored")
+    sys.exit(0)
 
 #Run through list of quizSongs and check for songs which are marked for an update. 1 is a correct, 2 is a miss
 extraIds = set()
@@ -49,7 +68,7 @@ for i, song in enumerate(songPool):
                 quizIds[song["ID"]] = 3-int(song["D"]/6) #increase penalty the more you know the song
                 pSong = copy.deepcopy(song)
                 sectionCount = len(pSong["sampleWeights"])-2
-                pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.00000000000000001)] += 2-2*((1+pSong["X"])%3)
+                pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.0000001)] += 2-2*((1+pSong["X"])%3)
                 if song["D"] < 7:
                     pSong["startPoint"] = quizSamples[song["ID"]]
                 else:
@@ -97,6 +116,18 @@ if countedKeys > argVal:
     errorQ = 1
 if errorQ:
     sys.exit(1)
+
+#save copy of pool to prevPool.json
+with open(filePrevPool+".json", 'r+', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(songPool,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
 
 #Update all keys and generate practice json
 for ID, index in idIndices.items():
