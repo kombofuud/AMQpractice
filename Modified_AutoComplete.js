@@ -475,16 +475,21 @@ if (!isNode) {
                 quiz.answerInput.typingInput.submitAnswer();
             });
         }
-		if (options.allowRightLeftArrows || options.allowTab) {
+		if ((options.allowRightLeftArrows || options.allowTab)) {
 			$(this.input).on("keydown", (e) => {
-                if ((e.keyCode == 37 || e.keyCode == 39) && options.allowRightLeftArrows && this.index== -1){}
+                if (this.index== -1){
+                    if(e.keyCode == 9) e.preventDefault();
+                }
 			    else if ((e.keyCode == 37 || (e.keyCode == 39 && this.index <= -2)) && options.allowRightLeftArrows){
                     this.previous();
                 }
-                else if ((e.keyCode == 38 || e.keyCode == 40) && this.index <= -2){
-                    this.previous();
+                else if (e.keyCode == 40 && this.index <= -2){
+                    e.preventDefault();
+                    this.next();
+                    this.next();
+                    this.next();
                 }
-				else if (e.keyCode == 39 && options.allowRightLeftArrows) {this.next();this.next();}
+				else if (e.keyCode == 39 && options.allowRightLeftArrows) {this.next();}
 				else if (e.keyCode == 9 && options.allowTab) {
 					e.preventDefault();
                     if(this.index <= -2){
@@ -498,16 +503,13 @@ if (!isNode) {
                         this.next();
                     }
 				}
-                else if (e.keyCode == 13 && this.index <= -2 && (!keyStates.ctrl || keyStates.shift)){
-                    this.previous();
-                }
 			})
 		}
 	}
 
 	AmqAwesomeplete.prototype.evaluate = function () {
 		if (this.isAnimeAutocomplete == false || options.enabled == false) return oldEvaluate.call(this);
-        this.index = -2;
+        this.index = -3;
 		let suggestions = this.filterManager.filterBy(this.input.value, options.fuzzy.dropdown);
 
 		if (!this.filterManager.fuzzySearched) suggestions = suggestions.sort((a, b) => {
@@ -550,10 +552,12 @@ if (!isNode) {
 	QuizTypeAnswerInput.prototype.submitAnswer = function () {
 	    try{
 			var awesome = this.autoCompleteController.awesomepleteInstance;
-            console.log(awesome.input.value);
-			if((!keyStates.ctrl || keyStates.shift) && options.enabled && awesome && awesome.input.value == awesome.filterManager.lastStr && awesome.suggestions && awesome.input.value.trim() && awesome.suggestions.slice(1).every(s => cleanString(s.value) != cleanString(awesome.input.value)) && (awesome.suggestions.length || (!options.fuzzy.dropdown && options.fuzzy.answer))) {
-                awesome.input.value = awesome.suggestions.length ? awesome.suggestions[0].value : awesome.filterManager.filterBy(awesome.input.value, true)[0].originalStr;
+//			if((!keyStates.ctrl || keyStates.shift) && options.enabled && awesome && awesome.input.value == awesome.filterManager.lastStr && awesome.suggestions && awesome.input.value.trim() && awesome.suggestions.slice(1).every(s => cleanString(s.value) != cleanString(awesome.input.value)) && (awesome.suggestions.length || (!options.fuzzy.dropdown && options.fuzzy.answer))) {
+			if((!keyStates.ctrl || keyStates.shift) && options.enabled && awesome && awesome.input.value == awesome.filterManager.lastStr && awesome.suggestions && awesome.input.value.trim() && awesome.suggestions.slice(1).every(s => cleanString(s.value) != cleanString(awesome.input.value))) {
+                //awesome.input.value = awesome.suggestions.length ? awesome.suggestions[0].value : awesome.filterManager.filterBy(awesome.input.value, true)[0].originalStr;
+                awesome.input.value = awesome.suggestions.length ? awesome.suggestions[0].value : "";
 			}
+            awesome.close();
 		} catch (ex) {
 	        console.log(ex);
 		}
