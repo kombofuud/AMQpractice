@@ -182,6 +182,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["D"] = song["D"]
+        knownList[index]["X"] = song["X"]
         knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], knownList[index]["annId"])
         if song["length"] is not None and knownList[index]["length"] is not None:
             if abs(song["length"]-knownList[index]["length"]) > 1:
