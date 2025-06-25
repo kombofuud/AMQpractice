@@ -57,6 +57,7 @@ idIndices = dict()
 extraIndices = dict()
 practice = []
 errorQ = 0
+gain = 0
 for i, song in enumerate(songPool):
     if song["X"] != 0 or song["ID"] in quizIds:
         #alter amount added to songId. 1 -> -1, 2 -> ???
@@ -77,6 +78,7 @@ for i, song in enumerate(songPool):
             elif song["X"] != 0:
                 print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
                 errorQ = 1
+            gain += quizIds[song["ID"]]
         else:
             #print(f"\033[31mExtra Song\033[0m was Incremented: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
             errorQ = 1
@@ -171,4 +173,4 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
 
 
 #Print sucess statement
-print("Practice List Compiled: Len = "+str(len(practice)))
+print("Practice List Compiled: Len = "+str(len(practice))+", Gain = "+str(gain))
