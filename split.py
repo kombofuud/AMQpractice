@@ -22,40 +22,42 @@ def getRanges(rangeString):
         secondsRange = []
         for number in startEnd:
             minutesSeconds = number.split(':')
-            if len(minutesSeconds) >= 2:
+            if len(minutesSeconds) > 2:
                 print(f"Error - TimeStamp: {minutesSeconds} of Range: {element} of String: {rangeString} is not a valid TimeStamp")
                 sys.exit(1)
-            if minutesSeconds.length == 1:
+            if len(minutesSeconds) == 1:
                 minutesSeconds.insert(0,0)
             minutesSeconds[0] = int(minutesSeconds[0])
             minutesSeconds[1] = float(minutesSeconds[1])
-            timeList.append(60*minutesSeconds[0]+minutesSeconds[1])
-        if timeList[1]-timeList[0] <= 0:
+            secondsRange.append(60*minutesSeconds[0]+minutesSeconds[1])
+        if secondsRange[1]-secondsRange[0] <= sampleLength:
             continue
-        timeList.append([timeList[0],timeList[1]-timeList[0]])
-    return timeList[]
+        timeList.append([secondsRange[0],secondsRange[1]-secondsRange[0]-sampleLength])
+    if len(timeList) == 0:
+        print(f"Error - no timeStamps found for String: {rangeString}")
+    return timeList
 
 #make maps from ids to important information
 timeMap = {}
 for i,ID in enumerate(splitData):
-    idMap[ID["ID"]] = getRanges(ID["sample"])
+    timeMap[ID["ID"]] = getRanges(ID["sample"])
 
 songMap = {}
 for i,song in enumerate(songPool):
-    if song["ID"] in idMap:
+    if song["ID"] in timeMap:
         songMap[song["ID"]] = i
 
 #randomize the list
 sampleSongs = []
 for i in range(1000):
     songID = splitData[random.randint(0,len(splitData)-1)]["ID"]
-    weightRanges = idMap[songID]
+    weightRanges = timeMap[songID]
     weightList = []
     for element in weightRanges:
-        weightList.append(weightRanges[1])
+        weightList.append(element[1])
     section = random.choices(range(len(weightList)), weights=weightList, k=1)[0]
-    song = copy.deepcopy(songPool[songID])
-    song["startPoint"] = weightRanges[section][0]+weightRanges[section][1]*random.random()
+    song = copy.deepcopy(songPool[songMap[songID]])
+    song["startPoint"] = max(100*(weightRanges[section][0]+weightRanges[section][1]*random.random())/(song["length"]-sampleLength),0)
     sampleSongs.append(song)
 
 with open("_split.json", 'r+', encoding = 'utf8') as file:
