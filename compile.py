@@ -78,7 +78,7 @@ for i, song in enumerate(songPool):
             elif song["X"] != 0:
                 print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
                 errorQ = 1
-            gain += quizIds[song["ID"]]
+            gain -= quizIds[song["ID"]]
         else:
             #print(f"\033[31mExtra Song\033[0m was Incremented: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
             errorQ = 1
