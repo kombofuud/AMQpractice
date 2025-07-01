@@ -23,7 +23,9 @@ quizIds = dict()
 quizSamples = dict()
 with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
     quizSongs = json.load(f)
+    print(quizSongs)
     for song in quizSongs:
+        print(song)
         quizIds[song["ID"]] = 0
         quizSamples[song["ID"]] = song["startPoint"]
 
@@ -36,7 +38,7 @@ else:
     argVal = len(quizSongs)
 
 #if argument is 0, reset the pool list to before the update
-if argVal == 0 and len(quizSongs) > 0:
+if argVal == 0:
     with open(filePrevPool+".json", 'r', encoding = 'utf8') as f:
         prevSongs = json.load(f)
     with open(filePool+".json", 'r+', encoding = 'utf8') as f:
@@ -199,7 +201,7 @@ with open(filePrevQuiz+".json", 'r+', encoding = 'utf8') as f:
 with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
-    json.dump("[]",f,ensure_ascii=False)
+    json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
 print("Practice List Compiled: Len = "+str(len(practice))+", Gain = "+str(gain))
