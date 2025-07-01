@@ -7,6 +7,7 @@ fileQuiz = "_quiz"
 filePractice = "_practice"
 filePool = "pool"
 filePrevPool = "prevPool"
+filePrevQuiz = "prevQuiz"
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -48,7 +49,19 @@ if argVal == 0 and len(quizSongs) > 0:
         fileData = fileData.replace("}]","}\n]")
         f.seek(0)
         f.write(fileData)
-    print("Pool Restored")
+    with open(filePrevQuiz+".json", 'r', encoding = 'utf8') as f:
+        prevQuizSongs = json.load(f)
+    with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        json.dump(prevQuizSongs,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
+    print("Pool+Quiz Restored")
     sys.exit(0)
 
 #Run through list of quizSongs and check for songs which are marked for an update. 1 is a correct, 2 is a miss
@@ -171,6 +184,22 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
+#overwrite quiz to prevent accidentally forgetting to run quiz.py next time
+with open(filePrevQuiz+".json", 'r+', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(quizSongs,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
+
+with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump("[]",f,ensure_ascii=False)
 
 #Print sucess statement
 print("Practice List Compiled: Len = "+str(len(practice))+", Gain = "+str(gain))
