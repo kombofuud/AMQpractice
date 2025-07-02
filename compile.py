@@ -23,9 +23,7 @@ quizIds = dict()
 quizSamples = dict()
 with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
     quizSongs = json.load(f)
-    print(quizSongs)
     for song in quizSongs:
-        print(song)
         quizIds[song["ID"]] = 0
         quizSamples[song["ID"]] = song["startPoint"]
 
