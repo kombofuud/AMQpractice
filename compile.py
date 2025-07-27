@@ -85,7 +85,7 @@ for i, song in enumerate(songPool):
                 pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.0000001)] += quizIds[pSong["ID"]]
                 #adjust song weight strength to match play weights
                 songWeightStrength = 1-math.pow(0.95,18-pSong["D"])
-                for i in range(len(psong["sampleWeights"])):
+                for i in range(len(pSong["sampleWeights"])):
                     pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
                 pSong["startPoint"] = pSong["sampleWeights"]
                 practice.append(pSong)
