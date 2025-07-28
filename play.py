@@ -62,10 +62,8 @@ if totalDWeight < targetDSum:
         if len(prepList) > 0 and len(loadingList) > 0:
             if random.randint(0,1):
                 newSong = loadingList.pop(0)
-                print(1)
             else:
                 newSong = prepList.pop(0)
-                print(0)
             newSongList.append(newSong)
             totalDWeight += newSong["D"]
             DList.append(math.exp(newSong["D"]))
