@@ -56,14 +56,16 @@ if totalDWeight < targetDSum:
     
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
     random.shuffle(loadingList)
-    random.shuffle(prepList)
     elementNull = prepList.pop(0)
+    random.shuffle(prepList)
     while totalDWeight < targetDSum:
         if len(prepList) > 0 and len(loadingList) > 0:
             if random.randint(0,1):
                 newSong = loadingList.pop(0)
+                print(1)
             else:
                 newSong = prepList.pop(0)
+                print(0)
             newSongList.append(newSong)
             totalDWeight += newSong["D"]
             DList.append(math.exp(newSong["D"]))
