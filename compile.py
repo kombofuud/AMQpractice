@@ -117,6 +117,8 @@ if countedKeys < argVal:
     for key in ignoredKeys:
         song = songPool[idIndices[key]]
         print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
+    errorQ = 1
+if len(extraIds):
     print("\nExtra Keys:")
     print("___________")
     for key in extraIds:
