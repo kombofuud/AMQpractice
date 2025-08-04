@@ -60,7 +60,7 @@ if totalDWeight < targetDSum:
     random.shuffle(prepList)
     while totalDWeight < targetDSum:
         if len(prepList) > 0 and len(loadingList) > 0:
-            if random.randint(0,1):
+            if random.randint(0,1) and False:
                 newSong = loadingList.pop(0)
             else:
                 newSong = prepList.pop(0)
