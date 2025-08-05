@@ -475,7 +475,7 @@ if (!isNode) {
                 quiz.answerInput.typingInput.submitAnswer();
             });
         }
-		if ((options.allowRightLeftArrows || options.allowTab)) {
+		if ((options.allowRightLeftArrows || options.allowTab || this.index <= -2)) {
 			$(this.input).on("keydown", (e) => {
                 if (this.index== -1){
                     if(e.keyCode == 9) e.preventDefault();
