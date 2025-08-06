@@ -47,11 +47,8 @@ for index, song in enumerate(poolSongList):
     songCounter += 1
 
 #read prep and loadingLists
-prepListMalIds = set()
 with open(filePrep+".json", "r", encoding="utf-8") as file:
     prepList = json.load(file)
-    for song in prepList:
-        prepListMalIds.add(song["malId"])
 with open(fileLoad+".json", "r", encoding="utf-8") as file:
     loadingList = json.load(file)
 
@@ -65,8 +62,11 @@ newSongCount = (int)((desiredQuizSize-2*len(practiceList)+random.randint(0,added
 if newSongCount > 0:
     
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
+    prepListMalIds = set()
     random.shuffle(loadingList)
     elementNull = prepList.pop(0)
+    for song in prepList:
+        prepListMalIds.add(song["malId"])
     random.shuffle(prepList)
     malIds = set()
     while newSongCount > 0:
@@ -113,7 +113,7 @@ if newSongCount > 0:
     if len(prepList) < prepListMinSize:
         for i in range(len(loadingList)-1,-1,-1):
             if loadingList[i]["malId"] not in prepListMalIds:
-                prepListMalIds.add(loadingList[i]["malId"]
+                prepListMalIds.add(loadingList[i]["malId"])
                 prepList.append(loadingList.pop(i))
         if len(prepList) < prepListMinSize:
             print("Warning: Insufficient Anime Diversity")
