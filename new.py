@@ -169,6 +169,7 @@ def translateLength(oldList, oldSize, size, annId):
 
 deadCount = set()
 oldSongs = set()
+familiarMalIds = set()
 with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
     deadIndices = []
@@ -183,6 +184,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["D"] = song["D"]
         knownList[index]["X"] = song["X"]
+        familiarMalIds.add(knownList[index]["malId"])
         knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], knownList[index]["annId"])
         if song["length"] is not None and knownList[index]["length"] is not None:
             if abs(song["length"]-knownList[index]["length"]) > 1:
@@ -240,6 +242,8 @@ with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
+learningMalIds = set()
+newSongs = []
 with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
     elementNull = knownList.pop(0)
@@ -255,9 +259,18 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["sampleWeights"] = translateLength(None, None, knownList[index]["length"], song["annSongId"])
         knownList[index]["D"] = startingD
+        learningMalIds.add(knownList[index]["malId"])
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
+    for song in songList:            
+        if song["annSongId"] not in oldSongs and song["malId"] in familiarMalIds and song["malId"] not in learningMalIds:
+            song["sampleWeights"] = translateLength(None, None, song["length"], song["annSongId"])
+            newSongs.append(song)
+            knownList.append(song)
+            oldSongs.add(song["annSongId"])
+            learningMalIds.add(song["malId"])
+            print(f"Previously learned MalID: {song["malId"]} gained at least 1 song.")
 
     f.truncate(0)
     f.seek(0)
@@ -271,7 +284,6 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     f.write(fileData)
 
 #swap old songs from fileLoad out and add any new songs to it.
-newSongs = []
 with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     knownList = json.load(f)
     deadIndices = []
