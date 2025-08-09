@@ -205,4 +205,4 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("Practice List Compiled: Len = "+str(len(practice))+", Gain = "+str(gain))
+print("Practice List Compiled: Len = "+str(len(practice))+", Gain = "+str((len(quizSongs)-2*len(practice))/9))
