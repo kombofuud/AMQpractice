@@ -23,7 +23,7 @@ filePractice = "dummyPractice"
 fileQuiz = "dummyQuiz"
 '''
 
-startingD = 12
+startingD = 18
 
 #get list of all songs
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
@@ -54,7 +54,7 @@ for index in range(len(rawSongList)):
     for key in rawSongList[index]:
         songList[index][key] = rawSongList[index][key]
     songList[index]["sampleWeights"] = None
-    songList[index]["D"] = 12
+    songList[index]["D"] = startingD
     songList[index]["annId"] = songList[index]["annSongId"]
     songList[index]["SN"] = "`"+songList[index]["SN"]+"`"
 
@@ -189,7 +189,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         if song["length"] is not None and knownList[index]["length"] is not None:
             if abs(song["length"]-knownList[index]["length"]) > 1:
                 print(f"ANNID={song["ID"]} {song["EN"]} by {song["SA"]} length increased by {song["length"]-knownList[index]["length"]} seconds")
-                knownList[index]["D"] = 12
+                knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
