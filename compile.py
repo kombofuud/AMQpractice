@@ -62,6 +62,10 @@ if argVal == 0:
         f.seek(0)
         f.write(fileData)
     print("Pool+Quiz Restored")
+    with open(filePractice+".json", 'r', encoding = 'utf8') as f:
+        practiceSongs = json.load(f)
+    for song in practiceSongs:
+        print(f"{song["SN"]} __from__ {song["EN"]}")
     sys.exit(0)
 
 #Run through list of quizSongs and check for songs which are marked for an update. 1 is a correct, 2 is a miss

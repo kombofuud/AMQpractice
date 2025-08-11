@@ -52,14 +52,16 @@ with open(filePrep+".json", "r", encoding="utf-8") as file:
 with open(fileLoad+".json", "r", encoding="utf-8") as file:
     loadingList = json.load(file)
 
-#read length of practice list
+#read length of practice list and length of quiz
 with open(filePractice+".json", "r", encoding="utf-8") as file:
     practiceList = json.load(file)
+with open(fileQuiz+".json", "r", encoding="utf-8") as file:
+    quizList = json.load(file)
 
 #Get new songs if applicable
 newSongList = []
 newSongCount = (int)((desiredQuizSize-2*len(practiceList)+random.randint(0,addedSongWeight-1))/addedSongWeight)
-if newSongCount > 0:
+if newSongCount > 0 and length(quizList) == 0:
     
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
     prepListMalIds = set()
