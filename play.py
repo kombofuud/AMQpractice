@@ -61,7 +61,8 @@ with open(fileQuiz+".json", "r", encoding="utf-8") as file:
 #Get new songs if applicable
 newSongList = []
 newSongCount = (int)((desiredQuizSize-2*len(practiceList)+random.randint(0,addedSongWeight-1))/addedSongWeight)
-if newSongCount > 0 and length(quizList) == 0:
+malIds = set()
+if newSongCount > 0 and len(quizList) == 0:
     
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
     prepListMalIds = set()
@@ -70,7 +71,6 @@ if newSongCount > 0 and length(quizList) == 0:
     for song in prepList:
         prepListMalIds.add(song["malId"])
     random.shuffle(prepList)
-    malIds = set()
     while newSongCount > 0:
         newSongCount -= 1
         '''
