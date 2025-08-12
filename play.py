@@ -13,7 +13,7 @@ fileLoad = "loadingcutlist"
 filePool = "pool"
 fileAdd = "addThese"
 fileQuiz = "_quiz"
-targetDSum = -2160
+targetDSum = -2150
 desiredQuizSize = 30
 filePractice = "_practice"
 prepListMinSize = 50
@@ -30,7 +30,8 @@ desiredQuizSize = 4
 
 #Index all songs in pool, get their total weight and check that compile doesn't need to be run
 DList = []
-DMin = 18
+DMin = 9999
+DMax = 8
 indexMap = dict()
 totalDWeight = 0
 songCounter = 0
@@ -60,9 +61,9 @@ with open(fileQuiz+".json", "r", encoding="utf-8") as file:
 
 #Get new songs if applicable
 newSongList = []
-newSongCount = (int)((desiredQuizSize-2*len(practiceList)+random.randint(0,addedSongWeight-1))/addedSongWeight)
+newSongCount = math.ceil((targetDSum-totalDWeight)/DMax)
 malIds = set()
-if newSongCount > 0 and len(quizList) == 0:
+if newSongCount > 0:
     
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
     prepListMalIds = set()
@@ -97,6 +98,7 @@ if newSongCount > 0 and len(quizList) == 0:
             newSong = prepList.pop(0)
             newSongList.append(newSong)
             malIds.add(newSong["malId"])
+            totalDWeight += newSong["D"]
             DList.append(math.exp(newSong["D"]))
             DMin = min(newSong["D"], DMin)
             indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
@@ -169,7 +171,7 @@ randomSongList = copy.deepcopy(randomSongList)
 #For each song, pick sample point
 for index, song in enumerate(randomSongList):
     distribution = copy.deepcopy(song["sampleWeights"])
-    songWeightStrength = 1-math.pow(0.95,18-song["D"])
+    songWeightStrength = 1-math.pow(0.95,DMax-song["D"])
     for i in range(len(distribution)):
         distribution[i] = math.pow(len(distribution),distribution[i]*songWeightStrength)
     section = random.choices(range(len(distribution)), weights=distribution, k=1)[0]
@@ -221,11 +223,11 @@ if len(newSongList) > 0:
 '''
 print()
 print(f"Pool Size: {len(poolSongList)} LoadingSize: {len(loadingList)+len(prepList)-1} TotalD: {totalDWeight} Min D: {DMin}")
-DList = [0]*(19-DMin)
+DList = [0]*(DMax-DMin+1)
 for song in poolSongList:
-    if song["D"] > 18:
-        song["D"] = 18
-    DList[18-song["D"]] += 1
+    if song["D"] > DMax:
+        song["D"] = DMax
+    DList[DMax-song["D"]] += 1
 print("DValue distribution")
 for index in range(len(DList)):
     if index%4==0:

@@ -23,7 +23,7 @@ filePractice = "dummyPractice"
 fileQuiz = "dummyQuiz"
 '''
 
-startingD = 9
+startingD = 8
 
 #get list of all songs
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
