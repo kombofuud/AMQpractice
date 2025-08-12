@@ -13,7 +13,7 @@ fileLoad = "loadingcutlist"
 filePool = "pool"
 fileAdd = "addThese"
 fileQuiz = "_quiz"
-addedSongWeight = 9
+targetDSum = -2160
 desiredQuizSize = 30
 filePractice = "_practice"
 prepListMinSize = 50
@@ -228,7 +228,7 @@ for song in poolSongList:
     DList[18-song["D"]] += 1
 print("DValue distribution")
 for index in range(len(DList)):
-    if index%6==0:
+    if index%4==0:
         print(f"\033[31m{DList[index]}\033[0m", end = " ")
     else:
         print(DList[index], end = " ")

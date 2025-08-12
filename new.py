@@ -23,7 +23,7 @@ filePractice = "dummyPractice"
 fileQuiz = "dummyQuiz"
 '''
 
-startingD = 18
+startingD = 9
 
 #get list of all songs
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
@@ -189,7 +189,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         if song["length"] is not None and knownList[index]["length"] is not None:
             if abs(song["length"]-knownList[index]["length"]) > 1:
                 print(f"ANNID={song["ID"]} {song["EN"]} by {song["SA"]} length increased by {song["length"]-knownList[index]["length"]} seconds")
-                knownList[index]["D"] = startingD
+                knownList[index]["D"] = max(knownList[index]["D"],knownList[index]["D"]+song["length"]-knownList[index]["length"])
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)

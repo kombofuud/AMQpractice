@@ -83,7 +83,7 @@ for i, song in enumerate(songPool):
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
-                quizIds[song["ID"]] = 3-int(song["D"]/6) #increase penalty the more you know the song
+                quizIds[song["ID"]] = 2-int(song["D"]/4) #increase penalty the more you know the song
                 pSong = copy.deepcopy(song)
                 sectionCount = len(pSong["sampleWeights"])-2
                 pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.0000001)] += quizIds[pSong["ID"]]
