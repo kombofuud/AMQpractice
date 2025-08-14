@@ -13,7 +13,7 @@ fileLoad = "loadingcutlist"
 filePool = "pool"
 fileAdd = "addThese"
 fileQuiz = "_quiz"
-targetDSum = -2150
+gainPerSong = 8
 desiredQuizSize = 30
 filePractice = "_practice"
 prepListMinSize = 50
@@ -61,7 +61,10 @@ with open(fileQuiz+".json", "r", encoding="utf-8") as file:
 
 #Get new songs if applicable
 newSongList = []
-newSongCount = math.ceil((targetDSum-totalDWeight)/DMax)
+newSongCount = len(quizList)-len(practiceList)+random.randint(0,gainPerSong-1)
+for song in practiceList:
+    newSongCount -= song["X"]
+newSongCount = math.floor(newSongCount/gainPerSong)
 malIds = set()
 if newSongCount > 0:
     

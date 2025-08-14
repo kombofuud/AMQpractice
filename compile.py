@@ -82,6 +82,7 @@ for i, song in enumerate(songPool):
             idIndices[song["ID"]] = i
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
+                gain += 1
             elif song["X"] == 2:
                 quizIds[song["ID"]] = 2-int(song["D"]/4) #increase penalty the more you know the song
                 pSong = copy.deepcopy(song)
@@ -92,11 +93,12 @@ for i, song in enumerate(songPool):
                 for i in range(len(pSong["sampleWeights"])):
                     pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
                 pSong["startPoint"] = pSong["sampleWeights"]
+                pSong["X"] = max(quizIds[pSong["ID"]],1)
                 practice.append(pSong)
+                gain -= pSong["X"]
             elif song["X"] != 0:
                 print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
                 errorQ = 1
-            gain -= quizIds[song["ID"]]
         else:
             #print(f"\033[31mExtra Song\033[0m was Incremented: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
             errorQ = 1
@@ -209,4 +211,4 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("Practice List Compiled: Len = "+str(len(practice))+", Gain = "+str(gain))
+print("Practice List Compiled: Len = "+str(len(practice))+", Gain = "+str(gain/8))
