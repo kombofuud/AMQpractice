@@ -958,7 +958,8 @@ function setup() {
                 "success": true
             });
             if (quiz.soloMode) {
-                fireListener("player answered", [0]);
+                const time = Number(((Date.now() - songStartTime) / 1000).toFixed(3));
+                fireListener("player answered", [{ answerTime: time, gamePlayerIds: [0] }]);
                 if (options.autoVoteSkipGuess) {
                     this.skipController.voteSkip();
                     fireListener("quiz overlay message", "Skipping to Answers");
@@ -1638,7 +1639,8 @@ function parseMessage(content, sender) {
     }
     else if (content === "§CSL13") { //player answered
         if (quiz.cslActive && player) {
-            fireListener("player answered", [player.gamePlayerId]);
+             const time = Number(((Date.now() - songStartTime) / 1000).toFixed(3));
+             fireListener("player answered", [{ answerTime: time, gamePlayerIds: [player.gamePlayerId] }]);
         }
     }
     else if (content === "§CSL14") { //vote skip
@@ -1906,7 +1908,6 @@ function getStartPoint(sample) {
     else if (Array.isArray(sample)){
         let totalWeight = 0;
         for (let i = 0; i < sample.length; i++){
-            sample[i] = Math.pow(sample.length, sample[i]/3);
             totalWeight += sample[i];
         }
         const randomIndex = totalWeight*Math.random();
