@@ -74,7 +74,7 @@ idIndices = dict()
 extraIndices = dict()
 practice = []
 errorQ = 0
-gain = 0
+gain = len(quizSongs)
 for i, song in enumerate(songPool):
     if song["X"] != 0 or song["ID"] in quizIds:
         #alter amount added to songId. 1 -> -1, 2 -> ???
@@ -82,7 +82,6 @@ for i, song in enumerate(songPool):
             idIndices[song["ID"]] = i
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
-                gain += 1
             elif song["X"] == 2:
                 quizIds[song["ID"]] = 2-int(song["D"]/4) #increase penalty the more you know the song
                 pSong = copy.deepcopy(song)

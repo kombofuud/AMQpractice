@@ -57,6 +57,7 @@ for index in range(len(rawSongList)):
     songList[index]["D"] = startingD
     songList[index]["annId"] = songList[index]["annSongId"]
     songList[index]["SN"] = "`"+songList[index]["SN"]+"`"
+    songList[index]["ID"] = "``"+str(songList[index]["ID"]
 
 #map song ID's and broken URL's to equivalences
 equivMap = {}
@@ -231,6 +232,7 @@ with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
             knownList[index]["D"] = song["D"]
             knownList[index]["startPoint"] = song["startPoint"]
             knownList[index]["sampleWeights"] = song["sampleWeights"]
+            knownList[index]["X" = song["X"]
     
     f.truncate(0)
     f.seek(0)
