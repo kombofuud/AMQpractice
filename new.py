@@ -83,7 +83,7 @@ for index, song in enumerate(songList):
         song["altAnimeNames"] = altNames[equivMap[song["annSongId"]]]
     song["altAnimeNames"] = list(set(song["altAnimeNames"]+song["altAnimeNamesAnswers"]))
     if song["annSongId"] in brokenMap:
-        if song["video720"] == brokenURLs[brokenMap[song["annSongId"]]]["video720"]:
+        if song["video720"] == brokenURLs[brokenMap[song["annSongId"]]]["video720"] or song["video480"] == brokenURLs[brokenMap[song["annSongId"]]]["video720"]:
             fixedList.append(index)
         else:
             song["video720"] = brokenURLs[brokenMap[song["annSongId"]]]["video720"]
