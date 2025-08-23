@@ -8,6 +8,7 @@ filePractice = "_practice"
 filePool = "pool"
 filePrevPool = "prevPool"
 filePrevQuiz = "prevQuiz"
+dMax = 8
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -86,9 +87,12 @@ for i, song in enumerate(songPool):
                 quizIds[song["ID"]] = 2-int(song["D"]/4) #increase penalty the more you know the song
                 pSong = copy.deepcopy(song)
                 sectionCount = len(pSong["sampleWeights"])-2
-                pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.0000001)] += quizIds[pSong["ID"]]
                 #adjust song weight strength to match play weights
-                songWeightStrength = 1-math.pow(0.95,18-pSong["D"])
+                songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
+                for i in range(len(pSong["sampleWeights"])-1):
+                    pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/2
+                    pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/2
+                pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.0000001)] += 2
                 for i in range(len(pSong["sampleWeights"])):
                     pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
                 pSong["startPoint"] = pSong["sampleWeights"]
@@ -165,9 +169,6 @@ for ID, index in idIndices.items():
     else:
         sectionCount = len(songPool[index]["sampleWeights"])-2
         songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += 1-(1+songPool[index]["X"])%3
-    songPool[index]["X"] = 0
-for ID, index in extraIndices.items():
-    songPool[index]["D"] = max(songPool[index]["D"], int(countedTotalWeight/countedKeys))
     songPool[index]["X"] = 0
 
 with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
