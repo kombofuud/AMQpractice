@@ -675,6 +675,12 @@ function setup() {
                     console.error(error);
                     messageDisplayer.displayMessage("Upload Error");
                 }
+                if(this.files[0].name == "_practice.json"){
+                    songListTableView = 1;
+                }
+                if(this.files[0].name == "_quiz.json" || this.files[0].name == "_split.json"){
+                    songListTableView = 2;
+                }
                 setSongListTableSort();
                 createSongListTable(true);
                 createAnswerTable();
