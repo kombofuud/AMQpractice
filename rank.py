@@ -10,7 +10,7 @@ if len(sys.argv) == 2:
     newShow["name"] = sys.argv[1]
     newShow["score"] = 0
 elif len(sys.argv) == 1:
-    itterationCount = 2
+    itterationCount = 0
 else:
     print("rank takes 0-1 arguments")
 
@@ -37,7 +37,7 @@ def rank(shows):
         newOrdering.append(shows[num-1])
     return newOrdering
 
-if itterationCount: #check if we're reranking shows or inserting a new one
+'''if itterationCount: #check if we're reranking shows or inserting a new one
     while itterationCount > 0:
         itterationCount -= 1
         section = random.randint(0, len(showOrder)-4)
@@ -54,7 +54,7 @@ else: #inserting new show
             minV = pivot+1
         else:
             maxV = pivot
-    showOrder.insert(minV, newShow)
+    showOrder.insert(minV, newShow)'''
 
 #list any shows that need their score changed and rewrite ranking.json
 print("Changes:_____________________________")
