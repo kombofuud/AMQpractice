@@ -96,6 +96,7 @@ for i, song in enumerate(songPool):
                 for i in range(len(pSong["sampleWeights"])):
                     pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
                 pSong["startPoint"] = pSong["sampleWeights"]
+                pSong["sampleWeights"] = song["sampleWeights"]
                 pSong["X"] = max(quizIds[pSong["ID"]],1)+1
                 practice.append(pSong)
                 gain -= pSong["X"]
