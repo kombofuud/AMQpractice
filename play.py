@@ -70,7 +70,6 @@ if newSongCount > 0 and len(quizList) == 0:
     
     #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
     prepListMalIds = set()
-    random.shuffle(loadingList)
     elementNull = prepList.pop(0)
     for song in prepList:
         prepListMalIds.add(song["malId"])
@@ -117,6 +116,7 @@ if newSongCount > 0 and len(quizList) == 0:
             if len(malIds) == 0:
                 break
     #add new shows to filePrep if there aren't enough
+    loadingList.sort(key = lambda x : x["songDifficulty"])
     if len(prepList) < prepListMinSize:
         for i in range(len(loadingList)-1,-1,-1):
             if loadingList[i]["malId"] not in prepListMalIds:
