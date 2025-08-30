@@ -16,7 +16,7 @@ fileQuiz = "_quiz"
 gainPerSong = 8
 desiredQuizSize = 30
 filePractice = "_practice"
-prepListMinSize = 50
+prepListMinSize = 100
 '''
 fileMerged = "dummyMerged"
 filePrep = "dummyPreplist"

@@ -58,6 +58,8 @@ for index in range(len(rawSongList)):
     songList[index]["annId"] = songList[index]["annSongId"]
     songList[index]["SN"] = "`"+songList[index]["SN"]+"`"
     songList[index]["ID"] = "``"+str(songList[index]["ID"])
+    if songList[index]["songDifficulty"] is None:
+        songList[index]["songDifficulty"] = 0
 
 #map song ID's and broken URL's to equivalences
 equivMap = {}

@@ -3,6 +3,7 @@
 ,{"name": "Vinland Saga", "score": 10}
 ,{"name": "Kaguya-sama: Love is War -Ultra Romantic-", "score": 10}
 ,{"name": "Your Lie in April", "score": 10}
+,{"name": "Vinland Saga Season 2", "score": 10}
 ,{"name": "Kaguya-sama: Love is War?", "score": 10}
 ,{"name": "KonoSuba: God's Blessing on This Wonderful World! 2", "score": 10}
 ,{"name": "Attack on Titan Season 3 Part 2", "score": 10}
@@ -24,6 +25,7 @@
 ,{"name": "Medalist", "score": 10}
 ,{"name": "Rascal Does not Dream of a Dreaming Girl", "score": 10}
 ,{"name": "TsumaSho", "score": 10}
+,{"name": "Violet Evergarden", "score": 10}
 ,{"name": "Lucky☆Star", "score": 10}
 ,{"name": "Lycoris Recoil", "score": 10}
 ,{"name": "Death Note", "score": 10}
@@ -47,6 +49,8 @@
 ,{"name": "Attack on Titan: Final Season Part 2", "score": 9}
 ,{"name": "Phantom: Requiem for the Phantom", "score": 9}
 ,{"name": "Look Back", "score": 9}
+,{"name": "Urusei Yatsura (2022)", "score": 9}
+,{"name": "Urusei Yatsura (2022) 2nd Season", "score": 9}
 ,{"name": "Overtake!", "score": 9}
 ,{"name": "Toradora!", "score": 9}
 ,{"name": "Kaguya-sama: Love is War", "score": 9}
@@ -63,6 +67,7 @@
 ,{"name": "Blue Box", "score": 9}
 ,{"name": "Tonbo! Season 2", "score": 9}
 ,{"name": "Attack on Titan Season 3", "score": 9}
+,{"name": "Violet Evergarden Movie", "score": 9}
 ,{"name": "The Weakest Tamer Began a Journey to Pick Up Trash", "score": 9}
 ,{"name": "Shoshimin: How to Become Ordinary", "score": 9}
 ,{"name": "KonoSuba: God's Blessing on This Wonderful World! - Legend of Crimson", "score": 9}
@@ -80,7 +85,11 @@
 ,{"name": "Shangri-La Frontier Season 2", "score": 9}
 ,{"name": "Shangri-La Frontier", "score": 9}
 ,{"name": "Attack on Titan: The Last Attack", "score": 9}
+,{"name": "Vampire Hunter D (2000)", "score": 9}
+,{"name": "Violet Evergarden: Eternity and the Auto Memory Doll", "score": 9}
 ,{"name": "Villainess Level 99: I May Be the Hidden Boss but I'm Not the Demon Lord", "score": 8}
+,{"name": "Unnamed Memory", "score": 8}
+,{"name": "I'm in Love with the Villainess", "score": 8}
 ,{"name": "Sword Art Online", "score": 8}
 ,{"name": "KonoSuba: God's Blessing on This Wonderful World! - God's Blessing on This Wonderful Choker!", "score": 8}
 ,{"name": "Spy x Family Season 2", "score": 8}
@@ -97,6 +106,7 @@
 ,{"name": "The 100 Girlfriends Who Really, Really, Really, Really, Really Love You", "score": 8}
 ,{"name": "Your Lie in April: Moments", "score": 8}
 ,{"name": "Demon Slayer: Kimetsu no Yaiba Mugen Train Arc", "score": 8}
+,{"name": "My Happy Marriage Season 2", "score": 8}
 ,{"name": "Hikaru no Go Special, Match of Justice! The Ancient Flower", "score": 8}
 ,{"name": "Hikaru no Go: Journey to the North Star Cup", "score": 8}
 ,{"name": "Bottom-Tier Character Tomozaki 2nd Stage", "score": 8}
@@ -121,8 +131,10 @@
 ,{"name": "Food for the Soul", "score": 8}
 ,{"name": "Okitsura: Fell in Love with an Okinawan Girl, but I Just Wish I Know What She's Saying", "score": 7}
 ,{"name": "Sorairo Utility", "score": 8}
+,{"name": "My Happy Marriage", "score": 8}
 ,{"name": "Uma Musume: Cinderella Gray", "score": 8}
 ,{"name": "Spice and Wolf: Merchant Meets the Wise Wolf", "score": 8}
+,{"name": "Violet Evergarden: The Day You Understand \"I Love You\" Will Surely Come", "score": 8}
 ,{"name": "KonoSuba: God's Blessing on This Wonderful World! 3", "score": 8}
 ,{"name": "Mono", "score": 8}
 ,{"name": "Rascal Does Not Dream of Bunny Girl Senpai", "score": 8}
@@ -136,6 +148,7 @@
 ,{"name": "Mr. Villain's Day Off", "score": 7}
 ,{"name": "Bottom-Tier Character Tomozaki", "score": 7}
 ,{"name": "Re:ZERO -Starting Life in Another World- The Frozen Bond", "score": 8}
+,{"name": "My Happy Marriage: The Shape of My Happiness", "score": 8}
 ,{"name": "Mob Psycho 100 III", "score": 7}
 ,{"name": "Log Horizon 2nd Season", "score": 7}
 ,{"name": "Legend of the Galactic Heroes: My Conquest is the Sea of Stars", "score": 7}
@@ -185,6 +198,7 @@
 ,{"name": "Is It Wrong to Try to Pick Up Girls in a Dungeon? III", "score": 6}
 ,{"name": "The World's Finest Assassin Gets Reincarnated in Another World as an Aristocrat", "score": 6}
 ,{"name": "Yakuza Fiancé: Raise wa Tanin ga Ii", "score": 6}
+,{"name": "Undead Girl Murder Farce", "score": 6}
 ,{"name": "My Dress-Up Darling", "score": 6}
 ,{"name": "Bludgeoning Angel Dokuro-chan", "score": 6}
 ,{"name": "I'm Getting Married to a Girl I Hate in My Class", "score": 6}
@@ -245,11 +259,12 @@
 ,{"name": "Berserk of Gluttony", "score": 5}
 ,{"name": "Akame ga Kill!", "score": 5}
 ,{"name": "Mushoku Tensei: Jobless Reincarnation Season 2 - Episode 0 'Guardian Fitz'", "score": 5}
-,{"name": "Bocchi the Rock!", "score": 5}
 ,{"name": "A Salad Bowl of Eccentrics", "score": 5}
 ,{"name": "Catch Me at the Ballpark!", "score": 5}
 ,{"name": "Sword Art Online the Movie: Progressive - Aria of a Starless Night", "score": 5}
+,{"name": "Unnamed Memory Act.2", "score": 5}
 ,{"name": "Love Live! Sunshine!! The School Idol Movie: Over the Rainbow", "score": 5}
+,{"name": "Bocchi the Rock!", "score": 5}
 ,{"name": "Re:Creators", "score": 5}
 ,{"name": "Kaiju No. 8", "score": 5}
 ,{"name": "The Beginning After the End", "score": 5}
@@ -273,6 +288,7 @@
 ,{"name": "My Next Life as a Villainess: All Routes Lead to Doom!", "score": 4}
 ,{"name": "The Shiunji Family Children", "score": 4}
 ,{"name": "Zatsu Tabi: That's Journey", "score": 4}
+,{"name": "Undead Unluck", "score": 4}
 ,{"name": "Doctor Elise: The Royal Lady with the Lamp", "score": 4}
 ,{"name": "Sweet Reincarnation", "score": 4}
 ,{"name": "The Girl I Like Forgot Her Glasses", "score": 4}
@@ -313,6 +329,7 @@
 ,{"name": "Masamune-kun's Revenge", "score": 3}
 ,{"name": "My Deer Friend Nokotan", "score": 3}
 ,{"name": "Redo of Healer", "score": 3}
+,{"name": "Uzumaki", "score": 3}
 ,{"name": "Demon Slayer: Kimetsu no Yaiba Hashira Training Arc", "score": 3}
 ,{"name": "Mobile Suit Gundam: GQuuuuuuX", "score": 3}
 ,{"name": "Love Live! Sunshine!!", "score": 3}
