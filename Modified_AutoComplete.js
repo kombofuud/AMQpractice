@@ -50,7 +50,7 @@ const onlySpecialChars = (str) => {
 var options = {
 	enabled: true,
 	enabledToggle: 'E', // ctrl + E
-	highlight: false, // highlight or not the match
+	highlight: true, // highlight or not the match
 	allowRightLeftArrows: false, // use right and left arrows to move dropdown selected options
 	allowTab: true,
 	submitOnSelect: true,
