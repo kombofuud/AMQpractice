@@ -533,7 +533,7 @@ function setup() {
                                 <input id="cslgSettingsStartPoint" type="text" style="width: 70px">
                                 <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 40px;">Difficulty:</span>
                                 <input id="cslgSettingsDifficulty" type="text" style="width: 70px">
-                                <label class="clickAble" style="margin-left: 50px">Fast Skip<input id="cslgSettingsFastSkip" type="checkbox"></label>
+                                <label class="clickAble" style="margin-left: 50px">Fast Skip<input id="cslgSettingsFastSkip" type="checkbox" checked></label>
                             </div>
                             <div style="margin-top: 5px">
                                 <span style="font-size: 18px; font-weight: bold; margin-right: 10px;">Song Order:</span>
