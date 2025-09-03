@@ -95,7 +95,7 @@ let onManualChange = (key) => {
 		}
 	});
     document.addEventListener ("keyup", function (zEvent){
-        if (zEvent.keyCode == 13){
+        if (zEvent.keyCode == 13 && quiz.answerInput.inFocus && document.activeElement instanceof HTMLInputElement){
             event.target.select();
         }
     });
