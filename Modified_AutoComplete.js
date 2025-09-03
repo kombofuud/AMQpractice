@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Amq Autocomplete Dropdown improvement
+// @name         Amq Autocomplete Dropdown improvement Backup
 // @namespace    http://tampermonkey.net/
 // @version      1.35
 // @description  Modification of Juvian Autocomplete for people who want to want a faster version of the normal one with some QOL.
@@ -84,6 +84,7 @@ if (true) { //change to true to have same filters and order as amq
 		}
 	]
 	options.fuzzy = {dropdown: false, answer: false}
+    options.defaultSort = true;
 }
 
 let onManualChange = (key) => {
@@ -94,7 +95,7 @@ let onManualChange = (key) => {
 		}
 	});
     document.addEventListener ("keyup", function (zEvent){
-        if (zEvent.keyCode == 13){
+        if (zEvent.keyCode == 13 && quiz.answerInput.inFocus && document.activeElement instanceof HTMLInputElement){
             event.target.select();
         }
     });
@@ -317,6 +318,7 @@ class FilterManager {
 		for (let entrySet of this.options.entrySets) {
 
 			const filter = entrySet.filter || defaultFilter;
+            cache.clear();
 
 			if (entrySet.startsWith || entrySet.contains || entrySet.partial) {
 				let list = this.list.map((e, idx) => ({str: entrySet.clean(e.str || e.originalStr), specialStr: entrySet.special ? entrySet.special(e.str || e.originalStr) : '', originalIndex: e.originalIndex, listIndex: e.idx})).filter(filter);
@@ -475,7 +477,7 @@ if (!isNode) {
                 quiz.answerInput.typingInput.submitAnswer();
             });
         }
-		if ((options.allowRightLeftArrows || options.allowTab || this.index <= -2)) {
+		if ((options.allowRightLeftArrows || options.allowTab || this.index == -2)) {
 			$(this.input).on("keydown", (e) => {
                 if (this.index== -1){
                     if(e.keyCode == 9) e.preventDefault();
@@ -528,7 +530,8 @@ if (!isNode) {
 		this.$ul.children('li').remove();
 
 		for (let i = this.suggestions.length - 1; i >= 0; i--) {
-            this.ul.insertBefore(this.item(options.highlight ? this.suggestions[i] : escapeHtml(this.suggestions[i]), options.highlight ? suggestions[i].lastQry : "", i), this.ul.firstChild);
+            //this.ul.insertBefore(this.item(options.highlight ? this.suggestions[i] : escapeHtml(this.suggestions[i]), options.highlight ? suggestions[i].lastQry : "", i), this.ul.firstChild);
+            this.ul.insertBefore(this.item(this.suggestions[i], options.highlight ? suggestions[i].lastQry : "", i), this.ul.firstChild);
 		}
 
 		if (this.ul.children.length === 0) {
