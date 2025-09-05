@@ -47,17 +47,21 @@ for index, song in enumerate(poolSongList):
     DMin = min(DMin, song["D"])
     songCounter += 1
 
+with open(fileQuiz+".json", "r", encoding="utf-8") as file:
+    quizList = json.load(file)
+if len(quizList) > 0:
+    print("Quiz Already Exists")
+    sys.exit(1)
+
 #read prep and loadingLists
 with open(filePrep+".json", "r", encoding="utf-8") as file:
     prepList = json.load(file)
 with open(fileLoad+".json", "r", encoding="utf-8") as file:
     loadingList = json.load(file)
 
-#read length of practice list and length of quiz
+#read length of practice list
 with open(filePractice+".json", "r", encoding="utf-8") as file:
     practiceList = json.load(file)
-with open(fileQuiz+".json", "r", encoding="utf-8") as file:
-    quizList = json.load(file)
 
 #Get new songs if applicable
 newSongList = []
