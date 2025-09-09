@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Custom Song List Game Static
 // @namespace    https://github.com/kempanator
-// @version      0.89
+// @version      0.91
 // @description  Play a solo game with a custom song list
 // @author       kempanator
 // @match        https://*.animemusicquiz.com/*
@@ -77,7 +77,7 @@ let answerTimer;
 let extraGuessTimer;
 let endGuessTimer;
 let fileHostOverride = 0;
-let animeListLower = []; //store lowercase version for faster compare speed
+let animeListLower = new Set(); //store lowercase version for faster compare speed
 let autocompleteInput;
 let cslMultiplayer = { host: "", songInfo: {}, voteSkip: {} };
 let cslState = 0; //0: none, 1: guessing phase, 2: answer phase
@@ -219,18 +219,22 @@ function setup() {
         $("#cslgSettingsModal").modal("hide");
     }).bindListener();
     new Listener("get all song names", (data) => {
-        animeListLower = data.names.map(x => x.toLowerCase());
+        animeListLower = new Set(data.names.map(x => x.toLowerCase()));
         autocompleteInput = new AmqAwesomeplete(document.querySelector("#cslgNewAnswerInput"), { list: data.names }, true);
     }).bindListener();
     new Listener("update all song names", (data) => {
         if (data.deleted.length) {
-            const deletedLower = data.deleted.map(x => x.toLowerCase());
             animeListLower = animeListLower.filter(name => !deletedLower.includes(name));
+            for (const name of deletedLower) {
+                animeListLower.delete(name);
+            }
             autocompleteInput.list = autocompleteInput.list.filter(name => !data.deleted.includes(name));
         }
         if (data.new.length) {
             const newLower = data.new.map(x => x.toLowerCase());
-            animeListLower.push(...newLower);
+            for (const name of newLower) {
+                animeListLower.add(name);
+            }
             autocompleteInput.list.push(...data.new);
         }
     }).bindListener();
@@ -993,10 +997,12 @@ function setup() {
             createMergedSongListTable();
         },
         clearSongList: () => {
+            if (quiz.inQuiz) return;
             songList = [];
             createSongListTable(true);
         },
         transferMerged: () => {
+            if (quiz.inQuiz) return;
             songList = Array.from(mergedSongList);
             createSongListTable(true);
         },
@@ -1111,7 +1117,7 @@ function validateStart() {
     if (!songList || !songList.length) {
         return messageDisplayer.displayMessage("Unable to start", "No songs");
     }
-    if (animeListLower.length === 0) {
+    if (animeListLower.size === 0) {
         return messageDisplayer.displayMessage("Unable to start", "Autocomplete list empty");
     }
     const numSongs = parseInt($("#cslgSettingsSongs").val());
@@ -1119,11 +1125,11 @@ function validateStart() {
         return messageDisplayer.displayMessage("Unable to start", "Invalid number of songs");
     }
     guessTime = parseInt($("#cslgSettingsGuessTime").val());
-    if (isNaN(guessTime) || guessTime < 1 || guessTime > 99) {
+    if (isNaN(guessTime) || guessTime < 1 || guessTime > 999) {
         return messageDisplayer.displayMessage("Unable to start", "Invalid guess time");
     }
     extraGuessTime = parseInt($("#cslgSettingsExtraGuessTime").val());
-    if (isNaN(extraGuessTime) || extraGuessTime < 0 || extraGuessTime > 15) {
+    if (isNaN(extraGuessTime) || extraGuessTime < 0 || extraGuessTime > 60) {
         return messageDisplayer.displayMessage("Unable to start", "Invalid extra guess time");
     }
     const startPointText = $("#cslgSettingsStartPoint").val().trim();
@@ -1536,7 +1542,7 @@ function endGuessPhase(songNumber) {
                 if (quiz.soloMode) {
                     let defaultTimer = 0;
                     skipInterval = setInterval(() => {
-                        if (quiz.skipController._toggled || defaultTimer >= 60) {
+                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? 60 : 200)) {
                             clearInterval(skipInterval);
                             endReplayPhase(songNumber);
                         }
@@ -1733,7 +1739,7 @@ function parseMessage(content, sender) {
         }
     }
     else if (content === "§CSL21") { //has autocomplete
-        cslMessage(`Autocomplete: ${animeListLower.length ? "✅" : "⛔"}`);
+        cslMessage(`Autocomplete: ${animeListLower.size ? "✅" : "⛔"}`);
     }
     else if (content === "§CSL22") { //version
         cslMessage(`CSL version ${GM_info.script.version}`);
@@ -2089,7 +2095,7 @@ function quizOver() {
 // open custom song list settings modal
 function openSettingsModal() {
     if (lobby.inLobby) {
-        if (animeListLower.length) {
+        if (animeListLower.size) {
             $("#cslgAutocompleteButton").removeClass("btn-danger").addClass("btn-success disabled");
         }
         if ($("#cslgSongListModeSelect").val() === "Previous Game") {
@@ -2183,14 +2189,14 @@ function getAnisongdbData(mode, query, filters) {
     else if (mode === "song") {
         url = apiBase + "search_request";
         json.song_name_search_filter = {
-            search: filters.query,
+            search: query,
             partial_match: filters.partial
         };
     }
     else if (mode === "composer") {
         url = apiBase + "search_request";
         json.composer_search_filter = {
-            search: filters.query,
+            search: query,
             partial_match: filters.partial,
             arrangement: filters.arrangement
         };
@@ -2226,20 +2232,14 @@ function getAnisongdbData(mode, query, filters) {
             if (debug) console.log(json);
             handleData(json);
             setSongListTableSort();
-            if (!Array.isArray(json)) {
-                $("#cslgSongListCount").text("Songs: 0");
-                $("#cslgMergeCurrentCount").text("Current song list: 0 songs");
-                $("#cslgSongListTable tbody").empty();
-                $("#cslgSongListWarning").text(JSON.stringify(json));
-            }
-            else if (songList.length === 0 && isRankedRunning()) {
-                $("#cslgSongListCount").text("Songs: 0");
-                $("#cslgMergeCurrentCount").text("Current song list: 0 songs");
-                $("#cslgSongListTable tbody").empty();
-                $("#cslgSongListWarning").text("AnisongDB is not available during ranked");
+            if (Array.isArray(json)) {
+                createSongListTable(true);
             }
             else {
-                createSongListTable(true);
+                $("#cslgSongListCount").text("Songs: 0");
+                $("#cslgMergeCurrentCount").text("Current song list: 0 songs");
+                $("#cslgSongListTable tbody").empty();
+                $("#cslgSongListWarning").text(json?.detail || JSON.stringify(json));
             }
             createAnswerTable();
         })
@@ -2510,7 +2510,7 @@ function createAnswerTable() {
     if (songList.length === 0) {
         $("#cslgAnswerText").text("No list loaded");
     }
-    else if (animeListLower.length === 0) {
+    else if (animeListLower.size === 0) {
         $("#cslgAnswerText").text("Fetch autocomplete first");
     }
     else {
@@ -2521,7 +2521,7 @@ function createAnswerTable() {
             answers.forEach(x => animeList.add(x));
         }
         for (const anime of animeList) {
-            if (!animeListLower.includes(anime.toLowerCase())) {
+            if (!animeListLower.has(anime.toLowerCase())) {
                 missingAnimeList.push(anime);
             }
         }
