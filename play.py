@@ -235,7 +235,7 @@ if len(newSongList) > 0:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 '''
 print()
-print(f"Pool Size: {len(poolSongList)} LoadingSize: {len(loadingList)+len(prepList)-1} TotalD: {totalDWeight} Min D: {DMin}")
+print(f"Pool Size: {len(poolSongList)} LoadingSize: {len(loadingList)+len(prepList)-1} Min D: {DMin}")
 DList = [0]*(DMax-DMin+1)
 for song in poolSongList:
     if song["D"] > DMax:
