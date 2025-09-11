@@ -2,13 +2,23 @@ import json
 import sys
 import math
 import copy
+import random
 
 fileQuiz = "_quiz"
 filePractice = "_practice"
 filePool = "pool"
 filePrevPool = "prevPool"
 filePrevQuiz = "prevQuiz"
+filePrevPrep = "prevPrep"
+filePrep = "preplist"
+filePrevLoad = "prevLoading"
+fileLoad = "loadingcutlist"
+fileAdd = "addThese"
+rngFile = "addSongRandomValue.txt"
+malUpdateFile = "updateMal.txt"
+prevMalUpdateFile = "prevUpdateMal.txt"
 dMax = 8
+prepListMinSize = 100
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -16,7 +26,7 @@ filePool = "dummyPool"
 filePrevPool = "dummyPrevPool"
 '''
 
-#read files and create dict containing quiz songs and create practice list
+#read files and create dict containing quiz songs
 with open(filePool+".json", 'r', encoding = 'utf8') as f:
     songPool = json.load(f)
 
@@ -28,6 +38,14 @@ with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
         quizIds[song["ID"]] = 0
         quizSamples[song["ID"]] = song["startPoint"]
 
+with open(filePrep+".json", 'r', encoding = 'utf8') as f:
+    prepSongs = json.load(f)
+    elementNull = prepSongs.pop(0)
+    random.shuffle(prepSongs)
+
+with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
+    loadingSongs = json.load(f)
+
 #assume all songs must be accounted for unless user says otherwise. If user types a negative number, that indicates the number of skipped songs.
 if len(sys.argv) > 1:
     argVal = int(sys.argv[1])
@@ -36,8 +54,8 @@ if len(sys.argv) > 1:
 else:
     argVal = len(quizSongs)
 
-#if argument is 0, reset the pool list to before the update
-if argVal == 0:
+#if quizSongs is empty, reset the pool list to before the update
+if len(quizSongs) == 0:
     with open(filePrevPool+".json", 'r', encoding = 'utf8') as f:
         prevSongs = json.load(f)
     with open(filePool+".json", 'r+', encoding = 'utf8') as f:
@@ -62,7 +80,37 @@ if argVal == 0:
         fileData = fileData.replace("}]","}\n]")
         f.seek(0)
         f.write(fileData)
-    print("Pool+Quiz Restored")
+    with open(filePrevPrep+".json", 'r', encoding = 'utf8') as f:
+        prevPrepSongs = json.load(f)
+    with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        json.dump(prevPrepSongs,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
+    with open(filePrevLoad+".json", 'r', encoding = 'utf8') as f:
+        prevLoadSongs = json.load(f)
+    with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        json.dump(prevLoadSongs,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
+    with open(prevMalUpdateFile, 'r', encoding = 'utf8') as f:
+        prevMalUpdates = f.read()
+    with open(malUpdateFile, 'w', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        f.write(prevMalUpdates)
+    print("Pool+Quiz+Prep+Load+Update Restored")
     with open(filePractice+".json", 'r', encoding = 'utf8') as f:
         practiceSongs = json.load(f)
     for song in practiceSongs:
@@ -145,7 +193,8 @@ if countedKeys > argVal:
 if errorQ:
     sys.exit(1)
 
-#save copy of pool to prevPool.json
+
+#save copy of pool,quiz,prep,loading to prevPool,prevQuiz etc
 with open(filePrevPool+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
@@ -157,7 +206,47 @@ with open(filePrevPool+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
-#Update all keys and generate practice json
+with open(filePrevQuiz+".json", 'r+', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(quizSongs,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
+
+with open(filePrevPrep+".json", 'r+', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(prepSongs,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
+
+with open(filePrevLoad+".json", 'r+', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(loadingSongs,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
+
+with open(malUpdateFile, 'r', encoding = 'utf8') as f:
+    malUpdates = f.read()
+with open(prevMalUpdateFile, 'w', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    f.write(malUpdates)
+
+#Update all keys
 for ID, index in idIndices.items():
     '''if songPool[index]["D"] >= 18 and quizIds[ID] >= 0:
         songPool[index]["X"] = 0
@@ -172,6 +261,57 @@ for ID, index in idIndices.items():
         songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += 1-(1+songPool[index]["X"])%3
     songPool[index]["X"] = 0
 
+#Add new songs if appropriate
+with open(rngFile, 'r', encoding = 'utf8') as f:
+    randomValue = float(f.read().strip())
+if randomValue < 0:
+    randomValue = random.random()
+    with open(rngFile, 'w', encoding = 'utf8') as f:
+        f.write(str(randomValue))
+
+newSongCount = int(gain/8+randomValue)
+newSongs = []
+if newSongCount > len(prepSongs):
+    print("Warning: Insufficient New Songs")
+    newSongCount = len(prepSongs)
+
+if newSongCount > 0:
+    newSongMalIds = set()
+    newSongs = prepSongs[0:newSongCount]
+    practice.extend(newSongs)
+    songPool.extend(newSongs)
+    prepSongs = prepSongs[newSongCount:]
+    for song in newSongs:
+        newSongMalIds.add(song["malId"])
+
+    loadingSongs.sort(key = lambda x : x["songDifficulty"])
+    #replace added songs with songs from same show
+    for i in range(len(loadingSongs)-1,-1,-1):
+        if loadingSongs[i]["malId"] in newSongMalIds:
+            newSongMalIds.remove(loadingSongs[i]["malId"])
+            prepSongs.append(loadingSongs.pop(i))
+            if len(newSongMalIds) == 0:
+                break
+    completedMalIds = set()
+    for ID in newSongMalIds:
+        completedMalIds.add(ID)
+
+    #if a show had a final song, add a brand new show to replace it (assuming there aren't too many shows)
+    if len(prepSongs) < prepListMinSize:
+        newShowCount = 100-len(prepSongs)
+        for song in songPool:
+            newSongMalIds.add(song["malId"])
+        for i in range(len(loadingSongs)-1,-1,-1):
+            if loadingSongs[i]["malId"] not in newSongMalIds:
+                newSongMalIds.add(loadingSongs[i]["malId"])
+                prepList.append(loadingSongs.pop(i))
+                newShowCount -= 1
+                if newShowCount <= 0:
+                    break
+        if newShowCount > 0:
+            print("Warning: Insufficient Anime Diversity")
+
+#Generate practice.json
 with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
@@ -183,6 +323,7 @@ with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
+#Write updates to pool.json, prepList.json, loadingcutList.json
 with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
@@ -194,11 +335,11 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
-#overwrite quiz to prevent accidentally forgetting to run quiz.py next time
-with open(filePrevQuiz+".json", 'r+', encoding = 'utf8') as f:
+with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
-    json.dump(quizSongs,f,ensure_ascii=False)
+    prepSongs.insert(0, elementNull)
+    json.dump(prepSongs,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
     fileData = fileData.replace(", {","\n,{")
@@ -206,10 +347,41 @@ with open(filePrevQuiz+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
+with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    json.dump(loadingSongs,f,ensure_ascii=False)
+    f.seek(0)
+    fileData = f.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    f.seek(0)
+    f.write(fileData)
+
+#Update list of added songs and completed shows
+with open(fileAdd+".json", "r+", encoding="utf-8") as file:
+    knownList = json.load(file)
+    knownList.extend(newSongs)
+    file.truncate(0)
+    file.seek(0)
+    json.dump(knownList,file,ensure_ascii=False)
+    file.seek(0)
+    fileData = file.read()
+    fileData = fileData.replace(", {","\n,{")
+    fileData = fileData.replace("}]","}\n]")
+    file.seek(0)
+    file.write(fileData)
+
+with open(malUpdateFile, 'r+', encoding = 'utf8') as file:
+        file.seek(0,2)
+        for ID in completedMalIds:
+            file.write(f"\n{ID}")
+
+#overwrite quiz to prevent accidentally forgetting to run quiz.py next time
 with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("Practice List Compiled: Len = "+str(len(practice))+", Gain = "+str(gain/8))
+print("\033[31mPractice List Compiled:\033[0m Len = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PracticeSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))

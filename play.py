@@ -8,15 +8,15 @@ import sys
 #Read ALL Files
 
 fileMerged = "merged"
-filePrep = "preplist"
-fileLoad = "loadingcutlist"
+#filePrep = "preplist"
+#fileLoad = "loadingcutlist"
 filePool = "pool"
-fileAdd = "addThese"
+#fileAdd = "addThese"
 fileQuiz = "_quiz"
-gainPerSong = 8
-desiredQuizSize = 30
+#gainPerSong = 8
+desiredQuizSize = 40
 filePractice = "_practice"
-prepListMinSize = 100
+#prepListMinSize = 100
 '''
 fileMerged = "dummyMerged"
 filePrep = "dummyPreplist"
@@ -53,6 +53,7 @@ if len(quizList) > 0:
     print("Quiz Already Exists")
     sys.exit(1)
 
+'''
 #read prep and loadingLists
 with open(filePrep+".json", "r", encoding="utf-8") as file:
     prepList = json.load(file)
@@ -80,7 +81,6 @@ if newSongCount > 0 and len(quizList) == 0:
     random.shuffle(prepList)
     while newSongCount > 0:
         newSongCount -= 1
-        '''
         if len(prepList) > 0 and len(loadingList) > 0:
             if random.randint(0,1) and False:
                 newSong = loadingList.pop(0)
@@ -99,7 +99,7 @@ if newSongCount > 0 and len(quizList) == 0:
             DList.append(math.exp(newSong["D"]))
             DMin = min(newSong["D"], DMin)
             indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
-            continue'''
+            continue
         if len(prepList) > 0:
             newSong = prepList.pop(0)
             newSongList.append(newSong)
@@ -169,7 +169,7 @@ if newSongCount > 0 and len(quizList) == 0:
         fileData = fileData.replace("}]","}\n]")
         file.seek(0)
         file.write(fileData)
-poolSongList.extend(newSongList)
+poolSongList.extend(newSongList)'''
 
 #Pick Songs and Generate Song Section
 
@@ -216,13 +216,14 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as file:
         file.write(fileData)
 
 #Update updateMal.json
+'''
 with open("updateMal.txt", 'r+', encoding = 'utf8') as file:
         fileData = file.read()
         file.seek(0,2)
         for ID in malIds:
             file.write(f"\n{ID}")
         file.seek(0)
-        file.write(fileData)
+        file.write(fileData)'''
 
 
 #Output D distribution, poolSize, loadingSize
@@ -235,7 +236,7 @@ if len(newSongList) > 0:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 '''
 print()
-print(f"Pool Size: {len(poolSongList)} LoadingSize: {len(loadingList)+len(prepList)-1} Min D: {DMin}")
+print(f"Pool Size: {len(poolSongList)} Min D: {DMin}")
 DList = [0]*(DMax-DMin+1)
 for song in poolSongList:
     if song["D"] > DMax:
