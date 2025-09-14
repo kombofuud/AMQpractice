@@ -1542,7 +1542,7 @@ function endGuessPhase(songNumber) {
                 if (quiz.soloMode) {
                     let defaultTimer = 0;
                     skipInterval = setInterval(() => {
-                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? 60 : 200)) {
+                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? 160 : 200)) {
                             clearInterval(skipInterval);
                             endReplayPhase(songNumber);
                         }
@@ -1585,12 +1585,8 @@ function endReplayPhase(songNumber) {
             fireListener("quiz end result", data);
         }, fastSkip ? 1 : 5000);
         setTimeout(() => {
-            let defaultTimer = 0;
             skipInterval = setInterval(() => {
-                if (quiz.skipController._toggled) {
-                    defaultTimer = 60;
-                }
-                if (defaultTimer >= 60 && !quiz.pauseButton.pauseOn){
+                if (!quiz.pauseButton.pauseOn){
                     if (quiz.soloMode) {
                         quizOver();
                     }
@@ -1598,7 +1594,6 @@ function endReplayPhase(songNumber) {
                         cslMessage("§CSL10");
                     }
                 }
-                defaultTimer += 1;
             }, 100);
         }, fastSkip ? 1 : 12000);
     }
