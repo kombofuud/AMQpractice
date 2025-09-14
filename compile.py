@@ -385,3 +385,5 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
 
 #Print sucess statement
 print("\033[31mPractice List Compiled:\033[0m Len = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PracticeSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))
+for song in newSongs:
+    print(f"Added ANSID={song["annSongId"]}: {song["songName"]}\n    from: {song["EN"]}")
