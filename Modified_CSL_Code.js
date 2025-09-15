@@ -60,6 +60,7 @@ let extraGuessTime = 0;
 let currentSong = 0;
 let totalSongs = 0;
 let currentAnswers = {};
+let currentAnswerTime = 20;
 let score = {};
 let songListTableView = 2; //0: song + artist, 1: anime + song type + vintage, 2: video/audio links
 let songListTableSort = { mode: "", ascending: true } //modes: songName, artist, difficulty, anime, songType, vintage, mp3, 480, 720
@@ -315,6 +316,7 @@ function setup() {
     QuizTypeAnswerInputController.prototype.submitAnswer = function (answer) {
         if (quiz.cslActive) {
             currentAnswers[quiz.ownGamePlayerId] = answer;
+            currentAnswerTime = Number(((Date.now() - songStartTime) / 1000).toFixed(3));
             this.skipController.highlight = true;
             fireListener("quiz answer", {
                 "answer": answer,
@@ -1493,6 +1495,8 @@ function endGuessPhase(songNumber) {
                         "animeType": song.animeType,
                         "vintage": song.animeVintage,
                         "animeDifficulty": song.songDifficulty,
+                        "length": song.length,
+                        "D": song.D === undefined || song.D === null ? 8 : song.D,
                         "animeTags": song.animeTags,
                         "animeGenre": song.animeGenre,
                         "altAnimeNames": song.altAnimeNames,
@@ -1542,7 +1546,7 @@ function endGuessPhase(songNumber) {
                 if (quiz.soloMode) {
                     let defaultTimer = 0;
                     skipInterval = setInterval(() => {
-                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? 160 : 200)) {
+                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,-data.D))) : 300)) {
                             clearInterval(skipInterval);
                             endReplayPhase(songNumber);
                         }
@@ -2038,6 +2042,7 @@ function reset() {
     cslState = 0;
     currentSong = 0;
     currentAnswers = {};
+    currentAnswerTime = 20;
     score = {};
     previousSongFinished = false;
     fastSkip = true;
