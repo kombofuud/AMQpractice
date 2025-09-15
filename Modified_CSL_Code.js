@@ -1545,8 +1545,12 @@ function endGuessPhase(songNumber) {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
                     let defaultTimer = 0;
+                    const timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D)));
                     skipInterval = setInterval(() => {
-                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D))) : 300)) {
+                        if (defaultTimer >= timerEnd-30){
+                            fireListener("quiz overlay message", "About to Skip");
+                        }
+                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? timerEnd : 300)) {
                             clearInterval(skipInterval);
                             endReplayPhase(songNumber);
                         }
