@@ -1496,7 +1496,7 @@ function endGuessPhase(songNumber) {
                         "vintage": song.animeVintage,
                         "animeDifficulty": song.songDifficulty,
                         "length": song.length,
-                        "D": song.D === undefined || song.D === null ? 8 : song.D,
+                        "D": song.D,
                         "animeTags": song.animeTags,
                         "animeGenre": song.animeGenre,
                         "altAnimeNames": song.altAnimeNames,
@@ -1546,7 +1546,7 @@ function endGuessPhase(songNumber) {
                 if (quiz.soloMode) {
                     let defaultTimer = 0;
                     skipInterval = setInterval(() => {
-                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,-data.D))) : 300)) {
+                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,-song.D))) : 300)) {
                             clearInterval(skipInterval);
                             endReplayPhase(songNumber);
                         }
@@ -2305,6 +2305,7 @@ function handleData(data) {
         let startPoint = song.startPoint ?? song.startSample ?? null;
         let annSongId = song.annSongId ?? null;
         let length = parseFloat(song.songLength) || null;
+        let D = song.D === undefined || song.D === null ? 8 : song.D;
         let audio = song.audio ?? song.videoUrl ?? song.urls?.catbox?.[0] ?? song.songInfo?.videoTargetMap?.catbox?.[0] ?? song.songInfo?.urlMap?.catbox?.[0] ?? song.LinkMp3 ?? "";
         let video480 = song.video480 ?? song.MQ ?? song.videoUrl ?? song.urls?.catbox?.[480] ?? song.songInfo?.videoTargetMap?.catbox?.[480] ?? song.songInfo?.urlMap?.catbox?.[480] ?? "";
         let video720 = song.video720 ?? song.HQ ?? song.videoUrl ?? song.urls?.catbox?.[720] ?? song.songInfo?.videoTargetMap?.catbox?.[720] ?? song.songInfo?.urlMap?.catbox?.[720] ?? song.LinkVideo ?? "";
@@ -2357,6 +2358,7 @@ function handleData(data) {
                 startPoint,
                 annSongId,
                 length,
+                D,
                 audio,
                 video480,
                 video720,
