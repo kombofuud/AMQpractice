@@ -1546,7 +1546,7 @@ function endGuessPhase(songNumber) {
                 if (quiz.soloMode) {
                     let defaultTimer = 0;
                     skipInterval = setInterval(() => {
-                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,-song.D))) : 300)) {
+                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D))) : 300)) {
                             clearInterval(skipInterval);
                             endReplayPhase(songNumber);
                         }
