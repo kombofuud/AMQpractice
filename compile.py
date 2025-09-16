@@ -41,7 +41,6 @@ with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
 with open(filePrep+".json", 'r', encoding = 'utf8') as f:
     prepSongs = json.load(f)
     elementNull = prepSongs.pop(0)
-    random.shuffle(prepSongs)
 
 with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     loadingSongs = json.load(f)
@@ -220,7 +219,9 @@ with open(filePrevQuiz+".json", 'r+', encoding = 'utf8') as f:
 with open(filePrevPrep+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
+    prepSongs.insert(0, elementNull)
     json.dump(prepSongs,f,ensure_ascii=False)
+    elementNull = prepSongs.pop(0)
     f.seek(0)
     fileData = f.read()
     fileData = fileData.replace(", {","\n,{")
@@ -372,10 +373,11 @@ with open(fileAdd+".json", "r+", encoding="utf-8") as file:
     file.seek(0)
     file.write(fileData)
 
-with open(malUpdateFile, 'r+', encoding = 'utf8') as file:
-        file.seek(0,2)
-        for ID in completedMalIds:
-            file.write(f"\n{ID}")
+if newSongCount > 0:
+    with open(malUpdateFile, 'r+', encoding = 'utf8') as file:
+            file.seek(0,2)
+            for ID in completedMalIds:
+                file.write(f"\n{ID}")
 
 #overwrite quiz to prevent accidentally forgetting to run quiz.py next time
 with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
