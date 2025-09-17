@@ -282,6 +282,7 @@ if newSongCount > 0:
     practice.extend(newSongs)
     songPool.extend(newSongs)
     prepSongs = prepSongs[newSongCount:]
+    random.shuffle(prepSongs)
     for song in newSongs:
         newSongMalIds.add(song["malId"])
 
