@@ -53,6 +53,8 @@ for index in range(len(rawSongList)):
         songList[index][shortHand[jindex]] = rawSongList[index][longHand[jindex]]
     for key in rawSongList[index]:
         songList[index][key] = rawSongList[index][key]
+    if "D" in songList[index]:
+        songList[index].pop("D")
     songList[index]["sampleWeights"] = None
     songList[index]["D"] = startingD
     songList[index]["annId"] = songList[index]["annSongId"]
