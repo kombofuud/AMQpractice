@@ -1547,7 +1547,7 @@ function endGuessPhase(songNumber) {
                     let defaultTimer = 0;
                     const timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D)));
                     skipInterval = setInterval(() => {
-                        if (defaultTimer >= (correct[0]? timerEnd-30: 270)){
+                        if (defaultTimer >= (correct[0]? timerEnd-20: 280)){
                             fireListener("quiz overlay message", "About to Skip");
                         }
                         if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? timerEnd : 300)) {
