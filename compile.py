@@ -286,10 +286,12 @@ if newSongCount > 0:
     for song in newSongs:
         newSongMalIds.add(song["malId"])
 
-    if random.randint(0,2)==0:
+    if random.randint(0,3)==0:
         random.shuffle(loadingSongs)
-    elif random.randint(0,1) == 0:
+    elif random.randint(0,2) == 0:
         loadingSongs.sort(key = lambda x : (int(x["animeVintage"].split()[1]),{"Winter":1,"Spring":2,"Summer":3,"Fall":4}[x["animeVintage"].split()[0]]))
+    elif random.randint(0,1) == 0:
+        loadingSongs.sort(key = lambda x : x["songDifficulty"], reverse=True)
     #replace added songs with songs from same show
     for i in range(len(loadingSongs)-1,-1,-1):
         if loadingSongs[i]["malId"] in newSongMalIds:
