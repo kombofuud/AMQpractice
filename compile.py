@@ -286,7 +286,10 @@ if newSongCount > 0:
     for song in newSongs:
         newSongMalIds.add(song["malId"])
 
-    loadingSongs.sort(key = lambda x : x["songDifficulty"])
+    if random.randint(0,2)==0:
+        random.shuffle(loadingSongs)
+    elif random.randint(0,1) == 0:
+        loadingSongs.sort(key = lambda x : (int(x["animeVintage"].split()[1]),{"Winter":1,"Spring":2,"Summer":3,"Fall":4}[x["animeVintage"].split()[0]]))
     #replace added songs with songs from same show
     for i in range(len(loadingSongs)-1,-1,-1):
         if loadingSongs[i]["malId"] in newSongMalIds:
@@ -352,6 +355,7 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
 with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
+    loadingSongs.sort(key = lambda x : x["songDifficulty"])
     json.dump(loadingSongs,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
