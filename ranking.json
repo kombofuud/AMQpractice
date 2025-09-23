@@ -182,6 +182,7 @@
 ,{"name": "Delicious in Dungeon", "score": 7}
 ,{"name": "Ishura", "score": 7}
 ,{"name": "Cowboy Bebop: The Movie", "score": 7}
+,{"name": "Milky☆Subway: The Galactic Limited Express", "score": 7}
 ,{"name": "Mushoku Tensei: Jobless Reincarnation - Eris the Goblin Slayer", "score": 6}
 ,{"name": "So I'm a Spider, So What?", "score": 6}
 ,{"name": "Mobile Suit Gundam: The Witch from Mercury", "score": 6}
@@ -276,7 +277,7 @@
 ,{"name": "Mushoku Tensei: Jobless Reincarnation Season 2 - Episode 0 'Guardian Fitz'", "score": 5}
 ,{"name": "Call of the Night", "score": 5}
 ,{"name": "Sword Art Online the Movie: Progressive - Aria of a Starless Night", "score": 4}
-,{"name": "Unnamed Memory Act.2", "score": 4}
+,{"name": "Demon Slayer: Kimetsu no Yaiba Hashira Training Arc", "score": 3}
 ,{"name": "Love Live! Sunshine!! The School Idol Movie: Over the Rainbow", "score": 4}
 ,{"name": "The Beginning After the End", "score": 4}
 ,{"name": "Bocchi the Rock!", "score": 4}
@@ -298,6 +299,7 @@
 ,{"name": "Re:Creators", "score": 4}
 ,{"name": "The Gorilla God's Go-To Girl", "score": 4}
 ,{"name": "My Next Life as a Villainess: All Routes Lead to Doom!", "score": 4}
+,{"name": "Unnamed Memory Act.2", "score": 4}
 ,{"name": "The Boy and the Heron", "score": 4}
 ,{"name": "Slow Loop", "score": 4}
 ,{"name": "The Elusive Samurai", "score": 4}
@@ -338,22 +340,23 @@
 ,{"name": "Blue Miburo", "score": 3}
 ,{"name": "Gushing over Magical Girls", "score": 3}
 ,{"name": "You are Ms. Servant.", "score": 3}
+,{"name": "2.5 Dimensional Seduction", "score": 2}
 ,{"name": "From Old Country Bumpkin to Master Swordsman", "score": 3}
 ,{"name": "Narenare -Cheer for You!-", "score": 3}
 ,{"name": "Guilty Gear Strive: Dual Rulers", "score": 3}
 ,{"name": "The Do-Over Damsel Conquers The Dragon Emperor", "score": 3}
 ,{"name": "Cautious Hero: The Hero Is Overpowered but Overly Cautious", "score": 3}
+,{"name": "Ron Kamonohashi's Forbidden Deductions Season 2", "score": 3}
 ,{"name": "Synduality: Noir Part 2", "score": 3}
 ,{"name": "Synduality: Noir", "score": 3}
 ,{"name": "Mashle: Magic and Muscles The Divine Visionary Candidate Exam Arc", "score": 3}
 ,{"name": "Masamune-kun's Revenge", "score": 3}
 ,{"name": "My Deer Friend Nokotan", "score": 3}
 ,{"name": "Redo of Healer", "score": 3}
-,{"name": "Demon Slayer: Kimetsu no Yaiba Hashira Training Arc", "score": 3}
 ,{"name": "Mobile Suit Gundam: GQuuuuuuX", "score": 3}
 ,{"name": "Love Live! Sunshine!!", "score": 3}
 ,{"name": "I Parry Everything", "score": 3}
-,{"name": "Ron Kamonohashi's Forbidden Deductions Season 2", "score": 3}
+,{"name": "Even Given the Worthless 'Appraiser' Class, I’m Actually the Strongest", "score": 2}
 ,{"name": "Metallic Rouge", "score": 3}
 ,{"name": "Firefighter Daigo: Rescuer in Orange", "score": 3}
 ,{"name": "Tearmoon Empire", "score": 3}
@@ -369,10 +372,9 @@
 ,{"name": "Sword Art Online II", "score": 3}
 ,{"name": "Ishuzoku Reviewers", "score": 2}
 ,{"name": "My One-Hit Kill Sister", "score": 2}
-,{"name": "Even Given the Worthless 'Appraiser' Class, I’m Actually the Strongest", "score": 2}
 ,{"name": "The Demon Sword Master of Excalibur Academy", "score": 2}
 ,{"name": "Bye Bye, Earth 2nd Season", "score": 2}
-,{"name": "2.5 Dimensional Seduction", "score": 2}
+,{"name": "With You and the Rain", "score": 2}
 ,{"name": "I'll Become a Villainess Who Goes Down in History", "score": 2}
 ,{"name": "My Stepmom's Daughter Is My Ex", "score": 2}
 ,{"name": "Medaka Kuroiwa is Impervious to My Charms", "score": 2}
@@ -388,12 +390,14 @@
 ,{"name": "Kaijuu Sekai Seifuku", "score": 2}
 ,{"name": "Initial D Battle Stage 2", "score": 2}
 ,{"name": "Ninja Kamui", "score": 2}
+,{"name": "0 Years Old Child Starting Dash Story", "score": 1}
 ,{"name": "I'm Living with an Otaku NEET Kunoichi!?", "score": 2}
 ,{"name": "Love Live! School Idol Project OVA", "score": 2}
 ,{"name": "An Archdemon's Dilemma: How to Love Your Elf Bride", "score": 2}
 ,{"name": "I May Be a Guild Receptionist, but I'll Solo Any Boss to Clock Out on Time", "score": 2}
 ,{"name": "Kuromi's Pretty Journey: Hacha Mecha! Multiverse Daidasshutsu!", "score": 2}
 ,{"name": "Delico's Nursery", "score": 2}
+,{"name": "Arknights: Rise from Ember", "score": 2}
 ,{"name": "The Brilliant Healer's New Life in the Shadows", "score": 2}
 ,{"name": "The Dinner Table Detective", "score": 2}
 ,{"name": "Possibly the Greatest Alchemist of All Time", "score": 2}
@@ -427,7 +431,6 @@
 ,{"name": "The Healer Who Was Banished From His Party, Is, in Fact, the Strongest", "score": 1}
 ,{"name": "Promise of Wizard", "score": 1}
 ,{"name": "I Want to Escape from Princess Lessons", "score": 1}
-,{"name": "0-saiji Start Dash Monogatari", "score": 1}
 ,{"name": "Takt Op. Destiny", "score": 1}
 ,{"name": "Migi & Dali", "score": 1}
 ,{"name": "Skelter Heaven", "score": 1}
@@ -454,6 +457,7 @@
 ,{"name": "Haigakura", "score": 1}
 ,{"name": "Classic★Stars", "score": 1}
 ,{"name": "#Compass2.0: Animation Project", "score": 1}
+,{"name": "Babanbabanban Vampire", "score": 1}
 ,{"name": "Failure Frame: I Became the Strongest and Annihilated Everything With Low-Level Spells", "score": 1}
 ,{"name": "The Kingdoms of Ruin", "score": 1}
 ,{"name": "Miru Tights", "score": 1}
