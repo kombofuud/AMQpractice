@@ -20,7 +20,7 @@ learningMalIds = set()
 print("unfinished MALIDs:__________________")
 for song in learning:
     if song["malId"] in playMalIds:
-        print(song["malId"]
+        print(song["malId"])
     learningMalIds.add(song["malId"])
 
 print("unadded MALIDs:_____________________")

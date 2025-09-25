@@ -17,6 +17,7 @@ fileQuiz = "_quiz"
 desiredQuizSize = 40
 filePractice = "_practice"
 #prepListMinSize = 100
+rngFile = "addSongRandomValue.txt"
 '''
 fileMerged = "dummyMerged"
 filePrep = "dummyPreplist"
@@ -224,7 +225,9 @@ with open("updateMal.txt", 'r+', encoding = 'utf8') as file:
             file.write(f"\n{ID}")
         file.seek(0)
         file.write(fileData)'''
-
+#Reset Random Number
+with open(rngFile, 'w', encoding = 'utf8') as f:
+    f.write("-1")
 
 #Output D distribution, poolSize, loadingSize
 '''
