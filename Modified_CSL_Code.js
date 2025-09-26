@@ -3087,6 +3087,21 @@ function getAnilistData(username, statuses, pageNumber) {
         .catch(error => console.log(error));
 }
 
+async function getAllMalIds(){
+  $("#cslgListImportText").text(`Retrieving All MalIds`);
+  const response = await fetch(apiBase + "annid_linked_ids");
+  const ann_song_ids = await response.json();
+  const malIdSet = new Set();
+  Object.values(ann_song_ids).forEach(song => {
+    const id = song.linked_ids.myanimelist;
+    if (id){
+      malIdSet.add(id);
+    }
+  })
+  const malIdArray = Array.from(malIdSet);
+  return malIdArray;
+}
+
 // convert list of mal ids to anisongdb song list
 async function getSongListFromMalIds(malIds) {
     importedSongList = [];
@@ -3140,7 +3155,9 @@ async function startImport() {
                 await getSongListFromMalIds(malIds);
             }
             else {
-                $("#cslgListImportText").text("Input Myanimelist Username");
+                //$("#cslgListImportText").text("Input Myanimelist Username");
+                const malIds = await getAllMalIds();
+                await getSongListFromMalIds(malIds);
             }
         }
         else {
