@@ -14,6 +14,7 @@ filePrep = "preplist"
 filePrevLoad = "prevLoading"
 fileLoad = "loadingcutlist"
 fileAdd = "addThese"
+filePrevAdd = "prevAddThese"
 rngFile = "addSongRandomValue.txt"
 malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
@@ -109,7 +110,13 @@ if len(quizSongs) == 0:
         f.truncate(0)
         f.seek(0)
         f.write(prevMalUpdates)
-    print("Pool+Quiz+Prep+Load+Update Restored")
+    with open(filePrevAdd+".json", 'r', encoding = 'utf8') as f:
+        prevAddedSongOrder = f.read()
+    with open(fileAdd+".json", 'w', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        f.write(prevAddedSongOrder)
+    print("Pool+Quiz+Prep+Load+Update+AddedOrder Restored")
     with open(filePractice+".json", 'r', encoding = 'utf8') as f:
         practiceSongs = json.load(f)
     for song in practiceSongs:
@@ -247,6 +254,13 @@ with open(prevMalUpdateFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
     f.write(malUpdates)
+
+with open(fileAdd+".json", 'r', encoding = 'utf8') as f:
+    addedSongOrder = f.read()
+with open(filePrevAdd+".json", 'r', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    f.write(addedSongOrder)
 
 #Update all keys
 for ID, index in idIndices.items():
