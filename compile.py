@@ -257,7 +257,7 @@ with open(prevMalUpdateFile, 'w', encoding = 'utf8') as f:
 
 with open(fileAdd+".json", 'r', encoding = 'utf8') as f:
     addedSongOrder = f.read()
-with open(filePrevAdd+".json", 'r', encoding = 'utf8') as f:
+with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
     f.write(addedSongOrder)
@@ -267,7 +267,10 @@ for ID, index in idIndices.items():
     '''if songPool[index]["D"] >= 18 and quizIds[ID] >= 0:
         songPool[index]["X"] = 0
         continue'''
-    songPool[index]["D"] += quizIds[ID] 
+    if songPool[index]["D"] == 8 and quizIds[ID] > 0:
+        songPool[index]["D"] += quizIds[ID]
+        continue
+    songPool[index]["D"] += quizIds[ID]
     if quizSamples[ID] == 0:
         songPool[index]["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
     elif quizSamples[ID] == 100:
@@ -287,7 +290,7 @@ if randomValue < 0:
 
 #newSongCount = int(gain/8+randomValue)
 newSongCount = 0
-if gain > 0:
+if gain >= 0:
     newSongCount = 10
 newSongs = []
 if newSongCount > len(prepSongs):
@@ -411,6 +414,6 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("\033[31mPractice List Compiled:\033[0m Len = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PracticeSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))
+print("\033[31mPractice List Compiled:\033[0m Missed = "+str(int((len(quizSongs)-gain)/5))+", Gain = "+str(newSongCount)+", PracticeSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))
 for song in newSongs:
     print(f"Added ANSID={song["annSongId"]}: {song["songName"]}\n    from: {song["EN"]}")
