@@ -131,9 +131,10 @@ for i, song in enumerate(songPool):
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
-                quizIds[song["ID"]] = 2-int(song["D"]/4) #increase penalty the more you know the song
+                quizIds[song["ID"]] = 2
                 pSong = copy.deepcopy(song)
                 sectionCount = len(pSong["sampleWeights"])-2
+
                 #adjust song weight strength to match play weights
                 songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
                 for i in range(len(pSong["sampleWeights"])-1):
@@ -145,8 +146,8 @@ for i, song in enumerate(songPool):
                 pSong["startPoint"] = pSong["sampleWeights"]
                 pSong["sampleWeights"] = song["sampleWeights"]
                 pSong["X"] = max(quizIds[pSong["ID"]],1)+1
-                practice.append(pSong)
-                gain -= pSong["X"]
+                #practice.append(pSong)
+                gain -= 5
             elif song["X"] != 0:
                 print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
                 errorQ = 1
@@ -270,7 +271,10 @@ if randomValue < 0:
     with open(rngFile, 'w', encoding = 'utf8') as f:
         f.write(str(randomValue))
 
-newSongCount = int(gain/8+randomValue)
+#newSongCount = int(gain/8+randomValue)
+newSongCount = 0
+if gain > 0:
+    newSongCount = 10
 newSongs = []
 if newSongCount > len(prepSongs):
     print("Warning: Insufficient New Songs")
