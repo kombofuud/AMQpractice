@@ -267,8 +267,8 @@ for ID, index in idIndices.items():
     '''if songPool[index]["D"] >= 18 and quizIds[ID] >= 0:
         songPool[index]["X"] = 0
         continue'''
-    if songPool[index]["D"] == 8 and quizIds[ID] > 0:
-        songPool[index]["D"] += quizIds[ID]
+    if songPool[index]["D"] + quizIds[ID] > dMax:
+        songPool[index]["D"] = dMax
         continue
     songPool[index]["D"] += quizIds[ID]
     if quizSamples[ID] == 0:
@@ -332,7 +332,7 @@ if newSongCount > 0:
         for i in range(len(loadingSongs)-1,-1,-1):
             if loadingSongs[i]["malId"] not in newSongMalIds:
                 newSongMalIds.add(loadingSongs[i]["malId"])
-                prepList.append(loadingSongs.pop(i))
+                prepSongs.append(loadingSongs.pop(i))
                 newShowCount -= 1
                 if newShowCount <= 0:
                     break
