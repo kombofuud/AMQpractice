@@ -19,7 +19,7 @@ rngFile = "addSongRandomValue.txt"
 malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
 dMax = 8
-prepListMinSize = 250
+prepListMinSize = 100
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
