@@ -264,11 +264,9 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
 
 #Update all keys
 for ID, index in idIndices.items():
-    '''if songPool[index]["D"] >= 18 and quizIds[ID] >= 0:
-        songPool[index]["X"] = 0
-        continue'''
     if songPool[index]["D"] + quizIds[ID] > dMax:
         songPool[index]["D"] = dMax
+        songPool[index]["X"] = 0
         continue
     songPool[index]["D"] += quizIds[ID]
     if quizSamples[ID] == 0:
