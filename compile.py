@@ -130,12 +130,12 @@ extraIndices = dict()
 practice = []
 errorQ = 0
 gain = len(quizSongs)
-diff8Q = True
+diff8Q = 0
 for i, song in enumerate(songPool):
     if song["X"] != 0 or song["ID"] in quizIds:
         #alter amount added to songId. 1 -> -1, 2 -> ???
         if song["D"] == 8 and song["X"] != 1:
-            diff8Q = False
+            diff8Q += 1
         if song["ID"] in quizIds:
             idIndices[song["ID"]] = i
             if song["X"] == 1:
@@ -291,7 +291,7 @@ if randomValue < 0:
 
 #newSongCount = int(gain/8+randomValue)
 newSongCount = 0
-if gain >= 0 and diff8Q:
+if gain >= 0 and diff8Q <= 5:
     newSongCount = 13
 newSongs = []
 if newSongCount > len(prepSongs):
