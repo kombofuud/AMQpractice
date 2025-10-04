@@ -291,8 +291,8 @@ if randomValue < 0:
 
 #newSongCount = int(gain/8+randomValue)
 newSongCount = 0
-if gain >= 0 and diff8Q <= 5:
-    newSongCount = 13
+if diff8Q == 0:
+    newSongCount = 10
 newSongs = []
 if newSongCount > len(prepSongs):
     print("Warning: Insufficient New Songs")
