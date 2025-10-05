@@ -44,7 +44,7 @@ for index, song in enumerate(poolSongList):
         sys.exit(1)
     totalDWeight += song["D"]
     indexMap[song["ID"]] = index
-    DList.append(math.exp(song["D"]))
+    DList.append(2.4 ** song["D"])
     DMin = min(DMin, song["D"])
     songCounter += 1
 
@@ -182,7 +182,8 @@ randomSongList = copy.deepcopy(randomSongList)
 #For each song, pick sample point
 for index, song in enumerate(randomSongList):
     distribution = copy.deepcopy(song["sampleWeights"])
-    songWeightStrength = 1-math.pow(0.95,DMax-song["D"])
+    #songWeightStrength = 1-math.pow(0.95,DMax-song["D"])
+    songWeightStrength = 0.5
     for i in range(len(distribution)-1):
         distribution[i+1] += song["sampleWeights"][i]/2
         distribution[i] += song["sampleWeights"][i+1]/2

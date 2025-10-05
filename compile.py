@@ -146,7 +146,8 @@ for i, song in enumerate(songPool):
                 sectionCount = len(pSong["sampleWeights"])-2
 
                 #adjust song weight strength to match play weights
-                songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
+                #songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
+                songWeightStrength = 0.5
                 for i in range(len(pSong["sampleWeights"])-1):
                     pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/2
                     pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/2
@@ -156,7 +157,7 @@ for i, song in enumerate(songPool):
                 pSong["startPoint"] = pSong["sampleWeights"]
                 pSong["sampleWeights"] = song["sampleWeights"]
                 pSong["X"] = max(quizIds[pSong["ID"]],1)+1
-                if song["D"]+2 >= 8:
+                if song["D"]+quizIds[song["ID"]] > dMax:
                     practice.append(pSong)
                 gain -= 5
             elif song["X"] != 0:
@@ -267,9 +268,11 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
     f.write(addedSongOrder)
 
 #Update all keys
+print("Missed Songs_______")
 for ID, index in idIndices.items():
-    if songPool[index]["D"] + quizIds[ID] > dMax:
+    if quizIds[ID] > 0:
         print(f"{songPool[index]["SN"]} __from__ {songPool[index]["EN"]}")
+    if songPool[index]["D"] + quizIds[ID] > dMax:
         songPool[index]["D"] = dMax
         songPool[index]["X"] = 0
         continue
