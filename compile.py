@@ -295,9 +295,7 @@ if randomValue < 0:
         f.write(str(randomValue))
 
 #newSongCount = int(gain/8+randomValue)
-newSongCount = 0
-if diff8Q == 0:
-    newSongCount = 10
+newSongCount = 10-diff8Q
 newSongs = []
 if newSongCount > len(prepSongs):
     print("Warning: Insufficient New Songs")
