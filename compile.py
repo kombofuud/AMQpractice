@@ -156,7 +156,8 @@ for i, song in enumerate(songPool):
                 pSong["startPoint"] = pSong["sampleWeights"]
                 pSong["sampleWeights"] = song["sampleWeights"]
                 pSong["X"] = max(quizIds[pSong["ID"]],1)+1
-                #practice.append(pSong)
+                if song["D"]+2 >= 8:
+                    practice.append(pSong)
                 gain -= 5
             elif song["X"] != 0:
                 print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
@@ -268,6 +269,7 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
 #Update all keys
 for ID, index in idIndices.items():
     if songPool[index]["D"] + quizIds[ID] > dMax:
+        print(f"{songPool[index]["SN"]} __from__ {songPool[index]["EN"]}")
         songPool[index]["D"] = dMax
         songPool[index]["X"] = 0
         continue
