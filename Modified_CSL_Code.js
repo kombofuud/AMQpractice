@@ -61,6 +61,8 @@ let currentSong = 0;
 let totalSongs = 0;
 let currentAnswers = {};
 let currentAnswerTime = 20;
+let currentStartPoint = 0;
+let nextStartPoint = 0;
 let score = {};
 let songListTableView = 2; //0: song + artist, 1: anime + song type + vintage, 2: video/audio links
 let songListTableSort = { mode: "", ascending: true } //modes: songName, artist, difficulty, anime, songType, vintage, mp3, 480, 720
@@ -1239,12 +1241,13 @@ function startQuiz() {
     });
     //console.log(data.players);
     fireListener("Game Starting", data);
+    currentStartPoint = getStartPoint(song.startPoint);
     setTimeout(() => {
         if (quiz.soloMode) {
             fireListener("quiz next video info", {
                 "playLength": guessTime,
                 "playbackSpeed": 1,
-                "startPoint": getStartPoint(song.startPoint),
+                "startPoint": currentStartPoint,
                 "videoInfo": {
                     "id": null,
                     "videoMap": {
@@ -1262,7 +1265,7 @@ function startQuiz() {
         }
         else {
             if (quiz.isHost) {
-                const message = `1§${getStartPoint(song.startPoint)}§${song.audio || ""}§${song.video480 || ""}§${song.video720 || ""}`;
+                const message = `1§${currentStartPoint}§${song.audio || ""}§${song.video480 || ""}§${song.video720 || ""}`;
                 splitIntoChunks(btoa(encodeURIComponent(message)) + "$", 144).forEach((item, index) => {
                     cslMessage("§CSL3" + base10to36(index % 36) + item);
                 });
@@ -1364,10 +1367,11 @@ function playSong(songNumber) {
             if (quiz.soloMode) {
                 readySong(songNumber + 1);
                 const nextSong = songList[songOrder[songNumber + 1]];
+                nextStartPoint = getStartPoint(nextSong.startPoint);
                 fireListener("quiz next video info", {
                     "playLength": guessTime,
                     "playbackSpeed": 1,
-                    "startPoint": getStartPoint(nextSong.startPoint),
+                    "startPoint": nextStartPoint,
                     "videoInfo": {
                         "id": null,
                         "videoMap": {
@@ -1387,7 +1391,7 @@ function playSong(songNumber) {
                 readySong(songNumber + 1);
                 if (quiz.isHost) {
                     const nextSong = songList[songOrder[songNumber + 1]];
-                    const message = `${songNumber + 1}§${getStartPoint(nextSong.startPoint)}§${nextSong.audio || ""}§${nextSong.video480 || ""}§${nextSong.video720 || ""}`;
+                    const message = `${songNumber + 1}§${currentStartPoint}§${nextSong.audio || ""}§${nextSong.video480 || ""}§${nextSong.video720 || ""}`;
                     splitIntoChunks(btoa(encodeURIComponent(message)) + "$", 144).forEach((item, index) => {
                         cslMessage("§CSL3" + base10to36(index % 36) + item);
                     });
@@ -1545,13 +1549,20 @@ function endGuessPhase(songNumber) {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
                     let defaultTimer = 0;
-                    const timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D)));
+                    let timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D)));
+                    if(correct[0]){
+                        timerEnd = 300;
+                    }
+                    if(song.length > 0){
+                        timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100+1), 10*(song.length+1));
+                    }
                     skipInterval = setInterval(() => {
-                        if (defaultTimer >= (correct[0]? timerEnd-20: 280)){
+                        if (defaultTimer >= (correct[0]? timerEnd-10: 280)){
                             fireListener("quiz overlay message", "About to Skip");
                         }
-                        if (quiz.skipController._toggled || defaultTimer >= (correct[0] ? timerEnd : 300)) {
+                        if (quiz.skipController._toggled || defaultTimer >= timerEnd) {
                             clearInterval(skipInterval);
+                            currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
                         defaultTimer += 1;
@@ -2308,7 +2319,7 @@ function handleData(data) {
         let dub = song.dub ?? song.isDub ?? song.songInfo?.dub ?? null;
         let startPoint = song.startPoint ?? song.startSample ?? null;
         let annSongId = song.annSongId ?? null;
-        let length = parseFloat(song.songLength) || null;
+        let length = parseFloat(song.songLength ?? parseFloat(song.length)) || null;
         let D = song.D === undefined || song.D === null ? 8 : song.D;
         let audio = song.audio ?? song.videoUrl ?? song.urls?.catbox?.[0] ?? song.songInfo?.videoTargetMap?.catbox?.[0] ?? song.songInfo?.urlMap?.catbox?.[0] ?? song.LinkMp3 ?? "";
         let video480 = song.video480 ?? song.MQ ?? song.videoUrl ?? song.urls?.catbox?.[480] ?? song.songInfo?.videoTargetMap?.catbox?.[480] ?? song.songInfo?.urlMap?.catbox?.[480] ?? "";
