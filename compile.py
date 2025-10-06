@@ -134,8 +134,9 @@ diff8Q = 0
 for i, song in enumerate(songPool):
     if song["X"] != 0 or song["ID"] in quizIds:
         #alter amount added to songId. 1 -> -1, 2 -> ???
-        if song["D"] == 8 and song["X"] != 1:
+        if song["D"] == dMax and song["X"] == 0:
             diff8Q += 1
+            continue
         if song["ID"] in quizIds:
             idIndices[song["ID"]] = i
             if song["X"] == 1:
@@ -157,7 +158,8 @@ for i, song in enumerate(songPool):
                 pSong["startPoint"] = pSong["sampleWeights"]
                 pSong["sampleWeights"] = song["sampleWeights"]
                 pSong["X"] = max(quizIds[pSong["ID"]],1)+1
-                if song["D"]+quizIds[song["ID"]] > dMax:
+                if song["D"]+quizIds[song["ID"]] >= dMax:
+                    diff8Q += 1
                     practice.append(pSong)
                 gain -= 5
             elif song["X"] != 0:
@@ -295,7 +297,7 @@ if randomValue < 0:
         f.write(str(randomValue))
 
 #newSongCount = int(gain/8+randomValue)
-newSongCount = 10-diff8Q
+newSongCount = max(10-diff8Q,0)
 newSongs = []
 if newSongCount > len(prepSongs):
     print("Warning: Insufficient New Songs")
@@ -418,6 +420,6 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("\033[31mPractice List Compiled:\033[0m Missed = "+str(int((len(quizSongs)-gain)/5))+", Gain = "+str(newSongCount)+", PracticeSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))
+print("\033[31mPractice List Compiled:\033[0m Missed = "+str(int((len(quizSongs)-gain)/5))+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))
 for song in newSongs:
     print(f"Added ANSID={song["annSongId"]}: {song["songName"]}\n    from: {song["EN"]}")
