@@ -132,11 +132,10 @@ errorQ = 0
 gain = len(quizSongs)
 diff8Q = 0
 for i, song in enumerate(songPool):
-    if song["X"] != 0 or song["ID"] in quizIds:
+    if song["X"] != 0 or song["ID"] in quizIds or song["D"] == dMax:
         #alter amount added to songId. 1 -> -1, 2 -> ???
         if song["D"] == dMax and song["X"] == 0:
             diff8Q += 1
-            continue
         if song["ID"] in quizIds:
             idIndices[song["ID"]] = i
             if song["X"] == 1:
