@@ -1212,6 +1212,10 @@ function startQuiz() {
     }
     skipping = false;
     quiz.cslActive = true;
+    hostModal.setCheckBox(hostModal.$fullSongRange, true);
+    console.log(hostModal.$fullSongRange);
+    console.log(hostModal.getSettings());
+    console.log(hostModal.getSettings().modifiers.fullSongRange);
     const date = new Date().toISOString();
     for (const player of Object.values(lobby.players)) {
         score[player.gamePlayerId] = 0;
