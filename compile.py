@@ -273,7 +273,7 @@ print("Missed Songs_______")
 for ID, index in idIndices.items():
     if quizIds[ID] > 0:
         print(f"{songPool[index]["SN"]} __from__ {songPool[index]["EN"]}")
-    if songPool[index]["D"] + quizIds[ID] > dMax:
+    if songPool[index]["D"] >= dMax and quizIds[ID] > 0:
         songPool[index]["D"] = dMax
         songPool[index]["X"] = 0
         continue
