@@ -129,46 +129,36 @@ idIndices = dict()
 extraIndices = dict()
 practice = []
 errorQ = 0
-gain = len(quizSongs)
 diff8Q = 0
+missedCount = 0
 for i, song in enumerate(songPool):
-    if song["X"] != 0 or song["ID"] in quizIds or song["D"] == dMax:
-        #alter amount added to songId. 1 -> -1, 2 -> ???
-        if song["D"] == dMax and song["X"] == 0:
-            diff8Q += 1
+    if song["ID"] in quizIds or song["D"] == dMax:
         if song["ID"] in quizIds:
             idIndices[song["ID"]] = i
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
                 quizIds[song["ID"]] = 2
-                pSong = copy.deepcopy(song)
-                sectionCount = len(pSong["sampleWeights"])-2
-
-                #adjust song weight strength to match play weights
-                #songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
-                songWeightStrength = 0.5
-                for i in range(len(pSong["sampleWeights"])-1):
-                    pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/2
-                    pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/2
-                #pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.0000001)] += 2
-                for i in range(len(pSong["sampleWeights"])):
-                    pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
-                pSong["startPoint"] = pSong["sampleWeights"]
-                pSong["sampleWeights"] = song["sampleWeights"]
-                pSong["X"] = max(quizIds[pSong["ID"]],1)+1
-                if song["D"]+quizIds[song["ID"]] >= dMax:
-                    diff8Q += 1
-                    practice.append(pSong)
-                gain -= 5
-            elif song["X"] != 0:
-                print(f"QuizSong Status Val Undefined: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
-                errorQ = 1
-        else:
-            #print(f"\033[31mExtra Song\033[0m was Incremented: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
-            errorQ = 1
-            extraIds.add(song["ID"])
-            extraIndices[song["ID"]] = i
+                missedCount += 1
+        if song["ID"] not in quizIds or quizIds[song["ID"]]+song["D"] >= dMax:
+            diff8Q += 1
+            pSong = copy.deepcopy(song)
+            sectionCount = len(pSong["sampleWeights"]
+            #songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
+            songWeightStrength = 0.5
+            for i in range(len(pSong["sampleWeights"])-1):
+                pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/2
+                pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/2
+            for i in range(len(pSong["sampleWeights"])):
+                pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
+            pSong["startPoint"] = pSong["sampleWeights"]
+            pSong["sampleWeights"] = song["sampleWeights"]
+            pSong["X"] = max(quizIds[pSong["ID"]],1)+1
+            practice.append(pSong)
+    elif song["X"] != 0:
+        errorQ = 1
+        extraIds.add(song["ID"])
+        extraIndices[song["ID"]] = i
 
 #Ensure that the correct number of songs were accounted for
 countedKeys = 0
@@ -295,7 +285,6 @@ if randomValue < 0:
     with open(rngFile, 'w', encoding = 'utf8') as f:
         f.write(str(randomValue))
 
-#newSongCount = int(gain/8+randomValue)
 newSongCount = max(10-diff8Q,0)
 newSongs = []
 if newSongCount > len(prepSongs):
@@ -419,6 +408,6 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("\033[31mPractice List Compiled:\033[0m Missed = "+str(int((len(quizSongs)-gain)/5))+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))
+print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))
 for song in newSongs:
     print(f"Added ANSID={song["annSongId"]}: {song["songName"]}\n    from: {song["EN"]}")
