@@ -151,7 +151,7 @@ for i, song in enumerate(songPool):
                 for i in range(len(pSong["sampleWeights"])-1):
                     pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/2
                     pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/2
-                pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.0000001)] += 2
+                #pSong["sampleWeights"][math.ceil(quizSamples[pSong["ID"]]*sectionCount/100*1.0000001)] += 2
                 for i in range(len(pSong["sampleWeights"])):
                     pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
                 pSong["startPoint"] = pSong["sampleWeights"]
