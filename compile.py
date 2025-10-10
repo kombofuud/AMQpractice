@@ -143,7 +143,7 @@ for i, song in enumerate(songPool):
         if song["ID"] not in quizIds or quizIds[song["ID"]]+song["D"] >= dMax:
             diff8Q += 1
             pSong = copy.deepcopy(song)
-            sectionCount = len(pSong["sampleWeights"]
+            sectionCount = len(pSong["sampleWeights"])
             #songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
             songWeightStrength = 0.5
             for i in range(len(pSong["sampleWeights"])-1):
@@ -153,7 +153,7 @@ for i, song in enumerate(songPool):
                 pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
             pSong["startPoint"] = pSong["sampleWeights"]
             pSong["sampleWeights"] = song["sampleWeights"]
-            pSong["X"] = max(quizIds[pSong["ID"]],1)+1
+            pSong["X"] = 2
             practice.append(pSong)
     elif song["X"] != 0:
         errorQ = 1
@@ -263,7 +263,7 @@ print("Missed Songs_______")
 for ID, index in idIndices.items():
     if quizIds[ID] > 0:
         print(f"{songPool[index]["SN"]} __from__ {songPool[index]["EN"]}")
-    if songPool[index]["D"] >= dMax and quizIds[ID] > 0:
+    if songPool[index]["D"] + quizIds[ID]>= dMax:
         songPool[index]["D"] = dMax
         songPool[index]["X"] = 0
         continue
