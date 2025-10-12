@@ -62,7 +62,6 @@ let totalSongs = 0;
 let currentAnswers = {};
 let currentAnswerTime = 20;
 let currentStartPoint = 0;
-let nextStartPoint = 0;
 let score = {};
 let songListTableView = 2; //0: song + artist, 1: anime + song type + vintage, 2: video/audio links
 let songListTableSort = { mode: "", ascending: true } //modes: songName, artist, difficulty, anime, songType, vintage, mp3, 480, 720
@@ -1212,7 +1211,7 @@ function startQuiz() {
     }
     skipping = false;
     quiz.cslActive = true;
-    hostModal.setCheckBox(hostModal.$fullSongRange, true);
+    lobby.settings.modifiers.fullSongRange = true;
     const date = new Date().toISOString();
     for (const player of Object.values(lobby.players)) {
         score[player.gamePlayerId] = 0;
@@ -1368,11 +1367,11 @@ function playSong(songNumber) {
             if (quiz.soloMode) {
                 readySong(songNumber + 1);
                 const nextSong = songList[songOrder[songNumber + 1]];
-                nextStartPoint = getStartPoint(nextSong.startPoint);
+                currentStartPoint = getStartPoint(nextSong.startPoint);
                 fireListener("quiz next video info", {
                     "playLength": guessTime,
                     "playbackSpeed": 1,
-                    "startPoint": nextStartPoint,
+                    "startPoint": currentStartPoint,
                     "videoInfo": {
                         "id": null,
                         "videoMap": {
@@ -1549,21 +1548,20 @@ function endGuessPhase(songNumber) {
             setTimeout(() => {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
-                    let defaultTimer = 0;
                     let timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D)));
-                    if(correct[0]){
+                    if(!correct[0]){
                         timerEnd = 300;
                     }
                     if(song.length > 0){
-                        timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100+1), 10*(song.length+1));
+                        timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100), 10*(song.length));
                     }
+                    let defaultTimer = 13;
                     skipInterval = setInterval(() => {
-                        if (defaultTimer >= (correct[0]? timerEnd-10: 280)){
+                        if (defaultTimer >= timerEnd-5){
                             fireListener("quiz overlay message", "About to Skip");
                         }
-                        if (quiz.skipController._toggled || defaultTimer >= timerEnd) {
+                        if (quiz.skipController._toggled || defaultTimer >= timerEnd+10) {
                             clearInterval(skipInterval);
-                            currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
                         defaultTimer += 1;
