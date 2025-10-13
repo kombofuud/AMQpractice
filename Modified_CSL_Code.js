@@ -62,6 +62,7 @@ let totalSongs = 0;
 let currentAnswers = {};
 let currentAnswerTime = 20;
 let currentStartPoint = 0;
+let nextStartPoint = 0;
 let score = {};
 let songListTableView = 2; //0: song + artist, 1: anime + song type + vintage, 2: video/audio links
 let songListTableSort = { mode: "", ascending: true } //modes: songName, artist, difficulty, anime, songType, vintage, mp3, 480, 720
@@ -1367,11 +1368,11 @@ function playSong(songNumber) {
             if (quiz.soloMode) {
                 readySong(songNumber + 1);
                 const nextSong = songList[songOrder[songNumber + 1]];
-                currentStartPoint = getStartPoint(nextSong.startPoint);
+                nextStartPoint = getStartPoint(nextSong.startPoint);
                 fireListener("quiz next video info", {
                     "playLength": guessTime,
                     "playbackSpeed": 1,
-                    "startPoint": currentStartPoint,
+                    "startPoint": nextStartPoint,
                     "videoInfo": {
                         "id": null,
                         "videoMap": {
@@ -1391,7 +1392,7 @@ function playSong(songNumber) {
                 readySong(songNumber + 1);
                 if (quiz.isHost) {
                     const nextSong = songList[songOrder[songNumber + 1]];
-                    const message = `${songNumber + 1}§${currentStartPoint}§${nextSong.audio || ""}§${nextSong.video480 || ""}§${nextSong.video720 || ""}`;
+                    const message = `${songNumber + 1}§${nextStartPoint}§${nextSong.audio || ""}§${nextSong.video480 || ""}§${nextSong.video720 || ""}`;
                     splitIntoChunks(btoa(encodeURIComponent(message)) + "$", 144).forEach((item, index) => {
                         cslMessage("§CSL3" + base10to36(index % 36) + item);
                     });
@@ -1562,6 +1563,7 @@ function endGuessPhase(songNumber) {
                         }
                         if (quiz.skipController._toggled || defaultTimer >= timerEnd+10) {
                             clearInterval(skipInterval);
+                            currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
                         defaultTimer += 1;
