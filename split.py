@@ -44,8 +44,8 @@ for i,ID in enumerate(splitData):
 
 songMap = {}
 for i,song in enumerate(songPool):
-    if song["ID"] in timeMap:
-        songMap[song["ID"]] = i
+    if song["annSongId"] in timeMap:
+        songMap[song["annSongId"]] = i
 
 #randomize the list
 sampleSongs = []
