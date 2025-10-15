@@ -245,7 +245,7 @@ DList = [0]*(DMax-DMin+1)
 for song in poolSongList:
     if song["D"] > DMax:
         song["D"] = DMax
-    DList[DMax-song["D"]] += 1
+    DList[int(round(DMax-song["D"]+0.25))] += 1
 print("DValue distribution")
 for index in range(len(DList)):
     if index%4==0:

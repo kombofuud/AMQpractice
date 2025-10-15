@@ -138,7 +138,7 @@ for i, song in enumerate(songPool):
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
-                quizIds[song["ID"]] = 2
+                quizIds[song["ID"]] = 1.5
                 missedCount += 1
         if song["ID"] not in quizIds or quizIds[song["ID"]]+song["D"] >= dMax:
             diff8Q += 1
