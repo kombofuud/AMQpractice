@@ -44,7 +44,10 @@ for index, song in enumerate(poolSongList):
         sys.exit(1)
     totalDWeight += song["D"]
     indexMap[song["ID"]] = index
-    DList.append(math.exp(song["D"]))
+    if song["D"] == dMax:
+        DList.append(math.exp(dMax*2))
+    else:
+        DList.append(math.exp(song["D"]))
     DMin = min(DMin, song["D"])
     songCounter += 1
 
