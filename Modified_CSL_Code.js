@@ -1051,9 +1051,10 @@ function setup() {
             if (quiz.cslActive) {
                 if (quiz.soloMode) {
                     if (quiz.pauseButton.pauseOn) {
-                        fireListener("quiz unpause triggered", {
+                        quiz.pauseButton.updateState(false);
+                        /*fireListener("quiz unpause triggered", {
                             "playerName": selfName
-                        });
+                        });*/
                         /*fireListener("quiz unpause triggered", {
                             "playerName": selfName,
                             "doCountDown": true,
@@ -1061,9 +1062,10 @@ function setup() {
                         });*/
                     }
                     else {
-                        fireListener("quiz pause triggered", {
+                        quiz.pauseButton.updateState(true);
+                        /*fireListener("quiz pause triggered", {
                             "playerName": selfName
-                        });
+                        });*/
                     }
                 }
                 else {
@@ -1557,6 +1559,7 @@ function endGuessPhase(songNumber) {
                         timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100), 10*(song.length));
                     }
                     let defaultTimer = 13;
+                    console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
                     skipInterval = setInterval(() => {
                         if (defaultTimer >= timerEnd-5){
                             fireListener("quiz overlay message", "About to Skip");
@@ -1608,6 +1611,7 @@ function endReplayPhase(songNumber) {
             skipInterval = setInterval(() => {
                 if (!quiz.pauseButton.pauseOn){
                     if (quiz.soloMode) {
+                        cslMessage(score[0]);
                         quizOver();
                     }
                     else if (quiz.isHost) {
