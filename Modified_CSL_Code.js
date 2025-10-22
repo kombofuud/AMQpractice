@@ -92,6 +92,7 @@ let resultChunk;
 let songInfoChunk;
 let nextSongChunk;
 let importRunning = false;
+let attachedFile = "";
 let hotKeys = {
     cslgWindow: loadHotkey("cslgWindow"),
     start: loadHotkey("start"),
@@ -704,10 +705,11 @@ function setup() {
                     console.error(error);
                     messageDisplayer.displayMessage("Upload Error");
                 }
-                if(this.files[0].name == "_practice.json"){
+                attachedFile = this.files[0].name;
+                if(attachedFile == "_practice.json"){
                     songListTableView = 1;
                 }
-                if(this.files[0].name == "_quiz.json" || this.files[0].name == "_split.json"){
+                if(attachedFile == "_quiz.json" || attachedFile == "_split.json"){
                     songListTableView = 2;
                 }
                 setSongListTableSort();
@@ -1611,7 +1613,9 @@ function endReplayPhase(songNumber) {
             skipInterval = setInterval(() => {
                 if (!quiz.pauseButton.pauseOn){
                     if (quiz.soloMode) {
-                        cslMessage(score[0]);
+                        if(attachedFile == "_quiz.json"){
+                            cslMessage(score[0]);
+                        }
                         quizOver();
                     }
                     else if (quiz.isHost) {
