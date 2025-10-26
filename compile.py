@@ -175,16 +175,9 @@ for song in quizSongs:
 if countedKeys < argVal:
     print("Insufficient songs updated: "+str(countedKeys)+"/"+str(argVal))
     print("Missing Keys:")
-    print("_____________")
+    print("_____________\n")
     for key in ignoredKeys:
         song = songPool[idIndices[key]]
-        print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
-    errorQ = 1
-if len(extraIds):
-    print("\nExtra Keys:")
-    print("___________")
-    for key in extraIds:
-        song = songPool[extraIndices[key]]
         print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
     errorQ = 1
 if countedKeys > argVal:
@@ -193,6 +186,13 @@ if countedKeys > argVal:
         if update != 0:
             song = songPool[key]
             print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
+    errorQ = 1
+if len(extraIds):
+    print("Extra Keys:")
+    print("___________")
+    for key in extraIds:
+        song = songPool[extraIndices[key]]
+        print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
     errorQ = 1
 if errorQ:
     sys.exit(1)
