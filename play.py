@@ -205,6 +205,7 @@ for index, song in enumerate(randomSongList):
 
 #Write quiz list
 with open(fileQuiz+".json", 'w', encoding = 'utf8') as file:
+    random.shuffle(randomSongList)
     json.dump(randomSongList, file)
 
 #Write new songs to pool and shuffle
