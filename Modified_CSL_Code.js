@@ -708,9 +708,11 @@ function setup() {
                 attachedFile = this.files[0].name;
                 if(attachedFile == "_practice.json"){
                     songListTableView = 1;
+                    songOrderType = "random";
                 }
                 if(attachedFile == "_quiz.json" || attachedFile == "_split.json"){
                     songListTableView = 2;
+                    songOrderType = "ascending";
                 }
                 setSongListTableSort();
                 createSongListTable(true);
@@ -1561,7 +1563,7 @@ function endGuessPhase(songNumber) {
                         timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100), 10*(song.length));
                     }
                     let defaultTimer = 13;
-                    console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
+                    //console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
                     skipInterval = setInterval(() => {
                         if (defaultTimer >= timerEnd-5){
                             fireListener("quiz overlay message", "About to Skip");
@@ -1613,8 +1615,9 @@ function endReplayPhase(songNumber) {
             skipInterval = setInterval(() => {
                 if (!quiz.pauseButton.pauseOn){
                     if (quiz.soloMode) {
+                        console.log(attachedFile);
                         if(attachedFile == "_quiz.json"){
-                            cslMessage(score[0]);
+                            gameChat.systemMessage(score[0] + " points scored");
                         }
                         quizOver();
                     }
