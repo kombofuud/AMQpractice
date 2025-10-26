@@ -301,7 +301,7 @@ if newSongCount > 0:
     prepSongs = prepSongs[newSongCount:]
 
     #log-normal shuffling of prepsongs
-    prepSongWeights = [(i*math.exp(random.gauss(0, 1)), song) for i, song in enumerate(prepSongs)]
+    prepSongWeights = [((i+1)*math.exp(random.gauss(0, 1)), song) for i, song in enumerate(prepSongs)]
     prepSongWeights.sort(key = lambda x: x[0])
     prepSongs = [song for _, song in prepSongWeights]
 
