@@ -262,7 +262,7 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
 #Update all keys
 print("Missed Songs_______")
 for song in quizSongs:
-    if quizIds[ID] > 0:
+    if quizIds[song["ID"]] > 0:
         print(f"{song["SN"]} __from__ {song["EN"]}")
 
 for ID, index in idIndices.items():
