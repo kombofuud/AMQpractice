@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Amq Autocomplete Dropdown improvement Backup
+// @name         Autocomplete Improvement (Kombo 1.40)
 // @namespace    http://tampermonkey.net/
-// @version      1.35
+// @version      1.40
 // @description  Modification of Juvian Autocomplete for people who want to want a faster version of the normal one with some QOL.
 // Modifications include: Default filters are applied, tab enabled by default and shift+tab has the reverse effect of tab. Fixed a bug where every other tab isn't registered. Ctrl+A effect occurs after submitting an answer.
 // When nothing in the dropdown is highlighted, down (or equiv) goes to the second option and up (or equiv) goes to the last option. (rather than highlighting the first option). (The first option can be submitted by pressing enter without highlighting the dropdown as in the original.)
@@ -56,7 +56,7 @@ var options = {
 	submitOnSelect: true,
 	fuzzy: {
 		dropdown: true, // whether to show fuzzy matches if no matches found
-		answer: true, // whether to use top fuzzy match on round end as answer if no matches found
+		answer: false, // whether to use top fuzzy match on round end as answer if no matches found
 	},
 	entrySets: [
 		{
@@ -72,7 +72,8 @@ var options = {
 			clean: cleanString,
 			special: onlySpecialChars // adds filtering special chars instead of just ignoring
 		}
-	]
+	],
+    defaultSort: true // sort animes by amq order (length). If false, sorts by priority (starts with > contains > partial > fuzzy)
 }
 
 if (true) { //change to true to have same filters and order as amq
@@ -100,7 +101,7 @@ let onManualChange = (key) => {
         }
     });
 }
-onManualChange(options.enabledToggle);
+if (!isNode) onManualChange(options.enabledToggle);
 
 var debug = false;
 
@@ -157,7 +158,6 @@ class SuperString {
 		this.lastIndex = 0;
 	}
 }
-//, specialStr: onlySpecialChars(v), splittedStr: cleanString(v).split(" ")
 
 class EntrySet {
 	constructor(list, config, manager) {
@@ -170,7 +170,7 @@ class EntrySet {
 
 		if (config.partial) this.list.forEach(e => e.splittedStr = e.str.split(' '));
 
-		this.results = new Set();
+		this.results = {};
 	}
 
 	reset() {
@@ -181,7 +181,7 @@ class EntrySet {
 		this.lastQry = "";
 		this.lastSpecialStr = "";
 		this.lastQrySplit = [];
-		this.results.clear();
+		this.results = {};
 		this.lastSpecialIndex = 0;
 	}
 
@@ -237,43 +237,44 @@ class EntrySet {
 		return !this.config.special || specialMatchesStr(this.lastSpecialStr, this.list[idx].specialStr);
 	}
 
-	addResult(idx) {
-		if (this.specialMatches(idx) && (!this.config.partial || this.partialMatches(idx))) {
-			this.results.add(idx);
+	addResult(idx, priority) {
+		if (this.specialMatches(idx) && (!this.config.partial || this.partialMatches(idx)) && !this.results.hasOwnProperty(idx)) {
+			this.results[idx] = priority;
 	    	this.manager.originalIndexResults.add(this.list[idx].originalIndex)
 		}
 	}
 
 	checkOldResults() {
-		let oldResults = Array.from(this.results);
+		let oldResults = Object.keys(this.results).map(k => +k);
 		let re = this.getQryRegex(this.lastQry);
 
-		this.results.clear();
+		this.results = [];
 
 		for (let idx of oldResults) {
 			let anime = this.list[idx].str;
-			if (anime.match(re) || (this.config.partial && this.partialMatches(idx))) this.addResult(idx);
+            if (anime.match(re)) this.addResult(idx, 1);
+			else if (this.config.partial && this.partialMatches(idx)) this.addResult(idx, 2);
 		}
 	}
 
 	addResults (range, list) {
 		for (var i = range.first; i <= range.last && this.manager.originalIndexResults.size < this.manager.limit; i++) {
-			this.addResult(list[i].originalIndex);
+			this.addResult(list[i].originalIndex, 0);
 		}
 	}
 
 	getQryRegex(qry) {
-		return this.config.getQryRegex ? this.config.getQryRegex(qry) : new RegExp(escapeRegExp(qry).replaceAll('u', '(u|uu)'), "g");
+		return this.config.getQryRegex ? this.config.getQryRegex(qry) : new RegExp(escapeRegExp(qry).replaceAll('u', '(u|uu)').replaceAll('o', '(o|ou|oo)'), "g");
 	}
 
-	addContainingResults (superString, qry) {
+	addContainingResults (superString, qry, priority) {
 		let re = this.getQryRegex(qry);
 		let match;
 
 		re.lastIndex = superString.lastIndex
 		while (this.manager.originalIndexResults.size < this.manager.limit && (match = re.exec(superString.str))) {
 			let idx = first(superString.lookup, v => v > match.index, 0, superString.lookup.length) - 1
-			this.addResult(idx);
+			this.addResult(idx, priority);
 			superString.lastIndex = re.lastIndex;
 		}
 	}
@@ -321,8 +322,8 @@ class FilterManager {
             cache.clear();
 
 			if (entrySet.startsWith || entrySet.contains || entrySet.partial) {
-				let list = this.list.map((e, idx) => ({str: entrySet.clean(e.str || e.originalStr), specialStr: entrySet.special ? entrySet.special(e.str || e.originalStr) : '', originalIndex: e.originalIndex, listIndex: e.idx})).filter(filter);
-				this.entrySets.push(new EntrySet(list, entrySet, this));
+				let list = this.list.map((e, idx) => ({str: entrySet.clean(e.str || e.originalStr), specialStr: entrySet.special ? entrySet.special(e.str || e.originalStr) : '', originalIndex: e.originalIndex})).filter(filter);
+                this.entrySets.push(new EntrySet(list, entrySet, this));
 			}
 		}
 	}
@@ -352,11 +353,11 @@ class FilterManager {
 
 		for (let entrySet of entrySets) {
 			if (entrySet.config.contains && entrySet.lastQry.length) {
-				entrySet.addContainingResults(entrySet.contains, entrySet.lastQry);
+				entrySet.addContainingResults(entrySet.contains, entrySet.lastQry, 1);
 			}
 			if (!entrySet.lastQry.length && entrySet.lastSpecialStr.length) {
 				for (; entrySet.lastSpecialIndex < entrySet.list.length && this.originalIndexResults.size < this.limit; entrySet.lastSpecialIndex++) {
-					entrySet.addResult(entrySet.lastSpecialIndex);
+					entrySet.addResult(entrySet.lastSpecialIndex, 1);
 				}
 			}
 		}
@@ -364,7 +365,7 @@ class FilterManager {
 		for (let entrySet of entrySets) {
 			if (entrySet.config.partial && entrySet.lastQrySplit.length >= 2) {
 				let qry = entrySet.lastQrySplit.filter((s) => s.trim()).sort((a, b) => b.length - a.length)[0];
-				entrySet.addContainingResults(entrySet.partial, qry);
+				entrySet.addContainingResults(entrySet.partial, qry, 2);
 			}
 		}
 	}
@@ -379,9 +380,9 @@ class FilterManager {
 		let s = new Set();
 
 		for (let entrySet of this.entrySets) {
-			for (let idx of entrySet.results) {
+			for (let [idx, priority] of Object.entries(entrySet.results)) {
 				if (!s.has(entrySet.list[idx].originalIndex)) {
-					results.push({lastQry: entrySet.lastQry, match: entrySet.list[idx], listMatch: this.list[entrySet.list[idx].listIndex]});
+					results.push({lastQry: entrySet.lastQry, match: entrySet.list[idx], listMatch: this.list[entrySet.list[idx].originalIndex], priority, entrySetIndex: this.entrySets.indexOf(entrySet)});
 					s.add(entrySet.list[idx].originalIndex);
 				}
 			}
@@ -392,7 +393,7 @@ class FilterManager {
 			let fuzzyResults = new Set((this.fuzzy.get(cleanString(str)) || []).slice(0, this.limit).map(r => this.reverseMapping[r[1]]).reduce((acc, val) => acc.concat(val), []).slice(0, this.limit));
 			for (let idx of Array.from(fuzzyResults)) {
 				if (!s.has(this.list[idx].originalIndex)) {
-					results.push({match: this.list[idx], listMatch: this.list[idx], lastQry: str})
+					results.push({match: this.list[idx], listMatch: this.list[idx], lastQry: str, priority: 3, entrySetIndex: this.entrySets.length})
 					s.add(this.list[idx].originalIndex);
 				}
 			}
@@ -515,7 +516,14 @@ if (!isNode) {
 		let suggestions = this.filterManager.filterBy(this.input.value, options.fuzzy.dropdown);
 
 		if (!this.filterManager.fuzzySearched) suggestions = suggestions.sort((a, b) => {
-		    if (this.sort !== false) {
+		    if (options.defaultSort == false) {
+				if (a.priority < b.priority) return -1;
+				else if (a.priority > b.priority) return 1;
+				else if (a.entrySetIndex < b.entrySetIndex) return -1;
+				else if (a.entrySetIndex > b.entrySetIndex) return 1;
+				return a.match.originalIndex < b.match.originalIndex ? -1 : 1;
+			}
+            else if (this.sort !== false) {
 			    if (a.match.originalIndex < b.match.originalIndex) return -1;
 			}
 
@@ -550,13 +558,14 @@ if (!isNode) {
 	};
 
 	//auto send incomplete answer
-	var oldSendAnswer = QuizTypeAnswerInput.prototype.submitAnswer;
+	const proto = typeof QuizTypeAnswerInput != 'undefined' ? QuizTypeAnswerInput.prototype : AmqAwesomeplete.prototype;
+	var oldSendAnswer = proto.submitAnswer;
 
-	QuizTypeAnswerInput.prototype.submitAnswer = function () {
+	proto.submitAnswer = function () {
 	    try{
 			var awesome = this.autoCompleteController.awesomepleteInstance;
 //			if((!keyStates.ctrl || keyStates.shift) && options.enabled && awesome && awesome.input.value == awesome.filterManager.lastStr && awesome.suggestions && awesome.input.value.trim() && awesome.suggestions.slice(1).every(s => cleanString(s.value) != cleanString(awesome.input.value)) && (awesome.suggestions.length || (!options.fuzzy.dropdown && options.fuzzy.answer))) {
-			if((!keyStates.ctrl || keyStates.shift) && options.enabled && awesome && awesome.input.value == awesome.filterManager.lastStr && awesome.suggestions && awesome.input.value.trim() && awesome.suggestions.slice(1).every(s => cleanString(s.value) != cleanString(awesome.input.value))) {
+			if((!keyStates.ctrl || keyStates.shift) && options.enabled && awesome && awesome.input.value == awesome.filterManager.lastStr && awesome.suggestions && awesome.input.value.trim()) {
                 //awesome.input.value = awesome.suggestions.length ? awesome.suggestions[0].value : awesome.filterManager.filterBy(awesome.input.value, true)[0].originalStr;
                 awesome.input.value = awesome.suggestions.length ? awesome.suggestions[0].value : "";
 			}
@@ -675,7 +684,6 @@ diacriticsMap["’"] = "'";
 diacriticsMap["@"] = "a";
 diacriticsMap["æ"] = "a";
 diacriticsMap["ñ"] = "n";
-diacriticsMap["°"] = "o";
 
 
 
@@ -689,8 +697,6 @@ function removeDiacritics (str, except) {
 if (isNode) {
 	Object.assign(options.entrySets[0], {startsWith: false, contains: true, partial: false});
 
-	let l = new FilterManager(["o", "asd", "asd!", "asd!!*hi", "o", "tt", "oh my kokoro", "kokoro", "guura"], 15);
-
 	escapeRegExp = (v) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	search = (str, len, first, fuzzy) => {
 		s = l.filterBy(str, fuzzy);
@@ -703,7 +709,10 @@ if (isNode) {
 	expect = (s, str) => {
 		if (l.filterBy(s)[0] !== str) console.log(str)
 	}
+	let l = new FilterManager(["shingeki season 2", "Shingeki Season 2: text"], 15);
+	search("shingeki 2", 2, "shingeki season 2")
 
+	l = new FilterManager(["o", "asd", "asd!", "asd!!*hi", "o", "tt", "oh my kokoro", "kokoro", "guura"], 15);
 	search("s", 3, "asd")
 	search("!s", 2, "asd!")
 	search("*", 1, "asd!!*hi")
