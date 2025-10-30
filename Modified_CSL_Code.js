@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         AMQ Custom Song List Game Static
+// @name         AMQ Custom Kombo Song Games
 // @namespace    https://github.com/kempanator
 // @version      0.91
 // @description  Play a solo game with a custom song list
@@ -710,9 +710,13 @@ function setup() {
                     songListTableView = 1;
                     songOrderType = "random";
                 }
-                if(attachedFile == "_quiz.json" || attachedFile == "_split.json"){
+                if(attachedFile == "_quiz.json"){
                     songListTableView = 2;
                     songOrderType = "ascending";
+                }
+                if(attachedFile == "_split.json"){
+                    songListTableView = 2;
+                    songOrderType = "random";
                 }
                 setSongListTableSort();
                 createSongListTable(true);
@@ -1615,7 +1619,6 @@ function endReplayPhase(songNumber) {
             skipInterval = setInterval(() => {
                 if (!quiz.pauseButton.pauseOn){
                     if (quiz.soloMode) {
-                        console.log(attachedFile);
                         if(attachedFile == "_quiz.json"){
                             gameChat.systemMessage(score[0] + " points scored");
                         }
