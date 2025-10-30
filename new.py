@@ -60,12 +60,6 @@ for index in range(len(rawSongList)):
     songList[index]["annId"] = songList[index]["annSongId"]
     songList[index]["SN"] = "`"+songList[index]["SN"]+"`"
     songList[index]["ID"] = "``"+str(songList[index]["ID"])
-    if len(songList[index]["audio"]) == 0:
-        songList[index]["audio"] = None
-    if len(songList[index]["video480"]) == 0:
-        songList[index]["video480"] = None
-    if len(songList[index]["video720"]) == 0:
-        songList[index]["video720"] = None
     if songList[index]["songDifficulty"] is None:
         songList[index]["songDifficulty"] = 30
 
