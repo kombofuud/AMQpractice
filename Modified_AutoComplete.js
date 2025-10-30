@@ -50,7 +50,7 @@ const onlySpecialChars = (str) => {
 var options = {
 	enabled: true,
 	enabledToggle: 'E', // ctrl + E
-	highlight: false, // highlight or not the match
+	highlight: true, // highlight or not the match
 	allowRightLeftArrows: false, // use right and left arrows to move dropdown selected options
 	allowTab: true,
 	submitOnSelect: true,
@@ -81,7 +81,8 @@ if (true) { //change to true to have same filters and order as amq
 		{
 			contains: true,
 			clean: (s) => s.toLowerCase(),
-			getQryRegex: (qry) => new RegExp(createAnimeSearchRegexQuery(qry), "g")
+			getQryRegex: (qry) => new RegExp(createAnimeSearchRegexQuery(qry), "g"),
+			special: onlySpecialChars,
 		}
 	]
 	options.fuzzy = {dropdown: false, answer: false}
@@ -291,7 +292,8 @@ class FilterManager {
 
 		this.addEntrySets();
 
-		if (this.options.fuzzy.dropdown || this.options.fuzzy.answer) {
+		//if (this.options.fuzzy.dropdown || this.options.fuzzy.answer) {
+        if (true){
 			let cleaned = this.list.map(v => cleanString(v.originalStr));
 			this.fuzzy = FuzzySet(cleaned);
 			this.reverseMapping = {}
@@ -538,8 +540,7 @@ if (!isNode) {
 		this.$ul.children('li').remove();
 
 		for (let i = this.suggestions.length - 1; i >= 0; i--) {
-            //this.ul.insertBefore(this.item(options.highlight ? this.suggestions[i] : escapeHtml(this.suggestions[i]), options.highlight ? suggestions[i].lastQry : "", i), this.ul.firstChild);
-            this.ul.insertBefore(this.item(this.suggestions[i], options.highlight ? suggestions[i].lastQry : "", i), this.ul.firstChild);
+            this.ul.insertBefore(this.item(this.suggestions[i], options.highlight ? suggestions[i].lastQry.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : "", i), this.ul.firstChild);
 		}
 
 		if (this.ul.children.length === 0) {
