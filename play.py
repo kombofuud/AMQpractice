@@ -208,7 +208,7 @@ with open(fileQuiz+".json", 'w', encoding = 'utf8') as file:
     random.shuffle(randomSongList)
     json.dump(randomSongList, file)
 
-#Write new songs to pool and shuffle
+#Shuffle Pool
 with open(filePool+".json", 'r+', encoding = 'utf8') as file:
         file.truncate(0)
         file.seek(0)
