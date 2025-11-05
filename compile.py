@@ -143,7 +143,13 @@ for i, song in enumerate(songPool):
         if song["ID"] not in quizIds or quizIds[song["ID"]]+song["D"] >= dMax:
             diff8Q += 1
             pSong = copy.deepcopy(song)
-            sectionCount = len(pSong["sampleWeights"])
+            if song["startPoint"] == 0:
+                pSong["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
+            elif song["startPoint"] == 100:
+                pSong["sampleWeights"][-1] += 1-(1+songPool[index]["X"])%3
+            else:
+                sectionCount = len(songPool[index]["sampleWeights"])-2
+                pSong["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += 1-(1+songPool[index]["X"])%3
             #songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
             songWeightStrength = 0.5
             for i in range(len(pSong["sampleWeights"])-1):
