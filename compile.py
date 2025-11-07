@@ -309,8 +309,8 @@ if newSongCount > 0:
     songPool.extend(newSongs)
     prepSongs = prepSongs[newSongCount:]
 
-    #log-normal shuffling of prepsongs
-    prepSongWeights = [((i+1)*math.exp(random.gauss(0, 1)), song) for i, song in enumerate(prepSongs)]
+    #progressiveNormal shuffling of prepsongs
+    prepSongWeights = [(math.exp(random.gauss(i, math.sqrt(i))), song) for i, song in enumerate(prepSongs)]
     prepSongWeights.sort(key = lambda x: x[0])
     prepSongs = [song for _, song in prepSongWeights]
 
