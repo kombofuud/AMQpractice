@@ -154,8 +154,8 @@ for i, song in enumerate(songPool):
             #songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
             songWeightStrength = 0.5
             for i in range(len(pSong["sampleWeights"])-1):
-                pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/2
-                pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/2
+                pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/3
+                pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/3
             for i in range(len(pSong["sampleWeights"])):
                 pSong["sampleWeights"][i] = math.pow(len(pSong["sampleWeights"]),pSong["sampleWeights"][i]*songWeightStrength)
             pSong["startPoint"] = pSong["sampleWeights"]
@@ -321,7 +321,7 @@ if newSongCount > 0:
         random.shuffle(loadingSongs)
     elif random.randint(0,1) == 0:
         loadingSongs.sort(key = lambda x : (int(x["animeVintage"].split()[1]),{"Winter":1,"Spring":2,"Summer":3,"Fall":4}[x["animeVintage"].split()[0]],x["songDifficulty"]))
-    if random.randint(0,1) == 0:
+    if random.randint(0,2) == 0:
         loadingSongs.reverse()
     #replace added songs with songs from same show
     for i in range(len(loadingSongs)-1,-1,-1):
