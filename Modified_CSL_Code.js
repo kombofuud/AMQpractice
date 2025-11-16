@@ -634,11 +634,11 @@ function setup() {
                                 <button id="cslgListImportStartButton" style="color: black;">Go</button>
                             </div>
                             <div style="margin-top: 5px">
-                                <label class="clickAble">Watching<input id="cslgListImportWatchingCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble">Watching<input id="cslgListImportWatchingCheckbox" type="checkbox"></label>
                                 <label class="clickAble" style="margin-left: 10px">Completed<input id="cslgListImportCompletedCheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">On Hold<input id="cslgListImportHoldCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">Dropped<input id="cslgListImportDroppedCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">Planning<input id="cslgListImportPlanningCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble" style="margin-left: 10px">Dropped<input id="cslgListImportDroppedCheckbox" type="checkbox"></label>
+                                <label class="clickAble" style="margin-left: 10px">Planning<input id="cslgListImportPlanningCheckbox" type="checkbox"></label>
                             </div>
                             <h4 id="cslgListImportText" style="margin-top: 10px;"></h4>
                             <div id="cslgListImportActionContainer" style="display: none;">
@@ -940,7 +940,7 @@ function setup() {
     $("#cslgAnisongdbMinGroupMembersInput").val("0");
     $("#cslgSettingsSongs").val("999");
     $("#cslgSettingsGuessTime").val("15");
-    $("#cslgSettingsExtraGuessTime").val("0");
+    $("#cslgSettingsExtraGuessTime").val("7");
     $("#cslgSettingsStartPoint").val("0-100");
     $("#cslgSettingsDifficulty").val("0-100");
     $("#cslgAnisongdbSearchRow").hide();
@@ -1569,7 +1569,7 @@ function endGuessPhase(songNumber) {
                     let defaultTimer = 13;
                     //console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
                     skipInterval = setInterval(() => {
-                        if (defaultTimer >= timerEnd-5){
+                        if (defaultTimer >= timerEnd-15){
                             fireListener("quiz overlay message", "About to Skip");
                         }
                         if (quiz.skipController._toggled || defaultTimer >= timerEnd+10) {
