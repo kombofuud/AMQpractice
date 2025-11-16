@@ -1,3 +1,4 @@
+import os
 import json
 import random
 
@@ -28,3 +29,5 @@ for song in known:
     if song["malId"] not in playMalIds and song["malId"] not in learningMalIds:
         print(song["malId"])
         playMalIds.add(song["malId"])
+
+os.remove("../../../Downloads/merged.json")
