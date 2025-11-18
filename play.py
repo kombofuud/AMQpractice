@@ -34,7 +34,7 @@ DList = []
 DMin = 9999
 DMax = 8
 indexMap = dict()
-totalDWeight = 0
+maxWeightCount = 0
 songCounter = 0
 with open(filePool+".json", "r", encoding="utf-8") as file:
     poolSongList = json.load(file)
@@ -42,12 +42,10 @@ for index, song in enumerate(poolSongList):
     if song["X"] != 0:
         print("Error: Previous quiz not compiled")
         sys.exit(1)
-    totalDWeight += song["D"]
+    if song["D"] == DMax:
+        maxWeightCount += 1
     indexMap[song["ID"]] = index
-    if song["D"] >= DMax-1:
-        DList.append(math.exp(DMax+4))
-    else:
-        DList.append(math.exp(song["D"]))
+    DList.append(math.exp(song["D"]))
     DMin = min(DMin, song["D"])
     songCounter += 1
 
@@ -178,9 +176,16 @@ poolSongList.extend(newSongList)'''
 #Pick Songs and Generate Song Section
 
 #Pick Songs
-songCount = min(desiredQuizSize,len(poolSongList))
-randomSongList = list(numpy.random.choice(poolSongList, size = songCount, p = DList/numpy.sum(DList), replace = False))
+randomSongList = list(numpy.random.choice(poolSongList, size = len(DList), p = DList/numpy.sum(DList), replace = False))
 randomSongList = copy.deepcopy(randomSongList)
+songCount = 0
+for song in randomSongList:
+    songCount += 1
+    if song["D"] == 8:
+        DMaxCount -= 1
+    if DMaxCount == 0:
+        break
+randomSongList = randomSongList[:songCount]
 
 #For each song, pick sample point
 for index, song in enumerate(randomSongList):
