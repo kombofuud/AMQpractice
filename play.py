@@ -182,8 +182,8 @@ songCount = 0
 for song in randomSongList:
     songCount += 1
     if song["D"] == 8:
-        DMaxCount -= 1
-    if DMaxCount == 0:
+         maxWeightCount-= 1
+    if maxWeightCount == 0:
         break
 randomSongList = randomSongList[:songCount]
 
@@ -248,8 +248,9 @@ if len(newSongList) > 0:
     for song in newSongList:
         print(song["animeEnglishName"]+": "+song["songName"]+" by "+song["songArtist"])
 '''
+print(f"Quiz of Size \033[31m{songCount}\033[0m created")
 print()
-print(f"Pool Size: {len(poolSongList)} Min D: {DMin}")
+print(f"Pool Size: {len(DList)} Min D: {DMin}")
 DList = [0]*(DMax-DMin+1)
 for song in poolSongList:
     if song["D"] > DMax:
