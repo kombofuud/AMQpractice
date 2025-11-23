@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Custom Kombo Song Games
 // @namespace    https://github.com/kempanator
-// @version      0.91
+// @version      0.92
 // @description  Play a solo game with a custom song list
 // @author       kempanator
 // @match        https://*.animemusicquiz.com/*
@@ -53,6 +53,7 @@ let replacedAnswers = saveData.replacedAnswers || {};
 let malClientId = saveData.malClientId ?? "";
 let debug = Boolean(saveData.debug);
 let fastSkip = true;
+let fullSongRange = true;
 let nextVideoReady = false;
 let showSelection = 1;
 let guessTime = 20;
@@ -228,7 +229,7 @@ function setup() {
     }).bindListener();
     new Listener("update all song names", (data) => {
         if (data.deleted.length) {
-            animeListLower = animeListLower.filter(name => !deletedLower.includes(name));
+            const deletedLower = data.deleted.map(x => x.toLowerCase());
             for (const name of deletedLower) {
                 animeListLower.delete(name);
             }
@@ -520,9 +521,6 @@ function setup() {
                                 <label class="clickAble">OP<input id="cslgSettingsOPCheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">ED<input id="cslgSettingsEDCheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">IN<input id="cslgSettingsINCheckbox" type="checkbox" checked></label>
-                                <span style="font-size: 18px; font-weight: bold; margin: 0 15px 0 35px;">Guess:</span>
-                                <label class="clickAble">Correct<input id="cslgSettingsCorrectGuessCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">Wrong<input id="cslgSettingsIncorrectGuessCheckbox" type="checkbox" checked></label>
                             </div>
                             <div style="margin-top: 5px">
                                 <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Anime Types:</span>
@@ -533,16 +531,25 @@ function setup() {
                                 <label class="clickAble" style="margin-left: 10px">Special<input id="cslgSettingsSpecialCheckbox" type="checkbox" checked></label>
                             </div>
                             <div style="margin-top: 5px">
-                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Modifiers:</span>
+                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Broadcast Types:</span>
                                 <label class="clickAble">Dub<input id="cslgSettingsDubCheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">Rebroadcast<input id="cslgSettingsRebroadcastCheckbox" type="checkbox" checked></label>
+                            </div>
+                            <div style="margin-top: 5px">
+                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Guess:</span>
+                                <label class="clickAble">Correct<input id="cslgSettingsCorrectGuessCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble" style="margin-left: 10px">Wrong<input id="cslgSettingsIncorrectGuessCheckbox" type="checkbox" checked></label>
+                            </div>
+                            <div style="margin-top: 5px">
+                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Gameplay Options:</span>
+                                <label class="clickAble">Full Song Range<input id="cslgSettingsFullSongRangeCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble" style="margin-left: 20px">Fast Skip<input id="cslgSettingsFastSkipCheckbox" type="checkbox" checked></label>
                             </div>
                             <div style="margin-top: 5px">
                                 <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 0;">Sample:</span>
                                 <input id="cslgSettingsStartPoint" type="text" style="width: 70px">
                                 <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 40px;">Difficulty:</span>
                                 <input id="cslgSettingsDifficulty" type="text" style="width: 70px">
-                                <label class="clickAble" style="margin-left: 50px">Fast Skip<input id="cslgSettingsFastSkip" type="checkbox" checked></label>
                             </div>
                             <div style="margin-top: 5px">
                                 <span style="font-size: 18px; font-weight: bold; margin-right: 10px;">Song Order:</span>
@@ -554,9 +561,9 @@ function setup() {
                                 <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 10px;">Override URL:</span>
                                 <select id="cslgHostOverrideSelect" style="color: black; padding: 3px 0;">
                                     <option value="0">default</option>
-                                    <option value="1">eudist.animemusicquiz.com</option>
-                                    <option value="2">nawdist.animemusicquiz.com</option>
-                                    <option value="3">naedist.animemusicquiz.com</option>
+                                    <option value="1">EU (eudist)</option>
+                                    <option value="2">NA1 (nawdist)</option>
+                                    <option value="3">NA2 (naedist)</option>
 
                                 </select>
                             </div>
@@ -933,7 +940,7 @@ function setup() {
         $(Object.values(idMap).join(",")).hide();
         $(idMap[val]).show();
         if (val === "Load File") $("#cslgAnisongdbQueryInput").val("");
-        if (val === "Previous Game") LoadPreviousGameOptions();
+        if (val === "Previous Game") loadPreviousGameOptions();
     });
     $("#cslgAnisongdbModeSelect").val("Artist");
     $("#cslgAnisongdbMaxOtherPeopleInput").val("99");
@@ -1139,11 +1146,11 @@ function validateStart() {
         return messageDisplayer.displayMessage("Unable to start", "Invalid number of songs");
     }
     guessTime = parseInt($("#cslgSettingsGuessTime").val());
-    if (isNaN(guessTime) || guessTime < 1 || guessTime > 999) {
+    if (isNaN(guessTime) || guessTime < 1) {
         return messageDisplayer.displayMessage("Unable to start", "Invalid guess time");
     }
     extraGuessTime = parseInt($("#cslgSettingsExtraGuessTime").val());
-    if (isNaN(extraGuessTime) || extraGuessTime < 0 || extraGuessTime > 60) {
+    if (isNaN(extraGuessTime) || extraGuessTime < 0) {
         return messageDisplayer.displayMessage("Unable to start", "Invalid extra guess time");
     }
     const startPointText = $("#cslgSettingsStartPoint").val().trim();
@@ -1188,7 +1195,7 @@ function validateStart() {
         .filter((key) => animeTypeFilter(songList[key], tv, movie, ova, ona, special))
         .filter((key) => difficultyFilter(songList[key], difficultyRange[0], difficultyRange[1]))
         .filter((key) => guessTypeFilter(songList[key], correctGuesses, incorrectGuesses))
-        .filter((key) => modifiersFilter(songList[key], dub, rebroadcast));
+        .filter((key) => broadcastTypeFilter(songList[key], dub, rebroadcast));
     if (songOrderType === "random") shuffleArray(songKeys);
     else if (songOrderType === "descending") songKeys.reverse();
     songKeys.slice(0, numSongs).forEach((key, i) => { songOrder[i + 1] = parseInt(key) });
@@ -1196,7 +1203,8 @@ function validateStart() {
     if (totalSongs === 0) {
         return messageDisplayer.displayMessage("Unable to start", "No songs");
     }
-    fastSkip = $("#cslgSettingsFastSkip").prop("checked");
+    fastSkip = $("#cslgSettingsFastSkipCheckbox").prop("checked");
+    fullSongRange = $("#cslgSettingsFullSongRangeCheckbox").prop("checked");
     $("#cslgSettingsModal").modal("hide");
     //console.log(songOrder);
     if (lobby.soloMode) {
@@ -1222,7 +1230,6 @@ function startQuiz() {
     }
     skipping = false;
     quiz.cslActive = true;
-    lobby.settings.modifiers.fullSongRange = true;
     const date = new Date().toISOString();
     for (const player of Object.values(lobby.players)) {
         score[player.gamePlayerId] = 0;
@@ -1259,6 +1266,7 @@ function startQuiz() {
                 "playLength": guessTime,
                 "playbackSpeed": 1,
                 "startPoint": currentStartPoint,
+                "fullSongRange": fullSongRange,
                 "videoInfo": {
                     "id": null,
                     "videoMap": {
@@ -1560,7 +1568,7 @@ function endGuessPhase(songNumber) {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
                     let timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D)));
-                    if(!correct[0]){
+                    if(!correct[0] || timerEnd > 300){
                         timerEnd = 300;
                     }
                     if(song.length > 0){
@@ -2048,8 +2056,8 @@ function guessTypeFilter(song, correctGuesses, incorrectGuesses) {
     return false;
 }
 
-// return true if the song is allowed under the selected modifiers
-function modifiersFilter(song, dub, rebroadcast) {
+// return true if the song is allowed under the selected broadcast type
+function broadcastTypeFilter(song, dub, rebroadcast) {
     if (!dub && song.dub) return false;
     if (!rebroadcast && song.rebroadcast) return false;
     return true;
@@ -2129,14 +2137,14 @@ function openSettingsModal() {
             $("#cslgAutocompleteButton").removeClass("btn-danger").addClass("btn-success disabled");
         }
         if ($("#cslgSongListModeSelect").val() === "Previous Game") {
-            LoadPreviousGameOptions();
+            loadPreviousGameOptions();
         }
         $("#cslgSettingsModal").modal("show");
     }
 }
 
 // load previous game options in song list window
-function LoadPreviousGameOptions() {
+function loadPreviousGameOptions() {
     const $select = $("#cslgPreviousGameSelect").empty();
     const games = [];
     for (const game of Object.values(songHistoryWindow.tabs[2].gameMap)) {
@@ -2892,14 +2900,6 @@ function isQuizOfTheDay() {
     return false;
 }
 
-// return true if ranked/themed is running
-function isRankedRunning() {
-    if (ranked.currentState === ranked.RANKED_STATE_IDS.RUNNING) return true;
-    if (ranked.currentState === ranked.RANKED_STATE_IDS.CHAMP_RUNNING) return true;
-    if (ranked.currentState === ranked.RANKED_STATE_IDS.THEMED_RUNNING) return true;
-    return false;
-}
-
 // safeguard against people putting valid javascript in the song json
 function preventCodeInjection(text) {
     if (/<script/i.test(text)) {
@@ -3181,7 +3181,6 @@ async function startImport() {
                 await getSongListFromMalIds(malIds);
             }
             else {
-                //$("#cslgListImportText").text("Input Myanimelist Username");
                 const malIds = await getAllMalIds();
                 await getSongListFromMalIds(malIds);
             }
