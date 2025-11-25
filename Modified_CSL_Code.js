@@ -1,3416 +1,748 @@
 // ==UserScript==
-// @name         AMQ Custom Kombo Song Games
-// @namespace    https://github.com/kempanator
-// @version      0.92
-// @description  Play a solo game with a custom song list
-// @author       kempanator
+// @name         Autocomplete Improvement (Kombo 1.40)
+// @namespace    http://tampermonkey.net/
+// @version      1.40
+// @description  Modification of Juvian Autocomplete for people who want to want a faster version of the normal one with some QOL.
+// Modifications include: Default filters are applied, tab enabled by default and shift+tab has the reverse effect of tab. Fixed a bug where every other tab isn't registered. Ctrl+A effect occurs after submitting an answer.
+// When nothing in the dropdown is highlighted, down (or equiv) goes to the second option and up (or equiv) goes to the last option. (rather than highlighting the first option). (The first option can be submitted by pressing enter without highlighting the dropdown as in the original.)
+// @author       Juvian (modifications by kombofuud)
 // @match        https://*.animemusicquiz.com/*
-// @require      https://github.com/joske2865/AMQ-Scripts/raw/master/common/amqScriptInfo.js
-// @downloadURL  https://github.com/kempanator/amq-scripts/raw/main/amqCustomSongListGame.user.js
-// @updateURL    https://github.com/kempanator/amq-scripts/raw/main/amqCustomSongListGame.user.js
-// @grant        GM_xmlhttpRequest
-// @connect      myanimelist.net
+// @require      https://cdnjs.cloudflare.com/ajax/libs/fuzzyset.js/0.0.8/fuzzyset.min.js
+// @grant        none
+// @copyright MIT license
 // ==/UserScript==
 
-/*
-How to start a custom song list game:
-  1. create a solo lobby
-  2. click the CSL button in the top right
-  3. click the autocomplete button if it is red
-  4. create or upload a list in the song list tab
-  5. change settings in the settings tab
-  6. fix any invalid answers in the answer tab
-  7. click start to play the quiz
-
-Supported upload files:
-  1. anisongdb json
-  2. official AMQ song history export
-  3. joseph song list script export
-  4. blissfulyoshi ranked song list
-
-Some considerations:
-  1. anisongdb is unavailable during ranked, please prepare some json files in advance
-  2. anime titles that were changed recently in AMQ will be incorrect if anisongdb never updated it
-  3. no automatic volume equalizing
-  4. keep duplicates in the song list if you want to use any acceptable title for each
-*/
-
-"use strict";
-if (typeof Listener === "undefined") return;
-const loadInterval = setInterval(() => {
-    if (document.querySelector("#loadingScreen.hidden")) {
-        clearInterval(loadInterval);
-        setup();
-    }
-}, 500);
-
-const saveData = validateLocalStorage("customSongListGame");
-const apiBase = "https://anisongdb.com/api/";
-const hostDict = { 1: "eudist.animemusicquiz.com", 2: "nawdist.animemusicquiz.com", 3: "naedist.animemusicquiz.com" };
-let CSLButtonCSS = saveData.CSLButtonCSS || "calc(25% - 250px)";
-let showCSLMessages = saveData.showCSLMessages ?? true;
-let replacedAnswers = saveData.replacedAnswers || {};
-let malClientId = saveData.malClientId ?? "";
-let debug = Boolean(saveData.debug);
-let fastSkip = true;
-let fullSongRange = true;
-let nextVideoReady = false;
-let showSelection = 1;
-let guessTime = 20;
-let extraGuessTime = 0;
-let currentSong = 0;
-let totalSongs = 0;
-let currentAnswers = {};
-let currentAnswerTime = 20;
-let currentStartPoint = 0;
-let nextStartPoint = 0;
-let score = {};
-let songListTableView = 2; //0: song + artist, 1: anime + song type + vintage, 2: video/audio links
-let songListTableSort = { mode: "", ascending: true } //modes: songName, artist, difficulty, anime, songType, vintage, mp3, 480, 720
-let songList = [];
-let songOrder = {}; //{song#: index#, ...}
-let mergedSongList = [];
-let importedSongList = [];
-let songOrderType = "random";
-let startPointRange = [0, 100];
-let difficultyRange = [0, 100];
-let previousSongFinished = false;
-let skipInterval;
-let nextVideoReadyInterval;
-let answerTimer;
-let extraGuessTimer;
-let endGuessTimer;
-let fileHostOverride = 0;
-let animeListLower = new Set(); //store lowercase version for faster compare speed
-let autocompleteInput;
-let cslMultiplayer = { host: "", songInfo: {}, voteSkip: {} };
-let cslState = 0; //0: none, 1: guessing phase, 2: answer phase
-let songLinkReceived = {};
-let songStartTime;
-let skipping = false;
-let answerChunks = {}; //store player answer chunks, ids are keys
-let resultChunk;
-let songInfoChunk;
-let nextSongChunk;
-let importRunning = false;
-let attachedFile = "";
-let hotKeys = {
-    cslgWindow: loadHotkey("cslgWindow"),
-    start: loadHotkey("start"),
-    stop: loadHotkey("stop"),
-    mergeAll: loadHotkey("mergeAll"),
-    clearSongList: loadHotkey("clearSongList"),
-    transferMerged: loadHotkey("transferMerged"),
-    clearMerged: loadHotkey("clearMerged"),
-    downloadMerged: loadHotkey("downloadMerged"),
-    tableMode: loadHotkey("tableMode"),
+let keyStates = {
+    ctrl: false,
+    shift: false
 };
 
-// setup
-function setup() {
-    new Listener("New Player", (data) => {
-        if (quiz.cslActive && quiz.inQuiz && quiz.isHost) {
-            const player = Object.values(quiz.players).find(p => p._name === data.name);
-            if (player) {
-                sendSystemMessage(`CSL: reconnecting ${data.name}`);
-                cslMessage("§CSL0" + btoa(`${showSelection}§${currentSong}§${totalSongs}§${guessTime}§${extraGuessTime}§${fastSkip ? "1" : "0"}`));
-            }
-            else {
-                cslMessage(`CSL game in progress, removing ${data.name}`);
-                lobby.changeToSpectator(data.name);
-            }
-        }
-    }).bindListener();
-    new Listener("New Spectator", (data) => {
-        if (quiz.cslActive && quiz.inQuiz && quiz.isHost) {
-            const player = Object.values(quiz.players).find(p => p._name === data.name);
-            if (player) {
-                sendSystemMessage(`CSL: reconnecting ${data.name}`);
-                cslMessage("§CSL17" + btoa(data.name));
-            }
-            else {
-                cslMessage("§CSL0" + btoa(`${showSelection}§${currentSong}§${totalSongs}§${guessTime}§${extraGuessTime}§${fastSkip ? "1" : "0"}`));
-            }
-            setTimeout(() => {
-                const song = songList[songOrder[currentSong]];
-                const message = `${currentSong}§${getStartPoint()}§${song.audio || ""}§${song.video480 || ""}§${song.video720 || ""}`;
-                splitIntoChunks(btoa(message) + "$", 144).forEach((item, index) => {
-                    cslMessage("§CSL3" + base10to36(index % 36) + item);
-                });
-            }, 300);
-        }
-    }).bindListener();
-    new Listener("Spectator Change To Player", (data) => {
-        if (quiz.cslActive && quiz.inQuiz && quiz.isHost) {
-            const player = Object.values(quiz.players).find(p => p._name === data.name);
-            if (player) {
-                cslMessage("§CSL0" + btoa(`${showSelection}§${currentSong}§${totalSongs}§${guessTime}§${extraGuessTime}§${fastSkip ? "1" : "0"}`));
-            }
-            else {
-                cslMessage(`CSL game in progress, removing ${data.name}`);
-                lobby.changeToSpectator(data.name);
-            }
-        }
-    }).bindListener();
-    new Listener("Player Change To Spectator", (data) => {
-        if (quiz.cslActive && quiz.inQuiz && quiz.isHost) {
-            const player = Object.values(quiz.players).find(p => p._name === data.name);
-            if (player) {
-                cslMessage("§CSL17" + btoa(data.name));
-            }
-            else {
-                cslMessage("§CSL0" + btoa(`${showSelection}§${currentSong}§${totalSongs}§${guessTime}§${extraGuessTime}§${fastSkip ? "1" : "0"}`));
-            }
-        }
-    }).bindListener();
-    new Listener("Host Promotion", (data) => {
-        if (quiz.cslActive && quiz.inQuiz) {
-            sendSystemMessage("CSL host changed, ending quiz");
-            quizOver();
-        }
-    }).bindListener();
-    new Listener("Player Left", (data) => {
-        if (quiz.cslActive && quiz.inQuiz && data.player.name === cslMultiplayer.host) {
-            sendSystemMessage("CSL host left, ending quiz");
-            quizOver();
-        }
-    }).bindListener();
-    new Listener("Spectator Left", (data) => {
-        if (quiz.cslActive && quiz.inQuiz && data.spectator === cslMultiplayer.host) {
-            sendSystemMessage("CSL host left, ending quiz");
-            quizOver();
-        }
-    }).bindListener();
-    new Listener("game closed", (data) => {
-        if (quiz.cslActive && quiz.inQuiz) {
-            reset();
-            messageDisplayer.displayMessage("Room Closed", data.reason);
-            lobby.leave({ supressServerMsg: true });
-        }
-    }).bindListener();
-    new Listener("game chat update", (data) => {
-        for (const message of data.messages) {
-            if (message.message.startsWith("§CSL")) {
-                if (!showCSLMessages) {
-                    setTimeout(() => {
-                        const $message = gameChat.$chatMessageContainer.find(".gcMessage").last();
-                        if ($message.text().startsWith("§CSL")) $message.parent().remove();
-                    }, 0);
-                }
-                parseMessage(message.message, message.sender);
-            }
-            else if (debug && message.sender === selfName && message.message.startsWith("/csl")) {
-                try { cslMessage(JSON.stringify(eval(message.message.slice(5)))) }
-                catch { cslMessage("ERROR") }
-            }
-        }
-    }).bindListener();
-    new Listener("Game Chat Message", (data) => {
-        if (data.message.startsWith("§CSL")) {
-            parseMessage(data.message, data.sender);
-        }
-    }).bindListener();
-    new Listener("Game Starting", (data) => {
-        clearTimeEvents();
-    }).bindListener();
-    new Listener("Join Game", (data) => {
-        reset();
-    }).bindListener();
-    new Listener("Spectate Game", (data) => {
-        reset();
-    }).bindListener();
-    new Listener("Host Game", (data) => {
-        reset();
-        $("#cslgSettingsModal").modal("hide");
-    }).bindListener();
-    new Listener("get all song names", (data) => {
-        animeListLower = new Set(data.names.map(x => x.toLowerCase()));
-        autocompleteInput = new AmqAwesomeplete(document.querySelector("#cslgNewAnswerInput"), { list: data.names }, true);
-    }).bindListener();
-    new Listener("update all song names", (data) => {
-        if (data.deleted.length) {
-            const deletedLower = data.deleted.map(x => x.toLowerCase());
-            for (const name of deletedLower) {
-                animeListLower.delete(name);
-            }
-            autocompleteInput.list = autocompleteInput.list.filter(name => !data.deleted.includes(name));
-        }
-        if (data.new.length) {
-            const newLower = data.new.map(x => x.toLowerCase());
-            for (const name of newLower) {
-                animeListLower.add(name);
-            }
-            autocompleteInput.list.push(...data.new);
-        }
-    }).bindListener();
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Control') keyStates.ctrl = true;
+    if (e.key === 'Shift') keyStates.shift = true;
+});
 
-    quiz.pauseButton.$button.off("click").on("click", () => {
-        if (quiz.cslActive) {
-            if (quiz.soloMode) {
-                if (quiz.pauseButton.pauseOn) {
-                    fireListener("quiz unpause triggered", {
-                        "playerName": selfName
-                    });
-                    /*fireListener("quiz unpause triggered", {
-                        "playerName": selfName,
-                        "doCountDown": true,
-                        "countDownLength": 3000
-                    });*/
-                }
-                else {
-                    fireListener("quiz pause triggered", {
-                        "playerName": selfName
-                    });
-                }
-            }
-            else {
-                if (quiz.pauseButton.pauseOn) {
-                    cslMessage("§CSL12");
-                }
-                else {
-                    cslMessage("§CSL11");
-                }
-            }
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'Control') keyStates.ctrl = false;
+    if (e.key === 'Shift') keyStates.shift = false;
+});
+
+let isNode = typeof window === 'undefined';
+
+if (!isNode && typeof Listener === 'undefined') throw "rip";
+
+if (isNode) {
+	FuzzySet = require('fuzzyset.js')
+}
+
+const cleanString = (str, except = []) => {
+	return removeDiacritics(str, except).replace(new RegExp('[^\\w\\s' + except.join('') + ']', "gi"), ' ').replace(/  +/g, ' ').toLowerCase().trim();
+}
+
+const semiCleanString = (str, except) => {
+	return removeDiacritics(str, except).replace(/  +/g, ' ').toLowerCase().trim();
+}
+
+const onlySpecialChars = (str) => {
+	return str.replace(/[\w\s]/gi, '').split('').sort().join('');
+}
+
+var options = {
+	enabled: true,
+	enabledToggle: 'E', // ctrl + E
+	highlight: true, // highlight or not the match
+	allowRightLeftArrows: false, // use right and left arrows to move dropdown selected options
+	allowTab: true,
+	submitOnSelect: true,
+	fuzzy: {
+		dropdown: true, // whether to show fuzzy matches if no matches found
+		answer: false, // whether to use top fuzzy match on round end as answer if no matches found
+	},
+	entrySets: [
+		{
+			startsWith: false, //change to true if you want more specific results
+			contains: false, //change to true if you want more specific results
+			partial: false, //not recommended to change
+			clean: semiCleanString // does not remove special characters so you can filter with it
+		},
+		{
+			startsWith: true, // allow startsWith priotization (fastest matching)
+			contains: true, // allow to search by contains
+			partial: true, // allow the words to be on any order (no hero boku will match boku no hero),
+			clean: cleanString,
+			special: onlySpecialChars // adds filtering special chars instead of just ignoring
+		}
+	],
+    defaultSort: true // sort animes by amq order (length). If false, sorts by priority (starts with > contains > partial > fuzzy)
+}
+
+if (true) { //change to true to have same filters and order as amq
+	options.entrySets = [
+		{
+			contains: true,
+			clean: (s) => s.toLowerCase(),
+			getQryRegex: (qry) => new RegExp(createAnimeSearchRegexQuery(qry), "g"),
+			special: onlySpecialChars,
+		}
+	]
+	options.fuzzy = {dropdown: false, answer: false}
+    options.defaultSort = true;
+}
+
+let onManualChange = (key) => {
+    document.addEventListener ("keydown", function (zEvent) {
+		if (zEvent.ctrlKey && zEvent.key.toLowerCase() === key.toLowerCase()) {
+			options.enabled = !options.enabled;
+			zEvent.preventDefault();
+		}
+	});
+    document.addEventListener ("keyup", function (zEvent){
+        if (zEvent.keyCode == 13 && quiz.answerInput.inFocus && document.activeElement instanceof HTMLInputElement){
+            event.target.select();
         }
-        else {
-            socket.sendCommand({
-                type: "quiz",
-                command: quiz.pauseButton.pauseOn ? "quiz unpause" : "quiz pause"
+    });
+}
+if (!isNode) onManualChange(options.enabledToggle);
+
+var debug = false;
+
+function log(msg) {
+    if(debug) console.log(msg)
+}
+
+if (!isNode && window.localStorage && window.localStorage.storedData) {
+     window.localStorage.storedData = ''; //clear, not used anymore
+}
+
+class SortedList {
+	constructor(list) {
+		this.list = this.alphabeticalSort(list.slice(0));
+		this.reset();
+	}
+
+	alphabeticalSort (list) {
+		return list.sort(function(a, b){
+			if (a.str < b.str)
+			    return -1;
+			if (a.str > b.str)
+			    return 1;
+			return 0;
+		});
+	}
+
+	reset() {
+		this.start = 0;
+		this.end = this.list.length;
+	}
+}
+
+class SuperString {
+	constructor(list) {
+		this.str = list.join("$$$");
+
+		this.lookup = [{str: 0}];
+
+		for (var i = 0; i < list.length; i++) {
+			this.lookup.push({str: this.lookup[i].str + list[i].length + 3})
+		}
+
+		this.reset();
+	}
+
+	clone() {
+		let superString = new SuperString([]);
+		Object.assign(superString, this);
+		return superString;
+	}
+
+	reset() {
+		this.lastIndex = 0;
+	}
+}
+
+class EntrySet {
+	constructor(list, config, manager) {
+		this.list = list;
+		this.manager = manager;
+		this.sorted = new SortedList(config.startsWith ? list : []);
+		this.contains = new SuperString(config.contains || config.partial ? list.map(v => v.str) : []);
+		this.partial = this.contains.clone();
+		this.config = config;
+
+		if (config.partial) this.list.forEach(e => e.splittedStr = e.str.split(' '));
+
+		this.results = {};
+	}
+
+	reset() {
+		this.sorted.reset();
+		this.partial.reset();
+		this.contains.reset();
+
+		this.lastQry = "";
+		this.lastSpecialStr = "";
+		this.lastQrySplit = [];
+		this.results = {};
+		this.lastSpecialIndex = 0;
+	}
+
+	partialMatches (idx) {
+		var animeSplitted = this.list[idx].splittedStr;
+
+		if (this.lastQrySplit.every((v) => this.list[idx].str.indexOf(v) != -1)) {
+			var used = animeSplitted.map(v => false);
+			var matches = []
+			for (var i = 0; i < this.lastQrySplit.length; i++) {
+				matches.push([])
+				for (var j = 0; j < animeSplitted.length; j++) {
+					matches[i].push(animeSplitted[j].indexOf(this.lastQrySplit[i]) != -1);
+				}
+			}
+			return this.matches(0, matches, used);
+		}
+	}
+
+	matches (currentIndex, matches, used) {
+		if (currentIndex == matches.length) return true;
+
+		for (var i = 0; i < matches[0].length; i++) {
+			if (!used[i] && matches[currentIndex][i]) {
+				used[i] = true;
+				if (this.matches(currentIndex + 1, matches, used)) return true;
+				used[i] = false;
+			}
+		}
+
+		return false;
+	}
+
+	setQuery(str) {
+		let specialStr = this.config.special ? this.config.special(str) : '';
+		str = this.config.clean(str);
+
+		if (!str.startsWith(this.lastQry) || (this.config.special && !specialMatchesStr(this.lastSpecialStr, specialStr))) this.reset();
+
+		this.lastQry = str;
+		this.lastQrySplit = str.split(" ").filter((s) => s.trim());
+		this.lastSpecialStr = specialStr;
+	}
+
+	handles(str) {
+		if (!this.config.handles || this.config.handles(str)) {
+			this.setQuery(str);
+			return true;
+		}
+	}
+
+	specialMatches(idx) {
+		return !this.config.special || specialMatchesStr(this.lastSpecialStr, this.list[idx].specialStr);
+	}
+
+	addResult(idx, priority) {
+		if (this.specialMatches(idx) && (!this.config.partial || this.partialMatches(idx)) && !this.results.hasOwnProperty(idx)) {
+			this.results[idx] = priority;
+	    	this.manager.originalIndexResults.add(this.list[idx].originalIndex)
+		}
+	}
+
+	checkOldResults() {
+		let oldResults = Object.keys(this.results).map(k => +k);
+		let re = this.getQryRegex(this.lastQry);
+
+		this.results = [];
+
+		for (let idx of oldResults) {
+			let anime = this.list[idx].str;
+            if (anime.match(re)) this.addResult(idx, 1);
+			else if (this.config.partial && this.partialMatches(idx)) this.addResult(idx, 2);
+		}
+	}
+
+	addResults (range, list) {
+		for (var i = range.first; i <= range.last && this.manager.originalIndexResults.size < this.manager.limit; i++) {
+			this.addResult(list[i].originalIndex, 0);
+		}
+	}
+
+	getQryRegex(qry) {
+		return this.config.getQryRegex ? this.config.getQryRegex(qry) : new RegExp(escapeRegExp(qry).replaceAll('u', '(u|uu)').replaceAll('o', '(o|ou|oo)'), "g");
+	}
+
+	addContainingResults (superString, qry, priority) {
+		let re = this.getQryRegex(qry);
+		let match;
+
+		re.lastIndex = superString.lastIndex
+		while (this.manager.originalIndexResults.size < this.manager.limit && (match = re.exec(superString.str))) {
+			let idx = first(superString.lookup, v => v > match.index, 0, superString.lookup.length) - 1
+			this.addResult(idx, priority);
+			superString.lastIndex = re.lastIndex;
+		}
+	}
+}
+
+class FilterManager {
+	constructor (list, limit, opts) {
+		this.list = list.filter(v => v.trim().length).map((v, idx) => ({idx: idx, originalStr: v, originalIndex: idx}));
+		this.limit = limit
+		this.specialChars = {}
+		this.options = Object.assign({}, options, opts || {});
+
+		this.list.forEach((v, idx) => v.idx = idx);
+
+		this.addEntrySets();
+
+		//if (this.options.fuzzy.dropdown || this.options.fuzzy.answer) {
+        if (true){
+			let cleaned = this.list.map(v => cleanString(v.originalStr));
+			this.fuzzy = FuzzySet(cleaned);
+			this.reverseMapping = {}
+			this.list.forEach((v, idx) => {
+				this.reverseMapping[cleaned[idx]] = this.reverseMapping[cleaned[idx]] || []
+				this.reverseMapping[cleaned[idx]].push(v.idx)
+			});
+		}
+
+		this.originalIndexResults = new Set();
+
+		this.reset();
+	}
+
+	addEntrySets() {
+		this.entrySets = [];
+
+		let cache = new Set();
+
+		const defaultFilter = (e) => {
+			if (cache.has(e.str + '|||' + e.specialStr)) return false;
+			return cache.add(e.str + '|||' + e.specialStr);
+		}
+
+		for (let entrySet of this.options.entrySets) {
+
+			const filter = entrySet.filter || defaultFilter;
+            cache.clear();
+
+			if (entrySet.startsWith || entrySet.contains || entrySet.partial) {
+				let list = this.list.map((e, idx) => ({str: entrySet.clean(e.str || e.originalStr), specialStr: entrySet.special ? entrySet.special(e.str || e.originalStr) : '', originalIndex: e.originalIndex})).filter(filter);
+                this.entrySets.push(new EntrySet(list, entrySet, this));
+			}
+		}
+	}
+
+	reset () {
+		this.entrySets.forEach(e => e.reset());
+		this.originalIndexResults.clear();
+	}
+
+	checkOldResults() {
+		this.originalIndexResults.clear();
+		this.entrySets.forEach(e => e.checkOldResults());
+	}
+
+	processResultsFor(str) {
+		const entrySets = this.entrySets.filter(e => e.handles(str));
+
+		this.lastStr = str;
+		this.checkOldResults();
+
+
+		for (let entrySet of entrySets) {
+			if (entrySet.config.startsWith && entrySet.lastQry.length) {
+				entrySet.addResults(range(entrySet.sorted, entrySet.lastQry), entrySet.sorted.list);
+			}
+		}
+
+		for (let entrySet of entrySets) {
+			if (entrySet.config.contains && entrySet.lastQry.length) {
+				entrySet.addContainingResults(entrySet.contains, entrySet.lastQry, 1);
+			}
+			if (!entrySet.lastQry.length && entrySet.lastSpecialStr.length) {
+				for (; entrySet.lastSpecialIndex < entrySet.list.length && this.originalIndexResults.size < this.limit; entrySet.lastSpecialIndex++) {
+					entrySet.addResult(entrySet.lastSpecialIndex, 1);
+				}
+			}
+		}
+
+		for (let entrySet of entrySets) {
+			if (entrySet.config.partial && entrySet.lastQrySplit.length >= 2) {
+				let qry = entrySet.lastQrySplit.filter((s) => s.trim()).sort((a, b) => b.length - a.length)[0];
+				entrySet.addContainingResults(entrySet.partial, qry, 2);
+			}
+		}
+	}
+
+	filterBy (str, fuzzy) {
+		if(debug) console.time(str + " filter")
+
+		if (str.trim().length == 0) return [];
+		this.processResultsFor(str);
+
+		let results = [];
+		let s = new Set();
+
+		for (let entrySet of this.entrySets) {
+			for (let [idx, priority] of Object.entries(entrySet.results)) {
+				if (!s.has(entrySet.list[idx].originalIndex)) {
+					results.push({lastQry: entrySet.lastQry, match: entrySet.list[idx], listMatch: this.list[entrySet.list[idx].originalIndex], priority, entrySetIndex: this.entrySets.indexOf(entrySet)});
+					s.add(entrySet.list[idx].originalIndex);
+				}
+			}
+		}
+
+		//add fuzzy results
+		if (this.originalIndexResults.size == 0 && fuzzy) {
+			let fuzzyResults = new Set((this.fuzzy.get(cleanString(str)) || []).slice(0, this.limit).map(r => this.reverseMapping[r[1]]).reduce((acc, val) => acc.concat(val), []).slice(0, this.limit));
+			for (let idx of Array.from(fuzzyResults)) {
+				if (!s.has(this.list[idx].originalIndex)) {
+					results.push({match: this.list[idx], listMatch: this.list[idx], lastQry: str, priority: 3, entrySetIndex: this.entrySets.length})
+					s.add(this.list[idx].originalIndex);
+				}
+			}
+		}
+
+		if(debug) console.timeEnd(str + " filter")
+
+		return results
+	}
+}
+
+const specialMatchesStr = (qry, strToMatch) => {
+	let curIdx = 0;
+
+	for (let i = 0; strToMatch && i < strToMatch.length && curIdx < qry.length && strToMatch[i] <= qry[curIdx]; i++) {
+		if (strToMatch[i] == qry[curIdx]) {
+			curIdx++;
+		}
+	}
+
+	return curIdx == qry.length;
+}
+
+
+const range = (data, lastQry) => {
+	let firstIndex = first(data.list, f => f >= lastQry, data.start, data.end);
+
+	if (firstIndex < data.end && data.list[firstIndex].str.startsWith(lastQry)) {
+		return {
+			first: firstIndex,
+			last: first(data.list, f => !f.startsWith(lastQry), firstIndex, data.end) - 1,
+			list: data.list
+		}
+	}
+
+	return {
+		first: data.end,
+		last: data.end - 1, // on purpose
+		list: data.list
+	}
+}
+
+const first = (array, pred, lo, hi) => {
+	while (lo != hi) {
+		const mi = lo + ((hi - lo) >> 1);
+		if (pred(array[mi].str)) {
+			hi = mi;
+		} else {
+			lo = mi + 1;
+		}
+	}
+	return hi;
+}
+
+class HightLightManager {
+    constructor (awesomeplete) {
+	    $(awesomeplete.input).on("awesomplete-highlight", function(event) {
+            awesomeplete.input.value = event.originalEvent.text.value;
+		})
+	}
+}
+
+if (!isNode) {
+
+	var oldProto = AmqAwesomeplete.prototype;
+	var oldEvaluate = AmqAwesomeplete.prototype.evaluate;
+
+	AmqAwesomeplete = function(input, o) {
+		oldProto.constructor.apply(this, Array.from(arguments))
+		this.isAnimeAutocomplete = this._list.indexOf("Serial Experiments Lain") != -1;
+		if (this.isAnimeAutocomplete) this.preprocess();
+	}
+
+	AmqAwesomeplete.prototype = oldProto;
+
+	AmqAwesomeplete.prototype.preprocess = function () {
+		this.filterManager = new FilterManager(this._list.sort(this.sort), this.maxItems);
+		this.highLightManager = new HightLightManager(this);
+
+        if (options.submitOnSelect) {
+            $(this.input).on("awesomplete-selectcomplete", (e) => {
+                quiz.answerInput.typingInput.submitAnswer();
             });
         }
-    });
-
-    const oldSendSkipVote = quiz.skipController.sendSkipVote;
-    quiz.skipController.sendSkipVote = function () {
-        if (quiz.cslActive) {
-            if (quiz.soloMode) {
-                clearTimeout(this.autoVoteTimeout);
-            }
-            else if (!skipping) {
-                cslMessage("§CSL14");
-            }
-        }
-        else {
-            oldSendSkipVote.apply(this, arguments);
-        }
-    }
-
-    const oldLeave = quiz.leave;
-    quiz.leave = function () {
-        reset();
-        oldLeave.apply(this, arguments);
-    }
-
-    const oldStartReturnLobbyVote = quiz.startReturnLobbyVote;
-    quiz.startReturnLobbyVote = function () {
-        if (quiz.cslActive && quiz.inQuiz) {
-            if (quiz.soloMode) {
-                quizOver();
-            }
-            else if (quiz.isHost) {
-                cslMessage("§CSL10");
-            }
-        }
-        else {
-            oldStartReturnLobbyVote.apply(this, arguments);
-        }
-    }
-
-    const oldSubmitAnswer = QuizTypeAnswerInputController.prototype.submitAnswer;
-    QuizTypeAnswerInputController.prototype.submitAnswer = function (answer) {
-        if (quiz.cslActive) {
-            currentAnswers[quiz.ownGamePlayerId] = answer;
-            currentAnswerTime = Number(((Date.now() - songStartTime) / 1000).toFixed(3));
-            this.skipController.highlight = true;
-            fireListener("quiz answer", {
-                "answer": answer,
-                "success": true
-            });
-            if (quiz.soloMode) {
-                const time = Number(((Date.now() - songStartTime) / 1000).toFixed(3));
-                fireListener("player answered", [{ answerTime: time, gamePlayerIds: [0] }]);
-                if (options.autoVoteSkipGuess) {
-                    this.skipController.voteSkip();
-                    fireListener("quiz overlay message", "Skipping to Answers");
+		if ((options.allowRightLeftArrows || options.allowTab || this.index == -2)) {
+			$(this.input).on("keydown", (e) => {
+                if (this.index== -1){
+                    if(e.keyCode == 9) e.preventDefault();
                 }
-            }
-            else {
-                cslMessage("§CSL13");
-                if (options.autoVoteSkipGuess) {
-                    this.skipController.voteSkip();
+			    else if ((e.keyCode == 37 || (e.keyCode == 39 && this.index <= -2)) && options.allowRightLeftArrows){
+                    this.previous();
                 }
-            }
-        }
-        else {
-            oldSubmitAnswer.apply(this, arguments);
-        }
-    }
-
-    const oldVideoReady = quiz.videoReady;
-    quiz.videoReady = function () {
-        if (quiz.cslActive && this.inQuiz) {
-            nextVideoReady = true;
-        }
-        else {
-            oldVideoReady.apply(this, arguments);
-        }
-    }
-
-    const oldHandleError = MoeVideoPlayer.prototype.handleError;
-    MoeVideoPlayer.prototype.handleError = function () {
-        if (quiz.cslActive) {
-            gameChat.systemMessage(`CSL Error: couldn't load song ${currentSong + 1}`);
-            nextVideoReady = true;
-        }
-        else {
-            oldHandleError.apply(this, arguments);
-        }
-    }
-
-    $("#lobbyPage .topMenuBar").append(`<div id="lnCustomSongListButton" class="clickAble topMenuButton topMenuMediumButton"><h3>CSL</h3></div>`);
-    $("#lnCustomSongListButton").on("click", openSettingsModal);
-
-    // build settings modal
-    $("#gameContainer").append($(/*html*/`
-        <div class="modal fade tab-modal" id="cslgSettingsModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document" style="width: 680px">
-                <div class="modal-content">
-                    <div class="modal-header" style="padding: 3px 0 0 0">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                        <h4 class="modal-title">Custom Song List Game</h4>
-                        <div class="tabContainer">
-                            <div id="cslgSongListTab" class="tab clickAble selected">
-                                <h5>Song List</h5>
-                            </div>
-                            <div id="cslgQuizSettingsTab" class="tab clickAble">
-                                <h5>Settings</h5>
-                            </div>
-                            <div id="cslgMergeTab" class="tab clickAble">
-                                <h5>Merge</h5>
-                            </div>
-                            <div id="cslgAnswerTab" class="tab clickAble">
-                                <h5>Answers</h5>
-                            </div>
-                            <div id="cslgHotkeyTab" class="tab clickAble">
-                                <h5>Hotkey</h5>
-                            </div>
-                            <div id="cslgListImportTab" class="tab clickAble">
-                                <h5>List Import</h5>
-                            </div>
-                            <div id="cslgInfoTab" class="tab clickAble" style="width: 45px; margin-right: -10px; padding-right: 8px; float: right;">
-                                <h5><i class="fa fa-info-circle" aria-hidden="true"></i></h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-body" style="overflow-y: auto; max-height: calc(100vh - 150px);">
-                        <div id="cslgSongListContainer" class="tabSection">
-                            <div id="cslgSongListTopRow" style="margin: 2px 0 3px 0;">
-                                <span style="font-size: 20px; font-weight: bold;">Mode</span>
-                                <select id="cslgSongListModeSelect" style="color: black; margin-left: 2px; padding: 3px 0;">
-                                    <option>Anisongdb</option>
-                                    <option>Load File</option>
-                                    <option>Previous Game</option>
-                                    <option>Filter List</option>
-                                </select>
-                                <i id="cslgMergeAllButton" class="fa fa-plus clickAble" aria-hidden="true" style="font-size: 20px; margin-left: 100px;"></i>
-                                <i id="cslgClearSongListButton" class="fa fa-trash clickAble" aria-hidden="true" style="font-size: 20px; margin-left: 10px;"></i>
-                                <i id="cslgTransferSongListButton" class="fa fa-exchange clickAble" aria-hidden="true" style="font-size: 20px; margin-left: 10px;"></i>
-                                <i id="cslgTableModeButton" class="fa fa-table clickAble" aria-hidden="true" style="font-size: 20px; margin-left: 10px;"></i>
-                                <span id="cslgSongListCount" style="font-size: 20px; font-weight: bold; margin-left: 20px;">Songs: 0</span>
-                                <span id="cslgMergedSongListCount" style="font-size: 20px; font-weight: bold; margin-left: 20px;">Merged: 0</span>
-                            </div>
-                            <div id="cslgAnisongdbSearchRow">
-                                <div>
-                                    <select id="cslgAnisongdbModeSelect" style="color: black; padding: 3px 0;">
-                                        <option>Anime</option>
-                                        <option>Artist</option>
-                                        <option>Song</option>
-                                        <option>Composer</option>
-                                        <option>Season</option>
-                                        <option>Ann Id</option>
-                                        <option>Mal Id</option>
-                                        <option>Ann Song Id</option>
-                                        <option>Amq Song Id</option>
-                                    </select>
-                                    <input id="cslgAnisongdbQueryInput" type="text" style="color: black; width: 310px;">
-                                    <button id="cslgAnisongdbSearchButtonGo" style="color: black">Go</button>
-                                    <button id="cslgAnisongdbFilterDropdownButton" style="color: black; margin-left: 7px;">Filters <i class="fa fa-caret-down" aria-hidden="true"></i></button>
-                                </div>
-                                <div id="cslgAnisongdbFilterOptions" style="display: none; margin-top: 7px;">
-                                    <div>
-                                        <label class="clickAble">Partial Match<input id="cslgAnisongdbPartialCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 20px">OP<input id="cslgAnisongdbOPCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 7px">ED<input id="cslgAnisongdbEDCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 7px">IN<input id="cslgAnisongdbINCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 20px">Ignore Duplicates<input id="cslgAnisongdbIgnoreDuplicatesCheckbox" type="checkbox"></label>
-                                        <label class="clickAble" style="margin-left: 20px">Arrangement<input id="cslgAnisongdbArrangementCheckbox" type="checkbox" checked></label>
-                                    </div>
-                                    <div>
-                                        <label class="clickAble">Normal Broadcasts<input id="cslgAnisongdbNormalCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 10px">Dubs<input id="cslgAnisongdbDubCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 10px">Rebroadcasts<input id="cslgAnisongdbRebroadcastCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 90px">Max Other People<input id="cslgAnisongdbMaxOtherPeopleInput" type="text" style="color: black; font-weight: normal; width: 40px; margin-left: 3px;"></label>
-                                    </div>
-                                    <div>
-                                        <label class="clickAble">Standard<input id="cslgAnisongdbStandardCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 10px">Character<input id="cslgAnisongdbCharacterCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 10px">Chanting<input id="cslgAnisongdbChantingCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 10px">Instrumental<input id="cslgAnisongdbInstrumentalCheckbox" type="checkbox" checked></label>
-                                        <label class="clickAble" style="margin-left: 38px">Min Group Members<input id="cslgAnisongdbMinGroupMembersInput" type="text" style="color: black; font-weight: normal; width: 40px; margin-left: 3px;"></label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="cslgFileUploadRow">
-                                <label style="vertical-align: -4px"><input id="cslgFileUpload" type="file" accept=".json" style="width: 600px"></label>
-                            </div>
-                            <div id="cslgPreviousGameRow">
-                                <select id="cslgPreviousGameSelect" style="color: black; padding: 3px 0;"></select>
-                                <button id="cslgPreviousGameButtonGo" style="color: black">Go</button>
-                            </div>
-                            <div id="cslgFilterListRow">
-                                <div>
-                                    <select id="cslgFilterModeSelect" style="color: black; padding: 3px 0;">
-                                        <option>Keep</option>
-                                        <option>Remove</option>
-                                    </select>
-                                    <select id="cslgFilterKeySelect" style="color: black; padding: 3px 0;">
-                                        <option>Anime</option>
-                                        <option>Artist</option>
-                                        <option>Song Name</option>
-                                        <option>Song Type</option>
-                                        <option>Anime Type</option>
-                                        <option>Difficulty</option>
-                                        <option>Vintage</option>
-                                        <option>Rebroadcast</option>
-                                        <option>Dub</option>
-                                        <option>Correct</option>
-                                        <option>Incorrect</option>
-                                    </select>
-                                    <input id="cslgFilterListInput" type="text" style="color: black; width: 250px;">
-                                    <button id="cslgFilterListButtonGo" style="color: black">Go</button>
-                                    <label class="clickAble" style="margin-left: 10px">Case<input id="cslgFilterListCaseCheckbox" type="checkbox"></label>
-                                </div>
-                            </div>
-                            <div style="height: 400px; margin: 5px 0; overflow-y: scroll;">
-                                <table id="cslgSongListTable" class="styledTable">
-                                    <thead>
-                                        <tr>
-                                            <th class="number">#</th>
-                                            <th class="song">Song</th>
-                                            <th class="artist">Artist</th>
-                                            <th class="difficulty">Dif</th>
-                                            <th class="action"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                                <div id="cslgSongListWarning"></div>
-                            </div>
-                        </div>
-                        <div id="cslgQuizSettingsContainer" class="tabSection" style="margin-top: 10px">
-                            <div>
-                                <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 0;">Songs:</span><input id="cslgSettingsSongs" type="text" style="width: 40px">
-                                <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 40px;">Guess Time:</span><input id="cslgSettingsGuessTime" type="text" style="width: 40px">
-                                <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 40px;">Extra Time:</span><input id="cslgSettingsExtraGuessTime" type="text" style="width: 40px">
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Song Types:</span>
-                                <label class="clickAble">OP<input id="cslgSettingsOPCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">ED<input id="cslgSettingsEDCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">IN<input id="cslgSettingsINCheckbox" type="checkbox" checked></label>
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Anime Types:</span>
-                                <label class="clickAble">TV<input id="cslgSettingsTVCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">Movie<input id="cslgSettingsMovieCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">OVA<input id="cslgSettingsOVACheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">ONA<input id="cslgSettingsONACheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">Special<input id="cslgSettingsSpecialCheckbox" type="checkbox" checked></label>
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Broadcast Types:</span>
-                                <label class="clickAble">Dub<input id="cslgSettingsDubCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">Rebroadcast<input id="cslgSettingsRebroadcastCheckbox" type="checkbox" checked></label>
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Guess:</span>
-                                <label class="clickAble">Correct<input id="cslgSettingsCorrectGuessCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">Wrong<input id="cslgSettingsIncorrectGuessCheckbox" type="checkbox" checked></label>
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Gameplay Options:</span>
-                                <label class="clickAble">Full Song Range<input id="cslgSettingsFullSongRangeCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 20px">Fast Skip<input id="cslgSettingsFastSkipCheckbox" type="checkbox" checked></label>
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 0;">Sample:</span>
-                                <input id="cslgSettingsStartPoint" type="text" style="width: 70px">
-                                <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 40px;">Difficulty:</span>
-                                <input id="cslgSettingsDifficulty" type="text" style="width: 70px">
-                            </div>
-                            <div style="margin-top: 5px">
-                                <span style="font-size: 18px; font-weight: bold; margin-right: 10px;">Song Order:</span>
-                                <select id="cslgSongOrderSelect" style="color: black; padding: 3px 0;">
-                                    <option value="random">random</option>
-                                    <option value="ascending">ascending</option>
-                                    <option value="descending">descending</option>
-                                </select>
-                                <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 10px;">Override URL:</span>
-                                <select id="cslgHostOverrideSelect" style="color: black; padding: 3px 0;">
-                                    <option value="0">default</option>
-                                    <option value="1">EU (eudist)</option>
-                                    <option value="2">NA1 (nawdist)</option>
-                                    <option value="3">NA2 (naedist)</option>
-
-                                </select>
-                            </div>
-                            <p style="margin-top: 20px">Normal room settings are ignored. Only these settings will apply.</p>
-                        </div>
-                        <div id="cslgAnswerContainer" class="tabSection">
-                            <span style="font-size: 16px; font-weight: bold;">Old:</span>
-                            <input id="cslgOldAnswerInput" type="text" style="width: 240px; color: black; margin: 10px 0;">
-                            <span style="font-size: 16px; font-weight: bold; margin-left: 10px;">New:</span>
-                            <input id="cslgNewAnswerInput" type="text" style="width: 240px; color: black; margin: 10px 0;">
-                            <button id="cslgAnswerButtonAdd" style="color: black; margin-left: 10px;">Add</button>
-                            <div id="cslgAnswerText" style="font-size: 16px; font-weight: bold;">No list loaded</div>
-                            <div style="height: 300px; margin: 5px 0; overflow-y: scroll;">
-                                <table id="cslgAnswerTable" class="styledTable">
-                                    <thead>
-                                        <tr>
-                                            <th class="oldName">Old</th>
-                                            <th class="newName">New</th>
-                                            <th class="edit"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p style="margin-top: 5px">Use this window to replace invalid answers from your imported song list with valid answers from AMQ's autocomplete.</p>
-                        </div>
-                        <div id="cslgMergeContainer" class="tabSection">
-                            <h4 style="text-align: center; margin-bottom: 10px;">Merge multiple song lists into 1 JSON file</h4>
-                            <div style="width: 400px; display: inline-block;">
-                                <div id="cslgMergeCurrentCount" style="font-size: 16px; font-weight: bold;">Current song list: 0 songs</div>
-                                <div id="cslgMergeTotalCount" style="font-size: 16px; font-weight: bold;">Merged song list: 0 songs</div>
-                            </div>
-                            <div style="display: inline-block; vertical-align: 13px">
-                                <button id="cslgMergeButton" class="btn btn-default">Merge</button>
-                                <button id="cslgMergeClearButton" class="btn btn-warning">Clear</button>
-                                <button id="cslgMergeDownloadButton" class="btn btn-success">Download</button>
-                            </div>
-                            <div style="height: 400px; margin: 5px 0; overflow-y: scroll;">
-                                <table id="cslgMergedSongListTable" class="styledTable">
-                                    <thead>
-                                        <tr>
-                                            <th class="number">#</th>
-                                            <th class="anime">Anime</th>
-                                            <th class="songType">Type</th>
-                                            <th class="action"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p style="margin-top: 30px; display: none;">1. Load some songs into the table in the song list tab<br>2. Come back to this tab<br>3. Click "merge" to add everything from that list to a new combined list<br>4. Repeat steps 1-3 as many times as you want<br>5. Click "download" to download the new json file<br>6. Upload the file in the song list tab and play</p>
-                        </div>
-                        <div id="cslgHotkeyContainer" class="tabSection">
-                            <table id="cslgHotkeyTable">
-                                <thead>
-                                    <tr>
-                                        <th>Action</th>
-                                        <th>Keybind</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div id="cslgListImportContainer" class="tabSection" style="text-align: center; margin: 10px 0;">
-                            <h4 style="">Import list from username</h4>
-                            <div>
-                                <select id="cslgListImportSelect" style="padding: 3px 0; color: black;">
-                                    <option>myanimelist</option>
-                                    <option>anilist</option>
-                                </select>
-                                <input id="cslgListImportUsernameInput" type="text" placeholder="username" style="width: 200px; color: black;">
-                                <button id="cslgListImportStartButton" style="color: black;">Go</button>
-                            </div>
-                            <div style="margin-top: 5px">
-                                <label class="clickAble">Watching<input id="cslgListImportWatchingCheckbox" type="checkbox"></label>
-                                <label class="clickAble" style="margin-left: 10px">Completed<input id="cslgListImportCompletedCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">On Hold<input id="cslgListImportHoldCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">Dropped<input id="cslgListImportDroppedCheckbox" type="checkbox"></label>
-                                <label class="clickAble" style="margin-left: 10px">Planning<input id="cslgListImportPlanningCheckbox" type="checkbox"></label>
-                            </div>
-                            <h4 id="cslgListImportText" style="margin-top: 10px;"></h4>
-                            <div id="cslgListImportActionContainer" style="display: none;">
-                                <button id="cslgListImportMoveButton" style="color: black;">Move To Song List</button>
-                                <button id="cslgListImportDownloadButton" style="color: black;">Download</button>
-                            </div>
-                        </div>
-                        <div id="cslgInfoContainer" class="tabSection" style="text-align: center; margin: 10px 0;">
-                            <h4>Script Info</h4>
-                            <div>Created by: kempanator</div>
-                            <div>Version: ${GM_info.script.version}</div>
-                            <div><a href="https://github.com/kempanator/amq-scripts/blob/main/amqCustomSongListGame.user.js" target="_blank">Github</a> <a href="https://github.com/kempanator/amq-scripts/raw/main/amqCustomSongListGame.user.js" target="_blank">Install</a></div>
-                            <h4 style="margin-top: 20px;">Custom CSS</h4>
-                            <div><span style="font-size: 15px; margin-right: 17px;">#lnCustomSongListButton </span>right: <input id="cslgCSLButtonCSSInput" type="text" style="width: 150px; color: black;"></div>
-                            <div style="margin: 10px 0"><button id="cslgResetCSSButton" style="color: black; margin-right: 10px;">Reset</button><button id="cslgApplyCSSButton" style="color: black;">Save</button></div>
-                            <h4 style="margin-top: 20px;">Prompt All Players</h4>
-                            <div style="margin: 10px 0"><button id="cslgPromptAllAutocompleteButton" style="color: black; margin-right: 10px;">Autocomplete</button><button id="cslgPromptAllVersionButton" style="color: black;">Version</button></div>
-                            <div style="margin-top: 15px"><span style="font-size: 16px; margin-right: 10px; vertical-align: middle;">Show CSL Messages</span><div class="customCheckbox" style="vertical-align: middle"><input type="checkbox" id="cslgShowCSLMessagesCheckbox"><label for="cslgShowCSLMessagesCheckbox"><i class="fa fa-check" aria-hidden="true"></i></label></div></div>
-                            <div style="margin: 10px 0"><input id="cslgMalClientIdInput" type="text" placeholder="MAL Client ID" style="width: 300px; color: black;"></div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button id="cslgAutocompleteButton" class="btn btn-danger" style="float: left">Autocomplete</button>
-                        <button id="cslgExitButton" class="btn btn-default" data-dismiss="modal">Exit</button>
-                        <button id="cslgStartButton" class="btn btn-primary">Start</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `));
-
-    const tabs = ["cslgSongList", "cslgQuizSettings", "cslgAnswer", "cslgMerge", "cslgHotkey", "cslgListImport", "cslgInfo"];
-    for (const tab of tabs) {
-        $(`#${tab}Tab`).on("click", () => {
-            switchTab(tab);
-        });
-    }
-    switchTab("cslgSongList");
-
-    $("#cslgAnisongdbSearchButtonGo").on("click", () => {
-        anisongdbDataSearch();
-    });
-    $("#cslgAnisongdbQueryInput").on("keypress", (event) => {
-        if (event.key === "Enter") {
-            anisongdbDataSearch();
-        }
-    });
-    $("#cslgAnisongdbFilterDropdownButton").on("click", function () {
-        $(this).find("i").toggleClass("fa-caret-down fa-caret-up");
-        $("#cslgAnisongdbFilterOptions").slideToggle(150);
-    });
-    $("#cslgFileUpload").on("change", function () {
-        if (this.files.length) {
-            this.files[0].text().then((data) => {
-                try {
-                    handleData(JSON.parse(data));
-                    if (songList.length === 0) {
-                        messageDisplayer.displayMessage("0 song links found");
+                else if (e.keyCode == 40 && this.index <= -2){
+                    e.preventDefault();
+                    this.next();
+                    this.next();
+                    this.next();
+                }
+				else if (e.keyCode == 39 && options.allowRightLeftArrows) {this.next();}
+				else if (e.keyCode == 9 && options.allowTab) {
+					e.preventDefault();
+                    if(this.index <= -2){
+                        this.previous();
                     }
-                }
-                catch (error) {
-                    songList = [];
-                    $(this).val("");
-                    console.error(error);
-                    messageDisplayer.displayMessage("Upload Error");
-                }
-                attachedFile = this.files[0].name;
-                if(attachedFile == "_practice.json"){
-                    songListTableView = 1;
-                    songOrderType = "random";
-                }
-                if(attachedFile == "_quiz.json"){
-                    songListTableView = 2;
-                    songOrderType = "ascending";
-                }
-                if(attachedFile == "_split.json"){
-                    songListTableView = 2;
-                    songOrderType = "random";
-                }
-                setSongListTableSort();
-                createSongListTable(true);
-                createAnswerTable();
-            });
-        }
-    });
-    $("#cslgPreviousGameButtonGo").on("click", () => {
-        const id = $("#cslgPreviousGameSelect").val();
-        const found = Object.values(songHistoryWindow.tabs[2].gameMap).find(game => game.quizId === id);
-        if (found) {
-            handleData(found.songTable.rows);
-            setSongListTableSort();
-            createSongListTable(true);
-            createAnswerTable();
-        }
-    });
-    $("#cslgFilterListButtonGo").on("click", () => {
-        filterSongList();
-    });
-    $("#cslgFilterListInput").on("keypress", (event) => {
-        if (event.key === "Enter") {
-            filterSongList();
-        }
-    });
-    $("#cslgMergeAllButton").on("click", () => {
-        const set = new Set(mergedSongList.concat(songList).map(JSON.stringify));
-        mergedSongList = Array.from(set, JSON.parse);
-        createMergedSongListTable();
-    }).popover({
-        content: "Add all to merged",
-        trigger: "hover",
-        placement: "bottom"
-    });
-    $("#cslgClearSongListButton").on("click", () => {
-        songList = [];
-        createSongListTable(true);
-    }).popover({
-        content: "Clear song list",
-        trigger: "hover",
-        placement: "bottom"
-    });
-    $("#cslgTransferSongListButton").on("click", () => {
-        songList = Array.from(mergedSongList);
-        createSongListTable(true);
-    }).popover({
-        content: "Transfer from merged",
-        trigger: "hover",
-        placement: "bottom"
-    });
-    $("#cslgTableModeButton").on("click", () => {
-        songListTableView = (songListTableView + 1) % 3;
-        createSongListTable(true);
-    }).popover({
-        content: "Table mode",
-        trigger: "hover",
-        placement: "bottom"
-    });
-    $("#cslgSongOrderSelect").on("change", function () {
-        songOrderType = this.value;
-    });
-    $("#cslgHostOverrideSelect").on("change", function () {
-        fileHostOverride = parseInt(this.value);
-    });
-    $("#cslgMergeButton").on("click", () => {
-        const set = new Set(mergedSongList.concat(songList).map(JSON.stringify));
-        mergedSongList = Array.from(set, JSON.parse);
-        createMergedSongListTable();
-    });
-    $("#cslgMergeClearButton").on("click", () => {
-        mergedSongList = [];
-        createMergedSongListTable();
-    });
-    $("#cslgMergeDownloadButton").on("click", () => {
-        if (mergedSongList.length) {
-            downloadListJson(mergedSongList, "merged.json");
-        }
-        else {
-            messageDisplayer.displayMessage("No songs", "Add some songs to the merged song list");
-        }
-    });
-    $("#cslgAutocompleteButton").on("click", () => {
-        if (lobby.soloMode) {
-            $("#cslgSettingsModal").modal("hide");
-            socket.sendCommand({ type: "lobby", command: "start game" });
-            const autocompleteListener = new Listener("get all song names", () => {
-                autocompleteListener.unbindListener();
-                viewChanger.changeView("main");
-                setTimeout(() => {
-                    hostModal.displayHostSolo();
-                }, 200);
-                setTimeout(() => {
-                    const returnListener = new Listener("Host Game", () => {
-                        returnListener.unbindListener();
-                        if (songList.length) createAnswerTable();
-                        setTimeout(() => { openSettingsModal() }, 10);
-                    });
-                    returnListener.bindListener();
-                    roomBrowser.host();
-                }, 400);
-            });
-            autocompleteListener.bindListener();
-        }
-        else {
-            messageDisplayer.displayMessage("Autocomplete", "For multiplayer, just start the quiz normally and immediately lobby");
-        }
-    });
-    $("#cslgListImportUsernameInput").on("keypress", (event) => {
-        if (event.key === "Enter") {
-            startImport();
-        }
-    });
-    $("#cslgListImportStartButton").on("click", () => {
-        startImport();
-    });
-    $("#cslgListImportMoveButton").on("click", () => {
-        if (!importedSongList.length) return;
-        handleData(importedSongList);
-        setSongListTableSort();
-        createSongListTable(true);
-        createAnswerTable();
-    });
-    $("#cslgListImportDownloadButton").on("click", () => {
-        if (!importedSongList.length) return;
-        const listType = $("#cslgListImportSelect").val();
-        const username = $("#cslgListImportUsernameInput").val().trim();
-        const date = new Date();
-        const year = String(date.getFullYear());
-        const month = String(date.getMonth() + 1).padStart(2, 0);
-        const day = String(date.getDate()).padStart(2, 0);
-        const fileName = `${username} ${listType} ${year}-${month}-${day} song list.json`;
-        downloadListJson(importedSongList, fileName);
-    });
-    $("#cslgStartButton").on("click", () => {
-        validateStart();
-    });
-    $("#cslgSongListTable")
-        .on("click", "th", function () {
-            const sort = $(this).data("sort");
-            if (!sort) return;
-            setSongListTableSort(sort);
-            createSongListTable();
-        })
-        .on("click", "i.fa-plus", function () {
-            const index = $(this).closest("tr").index();
-            mergedSongList.push(songList[index]);
-            mergedSongList = Array.from(new Set(mergedSongList.map(JSON.stringify))).map(JSON.parse);
-            createMergedSongListTable();
-        })
-        .on("click", "i.fa-trash", function () {
-            const index = $(this).closest("tr").index();
-            songList.splice(index, 1);
-            createSongListTable(true);
-            createAnswerTable();
-        })
-        .on("mouseenter", "i.fa-plus, i.fa-trash", function () {
-            $(this).closest("tr").addClass("selected");
-        })
-        .on("mouseleave", "i.fa-plus, i.fa-trash", function () {
-            $(this).closest("tr").removeClass("selected");
-        });
-    $("#cslgAnswerButtonAdd").on("click", function () {
-        const oldName = $("#cslgOldAnswerInput").val().trim();
-        const newName = $("#cslgNewAnswerInput").val().trim();
-        if (oldName) {
-            if (newName) replacedAnswers[oldName] = newName;
-            else delete replacedAnswers[oldName];
-            saveSettings();
-            createAnswerTable();
-        }
-        //console.log(replacedAnswers);
-    });
-    $("#cslgAnswerTable").on("click", "i.fa-pencil", function () {
-        const $row = $(this).closest("tr");
-        const oldName = $row.find("td.oldName").text();
-        const newName = $row.find("td.newName").text();
-        $("#cslgOldAnswerInput").val(oldName);
-        $("#cslgNewAnswerInput").val(newName);
-    });
-    $("#cslgMergedSongListTable")
-        .on("click", "i.fa-chevron-up", function () {
-            const index = $(this).closest("tr").index();
-            if (index > 0) {
-                [mergedSongList[index], mergedSongList[index - 1]] = [mergedSongList[index - 1], mergedSongList[index]];
-                createMergedSongListTable();
-            }
-        })
-        .on("click", "i.fa-chevron-down", function () {
-            const index = $(this).closest("tr").index();
-            if (index < mergedSongList.length - 1) {
-                [mergedSongList[index], mergedSongList[index + 1]] = [mergedSongList[index + 1], mergedSongList[index]];
-                createMergedSongListTable();
-            }
-        })
-        .on("click", "i.fa-trash", function () {
-            const index = $(this).closest("tr").index();
-            mergedSongList.splice(index, 1);
-            createMergedSongListTable();
-        })
-        .on("mouseenter", "i.fa-chevron-up, i.fa-chevron-down, i.fa-trash", function () {
-            $(this).closest("tr").addClass("selected");
-        })
-        .on("mouseleave", "i.fa-chevron-up, i.fa-chevron-down, i.fa-trash", function () {
-            $(this).closest("tr").removeClass("selected");
-        });
-    $("#cslgSongListModeSelect").val("Load File").on("change", function () {
-        const val = this.value;
-        const idMap = {
-            "Anisongdb": "#cslgAnisongdbSearchRow",
-            "Load File": "#cslgFileUploadRow",
-            "Previous Game": "#cslgPreviousGameRow",
-            "Filter List": "#cslgFilterListRow"
-        }
-        $(Object.values(idMap).join(",")).hide();
-        $(idMap[val]).show();
-        if (val === "Load File") $("#cslgAnisongdbQueryInput").val("");
-        if (val === "Previous Game") loadPreviousGameOptions();
-    });
-    $("#cslgAnisongdbModeSelect").val("Artist");
-    $("#cslgAnisongdbMaxOtherPeopleInput").val("99");
-    $("#cslgAnisongdbMinGroupMembersInput").val("0");
-    $("#cslgSettingsSongs").val("999");
-    $("#cslgSettingsGuessTime").val("15");
-    $("#cslgSettingsExtraGuessTime").val("7");
-    $("#cslgSettingsStartPoint").val("0-100");
-    $("#cslgSettingsDifficulty").val("0-100");
-    $("#cslgAnisongdbSearchRow").hide();
-    $("#cslgPreviousGameRow").hide();
-    $("#cslgFilterListRow").hide();
-    $("#cslgCSLButtonCSSInput").val(CSLButtonCSS);
-    $("#cslgResetCSSButton").on("click", () => {
-        CSLButtonCSS = "calc(25% - 250px)";
-        $("#cslgCSLButtonCSSInput").val(CSLButtonCSS);
-    });
-    $("#cslgApplyCSSButton").on("click", () => {
-        const val = $("#cslgCSLButtonCSSInput").val();
-        if (val) {
-            CSLButtonCSS = val;
-            saveSettings();
-            applyStyles();
-        }
-        else {
-            messageDisplayer.displayMessage("Error");
-        }
-    });
-    $("#cslgShowCSLMessagesCheckbox").prop("checked", showCSLMessages).on("click", () => {
-        showCSLMessages = !showCSLMessages;
-    });
-    $("#cslgPromptAllAutocompleteButton").on("click", () => {
-        cslMessage("§CSL21");
-    });
-    $("#cslgPromptAllVersionButton").on("click", () => {
-        cslMessage("§CSL22");
-    });
-    $("#cslgMalClientIdInput").val(malClientId).on("change", function () {
-        malClientId = this.value;
-        saveSettings();
-    });
-
-    createHotkeyTable([
-        { action: "cslgWindow", title: "Open This Window" },
-        { action: "start", title: "Start CSL" },
-        { action: "stop", title: "Stop CSL" },
-        { action: "mergeAll", title: "Add All To Merged" },
-        { action: "clearSongList", title: "Clear Song List" },
-        { action: "transferMerged", title: "Transfer From Merged" },
-        { action: "clearMerged", title: "Clear Merged" },
-        { action: "downloadMerged", title: "Download Merged" },
-        { action: "tableMode", title: "Change Table Mode" }
-    ]);
-
-    const hotkeyActions = {
-        cslgWindow: () => {
-            if ($("#cslgSettingsModal").is(":visible")) {
-                $("#cslgSettingsModal").modal("hide");
-            }
-            else {
-                openSettingsModal();
-            }
-        },
-        start: () => {
-            validateStart();
-        },
-        stop: () => {
-            quizOver();
-        },
-        mergeAll: () => {
-            const set = new Set(mergedSongList.concat(songList).map(JSON.stringify));
-            mergedSongList = Array.from(set, JSON.parse);
-            createMergedSongListTable();
-        },
-        clearSongList: () => {
-            if (quiz.inQuiz) return;
-            songList = [];
-            createSongListTable(true);
-        },
-        transferMerged: () => {
-            if (quiz.inQuiz) return;
-            songList = Array.from(mergedSongList);
-            createSongListTable(true);
-        },
-        clearMerged: () => {
-            mergedSongList = [];
-            createMergedSongListTable();
-        },
-        downloadMerged: () => {
-            if (mergedSongList.length) {
-                downloadListJson(mergedSongList, "merged.json");
-            }
-            else {
-                messageDisplayer.displayMessage("No songs", "Add some songs to the merged song list");
-            }
-        },
-        tableMode: () => {
-            songListTableView = (songListTableView + 1) % 3;
-            createSongListTable(true);
-        }
-    };
-
-    document.addEventListener("keydown", (event) => {
-        const key = event.key.toUpperCase();
-        const ctrl = event.ctrlKey;
-        const alt = event.altKey;
-        const shift = event.shiftKey;
-        const match = (b) => {
-            if (!b.key) return false;
-            if (key !== b.key) return false;
-            if (ctrl !== b.ctrl) return false;
-            if (alt !== b.alt) return false;
-            if (shift !== b.shift) return false;
-            return true;
-        }
-        for (const [action, bind] of Object.entries(hotKeys)) {
-            if (match(bind)) {
-                event.preventDefault();
-                hotkeyActions[action]();
-            }
-        }
-        if (event.keyCode == '222' && shift && ctrl){
-            if (quiz.cslActive) {
-                if (quiz.soloMode) {
-                    if (quiz.pauseButton.pauseOn) {
-                        quiz.pauseButton.updateState(false);
-                        /*fireListener("quiz unpause triggered", {
-                            "playerName": selfName
-                        });*/
-                        /*fireListener("quiz unpause triggered", {
-                            "playerName": selfName,
-                            "doCountDown": true,
-                            "countDownLength": 3000
-                        });*/
+                    if (this.index == -1){}
+                    else if(e.shiftKey){
+                        this.previous();
                     }
-                    else {
-                        quiz.pauseButton.updateState(true);
-                        /*fireListener("quiz pause triggered", {
-                            "playerName": selfName
-                        });*/
+                    else{
+                        this.next();
                     }
-                }
-                else {
-                    if (quiz.pauseButton.pauseOn) {
-                        cslMessage("§CSL12");
-                    }
-                    else {
-                        cslMessage("§CSL11");
-                    }
-                }
-            }
-            else {
-                socket.sendCommand({
-                    type: "quiz",
-                    command: quiz.pauseButton.pauseOn ? "quiz unpause" : "quiz pause"
-                });
-            }
-        }
-    });
-
-    resultChunk = new Chunk();
-    songInfoChunk = new Chunk();
-    nextSongChunk = new Chunk();
-
-    applyStyles();
-    AMQ_addScriptData({
-        name: "Custom Song List Game",
-        author: "kempanator",
-        version: GM_info.script.version,
-        link: "https://github.com/kempanator/amq-scripts/raw/main/amqCustomSongListGame.user.js",
-        description: `
-            </ul><b>How to start a custom song list game:</b>
-                <li>create a solo lobby</li>
-                <li>click the CSL button in the top right</li>
-                <li>click the autocomplete button if it is red</li>
-                <li>create or upload a list in the song list tab</li>
-                <li>change settings in the settings tab</li>
-                <li>fix any invalid answers in the answer tab</li>
-                <li>click start to play the quiz</li>
-            </ul>
-        `
-    });
-}
-
-// validate all settings and attempt to start csl quiz
-function validateStart() {
-    if (!lobby.inLobby) return;
-    songOrder = {};
-    if (!lobby.isHost) {
-        return messageDisplayer.displayMessage("Unable to start", "Must be host");
-    }
-    if (lobby.numberOfPlayers !== lobby.numberOfPlayersReady) {
-        return messageDisplayer.displayMessage("Unable to start", "All players must be ready");
-    }
-    if (!songList || !songList.length) {
-        return messageDisplayer.displayMessage("Unable to start", "No songs");
-    }
-    if (animeListLower.size === 0) {
-        return messageDisplayer.displayMessage("Unable to start", "Autocomplete list empty");
-    }
-    const numSongs = parseInt($("#cslgSettingsSongs").val());
-    if (isNaN(numSongs) || numSongs < 1) {
-        return messageDisplayer.displayMessage("Unable to start", "Invalid number of songs");
-    }
-    guessTime = parseInt($("#cslgSettingsGuessTime").val());
-    if (isNaN(guessTime) || guessTime < 1) {
-        return messageDisplayer.displayMessage("Unable to start", "Invalid guess time");
-    }
-    extraGuessTime = parseInt($("#cslgSettingsExtraGuessTime").val());
-    if (isNaN(extraGuessTime) || extraGuessTime < 0) {
-        return messageDisplayer.displayMessage("Unable to start", "Invalid extra guess time");
-    }
-    const startPointText = $("#cslgSettingsStartPoint").val().trim();
-    if (/^[0-9]+$/.test(startPointText)) {
-        startPointRange = [parseInt(startPointText), parseInt(startPointText)];
-    }
-    else if (/^[0-9]+[\s-]+[0-9]+$/.test(startPointText)) {
-        const regex = /^([0-9]+)[\s-]+([0-9]+)$/.exec(startPointText);
-        startPointRange = [parseInt(regex[1]), parseInt(regex[2])];
-    }
-    else {
-        return messageDisplayer.displayMessage("Unable to start", "Song start sample must be a number or range 0-100");
-    }
-    if (startPointRange[0] < 0 || startPointRange[0] > 100 || startPointRange[1] < 0 || startPointRange[1] > 100 || startPointRange[0] > startPointRange[1]) {
-        return messageDisplayer.displayMessage("Unable to start", "Song start sample must be a number or range 0-100");
-    }
-    const difficultyText = $("#cslgSettingsDifficulty").val().trim();
-    if (/^[0-9]+[\s-]+[0-9]+$/.test(difficultyText)) {
-        const regex = /^([0-9]+)[\s-]+([0-9]+)$/.exec(difficultyText);
-        difficultyRange = [parseInt(regex[1]), parseInt(regex[2])];
-    }
-    else {
-        return messageDisplayer.displayMessage("Unable to start", "Difficulty must be a range 0-100");
-    }
-    if (difficultyRange[0] < 0 || difficultyRange[0] > 100 || difficultyRange[1] < 0 || difficultyRange[1] > 100 || difficultyRange[0] > difficultyRange[1]) {
-        return messageDisplayer.displayMessage("Unable to start", "Difficulty must be a range 0-100");
-    }
-    const ops = $("#cslgSettingsOPCheckbox").prop("checked");
-    const eds = $("#cslgSettingsEDCheckbox").prop("checked");
-    const ins = $("#cslgSettingsINCheckbox").prop("checked");
-    const tv = $("#cslgSettingsTVCheckbox").prop("checked");
-    const movie = $("#cslgSettingsMovieCheckbox").prop("checked");
-    const ova = $("#cslgSettingsOVACheckbox").prop("checked");
-    const ona = $("#cslgSettingsONACheckbox").prop("checked");
-    const special = $("#cslgSettingsSpecialCheckbox").prop("checked");
-    const dub = $("#cslgSettingsDubCheckbox").prop("checked");
-    const rebroadcast = $("#cslgSettingsRebroadcastCheckbox").prop("checked");
-    const correctGuesses = $("#cslgSettingsCorrectGuessCheckbox").prop("checked");
-    const incorrectGuesses = $("#cslgSettingsIncorrectGuessCheckbox").prop("checked");
-    const songKeys = Object.keys(songList)
-        .filter((key) => songTypeFilter(songList[key], ops, eds, ins))
-        .filter((key) => animeTypeFilter(songList[key], tv, movie, ova, ona, special))
-        .filter((key) => difficultyFilter(songList[key], difficultyRange[0], difficultyRange[1]))
-        .filter((key) => guessTypeFilter(songList[key], correctGuesses, incorrectGuesses))
-        .filter((key) => broadcastTypeFilter(songList[key], dub, rebroadcast));
-    if (songOrderType === "random") shuffleArray(songKeys);
-    else if (songOrderType === "descending") songKeys.reverse();
-    songKeys.slice(0, numSongs).forEach((key, i) => { songOrder[i + 1] = parseInt(key) });
-    totalSongs = Object.keys(songOrder).length;
-    if (totalSongs === 0) {
-        return messageDisplayer.displayMessage("Unable to start", "No songs");
-    }
-    fastSkip = $("#cslgSettingsFastSkipCheckbox").prop("checked");
-    fullSongRange = $("#cslgSettingsFullSongRangeCheckbox").prop("checked");
-    $("#cslgSettingsModal").modal("hide");
-    //console.log(songOrder);
-    if (lobby.soloMode) {
-        startQuiz();
-    }
-    else if (lobby.isHost) {
-        cslMessage("§CSL0" + btoa(`${showSelection}§${currentSong}§${totalSongs}§${guessTime}§${extraGuessTime}§${fastSkip ? "1" : "0"}`));
-    }
-}
-
-// start quiz and load first song
-function startQuiz() {
-    if (!lobby.inLobby) return;
-    if (lobby.soloMode) {
-        if (!songList.length) return;
-    }
-    else {
-        cslMultiplayer.host = lobby.hostName;
-    }
-    let song;
-    if (lobby.isHost) {
-        song = songList[songOrder[1]];
-    }
-    skipping = false;
-    quiz.cslActive = true;
-    const date = new Date().toISOString();
-    for (const player of Object.values(lobby.players)) {
-        score[player.gamePlayerId] = 0;
-    }
-    //console.log({showSelection, totalSongs, guessTime, extraGuessTime, fastSkip});
-    const data = {
-        "gameMode": lobby.soloMode ? "Solo" : "Multiplayer",
-        "showSelection": showSelection,
-        "groupSlotMap": createGroupSlotMap(Object.keys(lobby.players)),
-        "players": [],
-        "multipleChoice": false,
-        "quizDescription": {
-            "quizId": crypto.randomUUID(),
-            "startTime": date,
-            "roomName": hostModal.$roomName.val()
-        }
-    };
-    Object.values(lobby.players).forEach((player, i) => {
-        player.pose = 1;
-        player.score = 0;
-        player.position = Math.floor(i / 8) + 1;
-        player.positionSlot = i % 8;
-        player.teamCaptain = null;
-        player.teamNumber = null;
-        player.teamPlayer = null;
-        data.players.push(player);
-    });
-    //console.log(data.players);
-    fireListener("Game Starting", data);
-    currentStartPoint = getStartPoint(song.startPoint);
-    setTimeout(() => {
-        if (quiz.soloMode) {
-            fireListener("quiz next video info", {
-                "playLength": guessTime,
-                "playbackSpeed": 1,
-                "startPoint": currentStartPoint,
-                "fullSongRange": fullSongRange,
-                "videoInfo": {
-                    "id": null,
-                    "videoMap": {
-                        "catbox": createCatboxLinkObject(song.audio, song.video480, song.video720)
-                    },
-                    "videoVolumeMap": {
-                        "catbox": {
-                            "0": -20,
-                            "480": -20,
-                            "720": -20
-                        }
-                    }
-                }
-            });
-        }
-        else {
-            if (quiz.isHost) {
-                const message = `1§${currentStartPoint}§${song.audio || ""}§${song.video480 || ""}§${song.video720 || ""}`;
-                splitIntoChunks(btoa(encodeURIComponent(message)) + "$", 144).forEach((item, index) => {
-                    cslMessage("§CSL3" + base10to36(index % 36) + item);
-                });
-            }
-        }
-    }, 100);
-    if (quiz.soloMode) {
-        setTimeout(() => {
-            fireListener("quiz ready", {
-                "numberOfSongs": totalSongs
-            });
-        }, 200);
-        setTimeout(() => {
-            fireListener("quiz waiting buffering", {
-                "firstSong": true
-            });
-        }, 300);
-        setTimeout(() => {
-            previousSongFinished = true;
-            readySong(1);
-        }, 400);
-    }
-}
-
-// check if all conditions are met to go to next song
-function readySong(songNumber) {
-    if (songNumber === currentSong) return;
-    //console.log("Ready song: " + songNumber);
-    nextVideoReadyInterval = setInterval(() => {
-        //console.log({nextVideoReady, previousSongFinished});
-        if (nextVideoReady && !quiz.pauseButton.pauseOn && previousSongFinished) {
-            clearInterval(nextVideoReadyInterval);
-            nextVideoReady = false;
-            previousSongFinished = false;
-            if (quiz.soloMode) {
-                playSong(songNumber);
-            }
-            else if (quiz.isHost) {
-                cslMessage("§CSL4" + btoa(songNumber));
-            }
-        }
-    }, 100);
-}
-
-// play a song
-function playSong(songNumber) {
-    if (!quiz.cslActive || !quiz.inQuiz) return reset();
-    for (const key of Object.keys(quiz.players)) {
-        currentAnswers[key] = "";
-        cslMultiplayer.voteSkip[key] = false;
-    }
-    answerChunks = {};
-    resultChunk = new Chunk();
-    songInfoChunk = new Chunk();
-    cslMultiplayer.songInfo = {};
-    currentSong = songNumber;
-    cslState = 1;
-    skipping = false;
-    songStartTime = Date.now();
-    fireListener("play next song", {
-        "time": guessTime,
-        "extraGuessTime": extraGuessTime,
-        "songNumber": songNumber,
-        "progressBarState": { "length": guessTime, "played": 0 },
-        "onLastSong": songNumber === totalSongs,
-        "multipleChoiceNames": null
-    });
-    if (extraGuessTime) {
-        extraGuessTimer = setTimeout(() => {
-            fireListener("extra guess time");
-        }, guessTime * 1000);
-    }
-    endGuessTimer = setTimeout(() => {
-        if (quiz.soloMode) {
-            clearInterval(skipInterval);
-            clearTimeout(endGuessTimer);
-            clearTimeout(extraGuessTimer);
-            endGuessPhase(songNumber);
-        }
-        else if (quiz.isHost) {
-            cslMessage("§CSL15");
-        }
-    }, (guessTime + extraGuessTime) * 1000);
-    if (quiz.soloMode) {
-        skipInterval = setInterval(() => {
-            if (quiz.skipController._toggled) {
-                fireListener("quiz overlay message", "Skipping to Answers");
-                clearInterval(skipInterval);
-                clearTimeout(endGuessTimer);
-                clearTimeout(extraGuessTimer);
-                setTimeout(() => {
-                    endGuessPhase(songNumber);
-                }, fastSkip ? 1 : 3000);
-            }
-        }, 100);
-    }
-    setTimeout(() => {
-        if (songNumber < totalSongs) {
-            if (quiz.soloMode) {
-                readySong(songNumber + 1);
-                const nextSong = songList[songOrder[songNumber + 1]];
-                nextStartPoint = getStartPoint(nextSong.startPoint);
-                fireListener("quiz next video info", {
-                    "playLength": guessTime,
-                    "playbackSpeed": 1,
-                    "startPoint": nextStartPoint,
-                    "videoInfo": {
-                        "id": null,
-                        "videoMap": {
-                            "catbox": createCatboxLinkObject(nextSong.audio, nextSong.video480, nextSong.video720)
-                        },
-                        "videoVolumeMap": {
-                            "catbox": {
-                                "0": -20,
-                                "480": -20,
-                                "720": -20
-                            }
-                        }
-                    }
-                });
-            }
-            else {
-                readySong(songNumber + 1);
-                if (quiz.isHost) {
-                    const nextSong = songList[songOrder[songNumber + 1]];
-                    const message = `${songNumber + 1}§${nextStartPoint}§${nextSong.audio || ""}§${nextSong.video480 || ""}§${nextSong.video720 || ""}`;
-                    splitIntoChunks(btoa(encodeURIComponent(message)) + "$", 144).forEach((item, index) => {
-                        cslMessage("§CSL3" + base10to36(index % 36) + item);
-                    });
-                }
-            }
-        }
-    }, 100);
-}
-
-// end guess phase and display answer
-function endGuessPhase(songNumber) {
-    if (!quiz.cslActive || !quiz.inQuiz) return reset();
-    let song;
-    if (quiz.isHost) {
-        song = songList[songOrder[songNumber]];
-    }
-    fireListener("guess phase over");
-    if (!quiz.soloMode && quiz.inQuiz && !quiz.isSpectator) {
-        const answer = currentAnswers[quiz.ownGamePlayerId];
-        if (answer) {
-            splitIntoChunks(btoa(encodeURIComponent(answer)) + "$", 144).forEach((item, index) => {
-                cslMessage("§CSL5" + base10to36(index % 36) + item);
-            });
-        }
-    }
-    answerTimer = setTimeout(() => {
-        if (!quiz.cslActive || !quiz.inQuiz) return reset();
-        cslState = 2;
-        skipping = false;
-        if (!quiz.soloMode) {
-            for (const player of Object.values(quiz.players)) {
-                currentAnswers[player.gamePlayerId] = answerChunks[player.gamePlayerId] ? answerChunks[player.gamePlayerId].decode() : "";
-            }
-        }
-        for (const key of Object.keys(quiz.players)) {
-            cslMultiplayer.voteSkip[key] = false;
-        }
-        const data = {
-            "answers": [],
-            "progressBarState": null
-        };
-        for (const player of Object.values(quiz.players)) {
-            data.answers.push({
-                "gamePlayerId": player.gamePlayerId,
-                "pose": 3,
-                "answer": currentAnswers[player.gamePlayerId] || ""
-            });
-        }
-        fireListener("player answers", data);
-        if (!quiz.soloMode && quiz.isHost) {
-            const message = `${song.animeRomajiName || ""}\n${song.animeEnglishName || ""}\n${(song.altAnimeNames || []).join("\t")}\n${(song.altAnimeNamesAnswers || []).join("\t")}\n${song.songArtist || ""}\n${song.songName || ""}\n${song.songType || ""}\n${song.songTypeNumber || ""}\n${song.songDifficulty || ""}\n${song.animeType || ""}\n${song.animeVintage || ""}\n${song.annId || ""}\n${song.malId || ""}\n${song.kitsuId || ""}\n${song.aniListId || ""}\n${Array.isArray(song.animeTags) ? song.animeTags.join(",") : ""}\n${Array.isArray(song.animeGenre) ? song.animeGenre.join(",") : ""}\n${song.audio || ""}\n${song.video480 || ""}\n${song.video720 || ""}`;
-            splitIntoChunks(btoa(encodeURIComponent(message)) + "$", 144).forEach((item, index) => {
-                cslMessage("§CSL7" + base10to36(index % 36) + item);
-            });
-        }
-        answerTimer = setTimeout(() => {
-            if (!quiz.cslActive || !quiz.inQuiz) return reset();
-            const correct = {};
-            const pose = {};
-            if (quiz.isHost) {
-                for (const player of Object.values(quiz.players)) {
-                    const isCorrect = isCorrectAnswer(songNumber, currentAnswers[player.gamePlayerId]);
-                    correct[player.gamePlayerId] = isCorrect;
-                    pose[player.gamePlayerId] = currentAnswers[player.gamePlayerId] ? (isCorrect ? 5 : 4) : 6;
-                    if (isCorrect) score[player.gamePlayerId]++;
-                }
-            }
-            if (quiz.soloMode) {
-                const data = {
-                    "players": [],
-                    "songInfo": {
-                        "animeNames": {
-                            "english": song.animeEnglishName,
-                            "romaji": song.animeRomajiName
-                        },
-                        "artist": song.songArtist,
-                        "artistInfo": {
-                            "artistId": null, //song.songArtistIds.artistId,
-                            "groupId": null, //song.songArtistIds.groupId,
-                            "name": song.songArtist
-                        },
-                        "arrangerInfo": {
-                            "artistId": null, //song.songArrangerIds.artistId,
-                            "groupId": null, //song.songArrangerIds.groupId,
-                            "name": song.songArranger
-                        },
-                        "composerInfo": {
-                            "artistId": null, //song.songComposerIds.artistId,
-                            "groupId": null, //song.songComposerIds.groupId,
-                            "name": song.songComposer
-                        },
-                        "songName": song.songName,
-                        "videoTargetMap": {
-                            "catbox": {
-                                "0": formatTargetUrl(song.audio),
-                                "480": formatTargetUrl(song.video480),
-                                "720": formatTargetUrl(song.video720)
-                            }
-                        },
-                        "type": song.songType,
-                        "typeNumber": song.songTypeNumber,
-                        "annId": song.annId,
-                        "highRisk": 0,
-                        "animeScore": null,
-                        "animeType": song.animeType,
-                        "vintage": song.animeVintage,
-                        "animeDifficulty": song.songDifficulty,
-                        "length": song.length,
-                        "D": song.D,
-                        "animeTags": song.animeTags,
-                        "animeGenre": song.animeGenre,
-                        "altAnimeNames": song.altAnimeNames,
-                        "altAnimeNamesAnswers": song.altAnimeNamesAnswers,
-                        "rebroadcast": song.rebroadcast,
-                        "dub": song.dub,
-                        "siteIds": {
-                            "annId": song.annId,
-                            "malId": song.malId,
-                            "kitsuId": song.kitsuId,
-                            "aniListId": song.aniListId
-                        }
-                    },
-                    "progressBarState": {
-                        "length": 25,
-                        "played": 0
-                    },
-                    "groupMap": createGroupSlotMap(Object.keys(quiz.players)),
-                    "watched": false
-                };
-                for (const player of Object.values(quiz.players)) {
-                    data.players.push({
-                        "gamePlayerId": player.gamePlayerId,
-                        "pose": pose[player.gamePlayerId],
-                        "level": quiz.players[player.gamePlayerId].level,
-                        "correct": correct[player.gamePlayerId],
-                        "score": score[player.gamePlayerId],
-                        "listStatus": null,
-                        "showScore": null,
-                        "position": Math.floor(player.gamePlayerId / 8) + 1,
-                        "positionSlot": player.gamePlayerId % 8
-                    });
-                }
-                fireListener("answer results", data);
-            }
-            else if (quiz.isHost) {
-                const list = [];
-                for (const id of Object.keys(correct)) {
-                    list.push(`${id},${correct[id] ? "1" : "0"},${pose[id]},${score[id]}`);
-                }
-                splitIntoChunks(btoa(encodeURIComponent(list.join("§"))) + "$", 144).forEach((item, index) => {
-                    cslMessage("§CSL6" + base10to36(index % 36) + item);
-                });
-            }
-            setTimeout(() => {
-                if (!quiz.cslActive || !quiz.inQuiz) return reset();
-                if (quiz.soloMode) {
-                    let timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D)));
-                    if(!correct[0] || timerEnd > 300){
-                        timerEnd = 300;
-                    }
-                    if(song.length > 0){
-                        timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100), 10*(song.length));
-                    }
-                    let defaultTimer = 13;
-                    //console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
-                    skipInterval = setInterval(() => {
-                        if (defaultTimer >= timerEnd-15){
-                            fireListener("quiz overlay message", "About to Skip");
-                        }
-                        if (quiz.skipController._toggled || defaultTimer >= timerEnd+10) {
-                            clearInterval(skipInterval);
-                            currentStartPoint = nextStartPoint;
-                            endReplayPhase(songNumber);
-                        }
-                        defaultTimer += 1;
-                    }, 100);
-                }
-            }, fastSkip ? 1000 : 2000);
-        }, fastSkip ? 200 : 3000);
-    }, fastSkip ? 100 : 400);
-}
-
-// end replay phase
-function endReplayPhase(songNumber) {
-    if (!quiz.cslActive || !quiz.inQuiz) return reset();
-    //console.log(`end replay phase (${songNumber})`);
-    if (songNumber < totalSongs) {
-        fireListener("quiz overlay message", "Skipping to Next Song");
-        setTimeout(() => {
-            previousSongFinished = true;
-        }, fastSkip ? 1 : 3000);
-    }
-    else {
-        fireListener("quiz overlay message", "Skipping to Final Standings");
-        setTimeout(() => {
-            const data = {
-                "resultStates": []
-            };
-            /*"progressBarState": {
-                "length": 26.484,
-                "played": 6.484
-            }*/
-            const sortedScores = Array.from(new Set(Object.values(score))).sort((a, b) => b - a);
-            for (const id of Object.keys(score)) {
-                data.resultStates.push({
-                    "gamePlayerId": parseInt(id),
-                    "pose": 1,
-                    "endPosition": sortedScores.indexOf(score[id]) + 1
-                });
-            }
-            fireListener("quiz end result", data);
-        }, fastSkip ? 1 : 5000);
-        setTimeout(() => {
-            skipInterval = setInterval(() => {
-                if (!quiz.pauseButton.pauseOn){
-                    if (quiz.soloMode) {
-                        if(attachedFile == "_quiz.json"){
-                            gameChat.systemMessage(score[0] + " points scored");
-                        }
-                        quizOver();
-                    }
-                    else if (quiz.isHost) {
-                        cslMessage("§CSL10");
-                    }
-                }
-            }, 100);
-        }, fastSkip ? 1 : 12000);
-    }
-}
-
-// fire all event listeners (including scripts)
-function fireListener(type, data) {
-    try {
-        for (const listener of socket.listners[type]) {
-            listener.fire(data);
-        }
-    }
-    catch (error) {
-        sendSystemMessage(`CSL Error: "${type}" listener failed`);
-        console.error(error);
-        console.log(type);
-        console.log(data);
-    }
-}
-
-// send csl chat message
-function cslMessage(text) {
-    if (!isQuizOfTheDay()) {
-        socket.sendCommand({ type: "lobby", command: "game chat message", data: { msg: String(text), teamMessage: false } });
-    }
-}
-
-// send a client side message to game chat
-function sendSystemMessage(message, message2) {
-    setTimeout(() => {
-        if (gameChat.open) {
-            if (message2) {
-                gameChat.systemMessage(String(message), String(message2));
-            }
-            else {
-                gameChat.systemMessage(String(message));
-            }
-        }
-        else if (nexus.inCoopLobby) {
-            nexusCoopChat.displayServerMessage({ message: String(message) });
-        }
-    }, 0);
-}
-
-// parse message
-function parseMessage(content, sender) {
-    if (isQuizOfTheDay()) return;
-    let player;
-    if (lobby.inLobby) player = Object.values(lobby.players).find(x => x._name === sender);
-    else if (quiz.inQuiz) player = Object.values(quiz.players).find(x => x._name === sender);
-    const isHost = sender === cslMultiplayer.host;
-    if (content.startsWith("§CSL0")) { //start quiz
-        if (lobby.inLobby && sender === lobby.hostName && !quiz.cslActive) {
-            const split = atob(content.slice(5)).split("§");
-            if (split.length === 6) {
-                //mode = parseInt(split[0]);
-                currentSong = parseInt(split[1]);
-                totalSongs = parseInt(split[2]);
-                guessTime = parseInt(split[3]);
-                extraGuessTime = parseInt(split[4]);
-                fastSkip = Boolean(parseInt(split[5]));
-                sendSystemMessage(`CSL: starting multiplayer quiz (${totalSongs} songs)`);
-                startQuiz();
-            }
-        }
-    }
-    else if (quiz.cslActive && quiz.inQuiz && cslMultiplayer.host !== lobby.hostName) {
-        sendSystemMessage("client out of sync, quitting CSL");
-        quizOver();
-    }
-    else if (content === "§CSL10") { //return to lobby
-        if (quiz.cslActive && quiz.inQuiz && (isHost || sender === lobby.hostName)) {
-            quizOver();
-        }
-    }
-    else if (content === "§CSL11") { //pause
-        if (quiz.cslActive && isHost) {
-            fireListener("quiz pause triggered", {
-                "playerName": sender
-            });
-        }
-    }
-    else if (content === "§CSL12") { //unpause
-        if (quiz.cslActive && isHost) {
-            fireListener("quiz unpause triggered", {
-                "playerName": sender
-            });
-        }
-    }
-    else if (content === "§CSL13") { //player answered
-        if (quiz.cslActive && player) {
-            const time = Number(((Date.now() - songStartTime) / 1000).toFixed(3));
-            fireListener("player answered", [{ answerTime: time, gamePlayerIds: [player.gamePlayerId] }]);
-        }
-    }
-    else if (content === "§CSL14") { //vote skip
-        if (quiz.cslActive && quiz.isHost && player) {
-            cslMultiplayer.voteSkip[player.gamePlayerId] = true;
-            if (!skipping && checkVoteSkip()) {
-                skipping = true;
-                if (cslState === 1) {
-                    cslMessage("§CSL15");
-                }
-                else if (cslState === 2) {
-                    cslMessage("§CSL16");
-                }
-            }
-        }
-    }
-    else if (content === "§CSL15") { //skip guessing phase
-        if (quiz.cslActive && isHost) {
-            fireListener("quiz overlay message", "Skipping to Answers");
-            clearInterval(skipInterval);
-            clearTimeout(endGuessTimer);
-            clearTimeout(extraGuessTimer);
-            setTimeout(() => {
-                endGuessPhase(currentSong);
-            }, fastSkip ? 1 : 3000);
-        }
-    }
-    else if (content === "§CSL16") { //skip replay phase
-        if (quiz.cslActive && isHost) {
-            endReplayPhase(currentSong);
-        }
-    }
-    else if (content.startsWith("§CSL17")) { //player rejoin
-        if (sender === lobby.hostName) {
-            const name = atob(content.slice(6));
-            if (name === selfName) {
-                socket.sendCommand({ type: "lobby", command: "change to player" });
-            }
-            else if (quiz.cslActive && quiz.inQuiz) {
-                const player = Object.values(quiz.players).find(p => p._name === name);
-                if (player) {
-                    fireListener("Rejoining Player", { "name": name, "gamePlayerId": player.gamePlayerId });
-                }
-            }
-        }
-    }
-    else if (content === "§CSL21") { //has autocomplete
-        cslMessage(`Autocomplete: ${animeListLower.size ? "✅" : "⛔"}`);
-    }
-    else if (content === "§CSL22") { //version
-        cslMessage(`CSL version ${GM_info.script.version}`);
-    }
-    else if (content.startsWith("§CSL3")) { //next song link
-        if (quiz.cslActive && isHost) {
-            //§CSL3#songNumber§startPoint§mp3§480§720
-            nextSongChunk.append(content);
-            if (nextSongChunk.isComplete) {
-                const split = nextSongChunk.decode().split("§");
-                nextSongChunk = new Chunk();
-                if (split.length === 5) {
-                    if (!songLinkReceived[split[0]]) {
-                        songLinkReceived[split[0]] = true;
-                        fireListener("quiz next video info", {
-                            "playLength": guessTime,
-                            "playbackSpeed": 1,
-                            "startPoint": parseInt(split[1]),
-                            "videoInfo": {
-                                "id": null,
-                                "videoMap": {
-                                    "catbox": createCatboxLinkObject(split[2], split[3], split[4])
-                                },
-                                "videoVolumeMap": {
-                                    "catbox": {
-                                        "0": -20,
-                                        "480": -20,
-                                        "720": -20
-                                    }
-                                }
-                            }
-                        });
-                        if (Object.keys(songLinkReceived).length === 1) {
-                            setTimeout(() => {
-                                fireListener("quiz ready", {
-                                    "numberOfSongs": totalSongs
-                                });
-                            }, 200);
-                            setTimeout(() => {
-                                fireListener("quiz waiting buffering", {
-                                    "firstSong": true
-                                });
-                            }, 300);
-                            setTimeout(() => {
-                                previousSongFinished = true;
-                                readySong(currentSong + 1);
-                            }, 400);
-                        }
-                    }
-                }
-                else {
-                    sendSystemMessage(`CSL Error: next song link decode failed`);
-                }
-            }
-        }
-    }
-    else if (content.startsWith("§CSL4")) { //play song
-        if (quiz.cslActive && isHost) {
-            const number = parseInt(atob(content.slice(5)));
-            //console.log("Play song: " + number);
-            if (currentSong !== totalSongs) {
-                playSong(number);
-            }
-        }
-    }
-    else if (content.startsWith("§CSL5")) { //player final answer
-        if (quiz.cslActive && player) {
-            if (!answerChunks[player.gamePlayerId]) answerChunks[player.gamePlayerId] = new Chunk();
-            answerChunks[player.gamePlayerId].append(content);
-        }
-    }
-    else if (content.startsWith("§CSL6")) { //answer results
-        if (quiz.cslActive && isHost) {
-            resultChunk.append(content);
-            if (resultChunk.isComplete) {
-                const split = resultChunk.decode().split("§");
-                const data = {
-                    "players": [],
-                    "songInfo": {
-                        "animeNames": {
-                            "english": cslMultiplayer.songInfo.animeEnglishName,
-                            "romaji": cslMultiplayer.songInfo.animeRomajiName
-                        },
-                        "artist": cslMultiplayer.songInfo.songArtist,
-                        "songName": cslMultiplayer.songInfo.songName,
-                        "videoTargetMap": {
-                            "catbox": {
-                                "0": formatTargetUrl(cslMultiplayer.songInfo.audio) || "",
-                                "480": formatTargetUrl(cslMultiplayer.songInfo.video480) || "",
-                                "720": formatTargetUrl(cslMultiplayer.songInfo.video720) || ""
-                            }
-                        },
-                        "type": cslMultiplayer.songInfo.songType,
-                        "typeNumber": cslMultiplayer.songInfo.songTypeNumber,
-                        "annId": cslMultiplayer.songInfo.annId,
-                        "highRisk": 0,
-                        "animeScore": null,
-                        "animeType": cslMultiplayer.songInfo.animeType,
-                        "vintage": cslMultiplayer.songInfo.animeVintage,
-                        "animeDifficulty": cslMultiplayer.songInfo.songDifficulty || 0,
-                        "animeTags": cslMultiplayer.songInfo.animeTags || [],
-                        "animeGenre": cslMultiplayer.songInfo.animeGenre || [],
-                        "altAnimeNames": cslMultiplayer.songInfo.altAnimeNames || [],
-                        "altAnimeNamesAnswers": cslMultiplayer.songInfo.altAnimeNamesAnswers || [],
-                        "siteIds": {
-                            "annId": cslMultiplayer.songInfo.annId,
-                            "malId": cslMultiplayer.songInfo.malId,
-                            "kitsuId": cslMultiplayer.songInfo.kitsuId,
-                            "aniListId": cslMultiplayer.songInfo.aniListId
-                        }
-                    },
-                    "progressBarState": {
-                        "length": 25,
-                        "played": 0
-                    },
-                    "groupMap": createGroupSlotMap(Object.keys(quiz.players)),
-                    "watched": false
-                };
-                const decodedPlayers = [];
-                for (const p of split) {
-                    const playerSplit = p.split(",");
-                    decodedPlayers.push({
-                        id: parseInt(playerSplit[0]),
-                        correct: Boolean(parseInt(playerSplit[1])),
-                        pose: parseInt(playerSplit[2]),
-                        score: parseInt(playerSplit[3])
-                    });
-                }
-                decodedPlayers.sort((a, b) => b.score - a.score);
-                decodedPlayers.forEach((p, i) => {
-                    data.players.push({
-                        "gamePlayerId": p.id,
-                        "pose": p.pose,
-                        "level": quiz.players[p.id].level,
-                        "correct": p.correct,
-                        "score": p.score,
-                        "listStatus": null,
-                        "showScore": null,
-                        "position": Math.floor(i / 8) + 1,
-                        "positionSlot": i % 8
-                    });
-                });
-                //console.log(data.players);
-                fireListener("answer results", data);
-            }
-        }
-    }
-    else if (content.startsWith("§CSL7")) {
-        songInfoChunk.append(content);
-        if (songInfoChunk.isComplete) {
-            const split = preventCodeInjection(songInfoChunk.decode()).split("\n");
-            cslMultiplayer.songInfo.animeRomajiName = split[0];
-            cslMultiplayer.songInfo.animeEnglishName = split[1];
-            cslMultiplayer.songInfo.altAnimeNames = split[2].split("\t").filter(Boolean);
-            cslMultiplayer.songInfo.altAnimeNamesAnswers = split[3].split("\t").filter(Boolean);
-            cslMultiplayer.songInfo.songArtist = split[4];
-            cslMultiplayer.songInfo.songName = split[5];
-            cslMultiplayer.songInfo.songType = parseInt(split[6]) || null;
-            cslMultiplayer.songInfo.songTypeNumber = parseInt(split[7]) || null;
-            cslMultiplayer.songInfo.songDifficulty = parseFloat(split[8]) || null;
-            cslMultiplayer.songInfo.animeType = split[9];
-            cslMultiplayer.songInfo.animeVintage = split[10];
-            cslMultiplayer.songInfo.annId = parseInt(split[11]) || null;
-            cslMultiplayer.songInfo.malId = parseInt(split[12]) || null;
-            cslMultiplayer.songInfo.kitsuId = parseInt(split[13]) || null;
-            cslMultiplayer.songInfo.aniListId = parseInt(split[14]) || null;
-            cslMultiplayer.songInfo.animeTags = split[15].split(",");
-            cslMultiplayer.songInfo.animeGenre = split[16].split(",");
-            cslMultiplayer.songInfo.audio = split[17];
-            cslMultiplayer.songInfo.video480 = split[18];
-            cslMultiplayer.songInfo.video720 = split[19];
-            console.log(split);
-        }
-    }
-}
-
-function checkVoteSkip() {
-    const keys = Object.keys(cslMultiplayer.voteSkip).filter((key) => quiz.players.hasOwnProperty(key) && !quiz.players[key].avatarDisabled);
-    for (const key of keys) {
-        if (!cslMultiplayer.voteSkip[key]) return false;
-    }
-    return true;
-}
-
-// input list of player keys, return group slot map
-function createGroupSlotMap(players) {
-    players = players.map(Number);
-    const map = {};
-    let group = 1;
-    if (Object.keys(score).length) players.sort((a, b) => score[b] - score[a]);
-    for (let i = 0; i < players.length; i += 8) {
-        map[group] = players.slice(i, i + 8);
-        group++;
-    }
-    return map;
-}
-
-// check if the player's answer is correct
-function isCorrectAnswer(songNumber, answer) {
-    if (!answer) return false;
-    answer = answer.toLowerCase();
-    const song = songList[songOrder[songNumber]];
-    const altAnimeNames = song.altAnimeNames || [];
-    const altAnimeNamesAnswers = song.altAnimeNamesAnswers || [];
-    const correctAnswers = [...altAnimeNames, ...altAnimeNamesAnswers];
-    for (const a1 of correctAnswers) {
-        const a2 = replacedAnswers[a1];
-        if (a2 && a2.toLowerCase() === answer) return true;
-        if (a1.toLowerCase() === answer) return true;
-    }
-    return false;
-}
-
-// get start point value (0-100)
-function getStartPoint(sample) {
-    if (typeof sample === 'number' && !isNaN(sample) && isFinite(sample)) {
-        return Math.min(100, Math.max(0, sample));
-    }
-    else if (Array.isArray(sample)){
-        let totalWeight = 0;
-        for (let i = 0; i < sample.length; i++){
-            totalWeight += sample[i];
-        }
-        const randomIndex = totalWeight*Math.random();
-        let partialSum = 0;
-        for (let i = 0; i < sample.length; i++){
-            partialSum += sample[i];
-            if (partialSum > randomIndex){
-                return Math.min(100, Math.max(0, 100/(sample.length-2)*(i+Math.random()-1)));
-            }
-        }
-    }
-    return Math.random() * (startPointRange[1] - startPointRange[0] + 1) + startPointRange[0];
-}
-
-// return true if song type is allowed
-function songTypeFilter(song, ops, eds, ins) {
-    const type = song.songType;
-    if (ops && type === 1) return true;
-    if (eds && type === 2) return true;
-    if (ins && type === 3) return true;
-    return false;
-}
-
-// return true if anime type is allowed
-function animeTypeFilter(song, tv, movie, ova, ona, special) {
-    if (song.animeType) {
-        const type = song.animeType.toLowerCase();
-        if (tv && type === "tv") return true;
-        if (movie && type === "movie") return true;
-        if (ova && type === "ova") return true;
-        if (ona && type === "ona") return true;
-        if (special && type === "special") return true;
-        return false;
-    }
-    else {
-        return tv && movie && ova && ona && special;
-    }
-}
-
-// return true if the song difficulty is in allowed range
-// songs with missing difficulty will only pass if 0-100
-function difficultyFilter(song, low, high) {
-    if (low === 0 && high === 100) return true;
-    const dif = parseFloat(song.songDifficulty);
-    if (isNaN(dif)) return false;
-    if (dif >= low && dif <= high) return true;
-    return false;
-}
-
-// return true if guess type is allowed
-// songs with null will only pass if both true
-function guessTypeFilter(song, correctGuesses, incorrectGuesses) {
-    if (correctGuesses && incorrectGuesses) return true;
-    if (correctGuesses && song.correctGuess === true) return true;
-    if (incorrectGuesses && song.incorrectGuess === true) return true;
-    return false;
-}
-
-// return true if the song is allowed under the selected broadcast type
-function broadcastTypeFilter(song, dub, rebroadcast) {
-    if (!dub && song.dub) return false;
-    if (!rebroadcast && song.rebroadcast) return false;
-    return true;
-}
-
-// clear all intervals and timeouts
-function clearTimeEvents() {
-    clearInterval(nextVideoReadyInterval);
-    clearInterval(skipInterval);
-    clearTimeout(endGuessTimer);
-    clearTimeout(extraGuessTimer);
-    clearTimeout(answerTimer);
-}
-
-// reset variables from this script
-function reset() {
-    clearTimeEvents();
-    quiz.cslActive = false;
-    cslMultiplayer = { host: "", songInfo: {}, voteSkip: {} };
-    cslState = 0;
-    currentSong = 0;
-    currentAnswers = {};
-    currentAnswerTime = 20;
-    score = {};
-    previousSongFinished = false;
-    fastSkip = true;
-    skipping = false;
-    songLinkReceived = {};
-    answerChunks = {};
-    songInfoChunk = new Chunk();
-    nextSongChunk = new Chunk();
-}
-
-// end quiz and set up lobby
-function quizOver() {
-    reset();
-    const data = {
-        "spectators": [],
-        "inLobby": true,
-        "settings": hostModal.getSettings(true),
-        "soloMode": quiz.soloMode,
-        "inQueue": [],
-        "hostName": lobby.hostName,
-        "gameId": lobby.gameId,
-        "players": [],
-        "numberOfTeams": 0,
-        "teamFullMap": {}
-    };
-    for (const player of Object.values(quiz.players)) {
-        if (gameChat.spectators.some((spectator) => spectator.name === player._name)) {
-            data.spectators.push({
-                "name": player._name,
-                "gamePlayerId": null
-            });
-        }
-        else if (!player.avatarDisabled) {
-            data.players.push({
-                "name": player._name,
-                "gamePlayerId": player.gamePlayerId,
-                "level": player.level,
-                "avatar": player.avatarInfo,
-                "ready": true,
-                "inGame": true,
-                "teamNumber": null,
-                "multipleChoice": false
-            });
-        }
-    }
-    lobby.setupLobby(data, gameChat.spectators.some((spectator) => spectator.name === selfName));
-    viewChanger.changeView("lobby", { supressServerMsg: true, keepChatOpen: true });
-}
-
-// open custom song list settings modal
-function openSettingsModal() {
-    if (lobby.inLobby) {
-        if (animeListLower.size) {
-            $("#cslgAutocompleteButton").removeClass("btn-danger").addClass("btn-success disabled");
-        }
-        if ($("#cslgSongListModeSelect").val() === "Previous Game") {
-            loadPreviousGameOptions();
-        }
-        $("#cslgSettingsModal").modal("show");
-    }
-}
-
-// load previous game options in song list window
-function loadPreviousGameOptions() {
-    const $select = $("#cslgPreviousGameSelect").empty();
-    const games = [];
-    for (const game of Object.values(songHistoryWindow.tabs[2].gameMap)) {
-        if (game.songTable.rows.length) {
-            games.push({
-                roomName: game.roomName,
-                startTime: game.startTime,
-                quizId: game.quizId
-            });
-        }
-    }
-    games.sort((a, b) => b.startTime - a.startTime);
-    for (const game of games) {
-        const text = `${game.roomName} - ${game.startTime.format("YYYY-MM-DD HH:mm")}`;
-        $select.append($("<option>", { text: text, val: game.quizId }));
-    }
-}
-
-// when you click the go button
-function anisongdbDataSearch() {
-    const mode = $("#cslgAnisongdbModeSelect").val().toLowerCase();
-    const query = $("#cslgAnisongdbQueryInput").val();
-    const filters = {
-        ops: $("#cslgAnisongdbOPCheckbox").prop("checked"),
-        eds: $("#cslgAnisongdbEDCheckbox").prop("checked"),
-        ins: $("#cslgAnisongdbINCheckbox").prop("checked"),
-        partial: $("#cslgAnisongdbPartialCheckbox").prop("checked"),
-        ignoreDuplicates: $("#cslgAnisongdbIgnoreDuplicatesCheckbox").prop("checked"),
-        arrangement: $("#cslgAnisongdbArrangementCheckbox").prop("checked"),
-        maxOtherPeople: parseInt($("#cslgAnisongdbMaxOtherPeopleInput").val()),
-        minGroupMembers: parseInt($("#cslgAnisongdbMinGroupMembersInput").val()),
-        normal: $("#cslgAnisongdbNormalCheckbox").prop("checked"),
-        dub: $("#cslgAnisongdbDubCheckbox").prop("checked"),
-        rebroadcast: $("#cslgAnisongdbRebroadcastCheckbox").prop("checked"),
-        standard: $("#cslgAnisongdbStandardCheckbox").prop("checked"),
-        character: $("#cslgAnisongdbCharacterCheckbox").prop("checked"),
-        chanting: $("#cslgAnisongdbChantingCheckbox").prop("checked"),
-        instrumental: $("#cslgAnisongdbInstrumentalCheckbox").prop("checked")
-    };
-    if (query && !isNaN(filters.maxOtherPeople) && !isNaN(filters.minGroupMembers)) {
-        getAnisongdbData(mode, query, filters);
-    }
-}
-
-// send anisongdb request
-function getAnisongdbData(mode, query, filters) {
-    $("#cslgSongListCount").text("Loading...");
-    $("#cslgSongListTable tbody").empty();
-    let url, data;
-    let json = {
-        and_logic: false,
-        ignore_duplicate: filters.ignoreDuplicates,
-        opening_filter: filters.ops,
-        ending_filter: filters.eds,
-        insert_filter: filters.ins,
-        normal_broadcast: filters.normal,
-        dub: filters.dub,
-        rebroadcast: filters.rebroadcast,
-        standard: filters.standard,
-        character: filters.character,
-        chanting: filters.chanting,
-        instrumental: filters.instrumental
-    };
-    if (mode === "anime") {
-        url = apiBase + "search_request";
-        json.anime_search_filter = {
-            search: query,
-            partial_match: filters.partial
-        };
-    }
-    else if (mode === "artist") {
-        url = apiBase + "search_request";
-        json.artist_search_filter = {
-            search: query,
-            partial_match: filters.partial,
-            group_granularity: filters.minGroupMembers,
-            max_other_artist: filters.maxOtherPeople
-        };
-    }
-    else if (mode === "song") {
-        url = apiBase + "search_request";
-        json.song_name_search_filter = {
-            search: query,
-            partial_match: filters.partial
-        };
-    }
-    else if (mode === "composer") {
-        url = apiBase + "search_request";
-        json.composer_search_filter = {
-            search: query,
-            partial_match: filters.partial,
-            arrangement: filters.arrangement
-        };
-    }
-    else if (mode === "season") {
-        json.season = query;
-        url = apiBase + "season_request";
-    }
-    else if (mode === "ann id") {
-        url = apiBase + "ann_ids_request";
-        json.ann_ids = query.trim().split(/[\s,]+/).map(Number);
-    }
-    else if (mode === "mal id") {
-        url = apiBase + "mal_ids_request";
-        json.mal_ids = query.trim().split(/[\s,]+/).map(Number);
-    }
-    else if (mode === "ann song id") {
-        url = apiBase + "ann_song_ids_request";
-        json.ann_song_ids = query.trim().split(/[\s,]+/).map(Number);
-    }
-    else if (mode === "amq song id") {
-        url = apiBase + "amq_song_ids_request";
-        json.amq_song_ids = query.trim().split(/[\s,]+/).map(Number);
-    }
-    data = {
-        method: "POST",
-        headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify(json)
-    };
-    fetch(url, data)
-        .then(res => res.json())
-        .then(json => {
-            if (debug) console.log(json);
-            handleData(json);
-            setSongListTableSort();
-            if (Array.isArray(json)) {
-                createSongListTable(true);
-            }
-            else {
-                $("#cslgSongListCount").text("Songs: 0");
-                $("#cslgMergeCurrentCount").text("Current song list: 0 songs");
-                $("#cslgSongListTable tbody").empty();
-                $("#cslgSongListWarning").text(json?.detail || JSON.stringify(json));
-            }
-            createAnswerTable();
-        })
-        .catch(res => {
-            songList = [];
-            setSongListTableSort();
-            $("#cslgSongListCount").text("Songs: 0");
-            $("#cslgMergeCurrentCount").text("Current song list: 0 songs");
-            $("#cslgSongListTable tbody").empty();
-            $("#cslgSongListWarning").text(res.toString());
-        });
-}
-
-function handleData(data) {
-    songList = [];
-    //remap data to actual song array
-    if (!Array.isArray(data)) {
-        if (typeof data === "object") {
-            if (data.songs) {
-                data = data.songs;
-            }
-            else if (data.songHistory) {
-                data = Object.values(data.songHistory);
-            }
-            else return;
-        }
-        else return;
-    }
-    for (const song of data) {
-        let animeRomajiName = song.animeRomajiName ?? song.animeJPName ?? song.songInfo?.animeNames?.romaji ?? song.anime?.romaji ?? song.animeRomaji ?? song.animeRom ?? "";
-        let animeEnglishName = song.animeEnglishName ?? song.animeENName ?? song.songInfo?.animeNames?.english ?? song.anime?.english ?? song.animeEnglish ?? song.animeEng ?? "";
-        let altAnimeNames = song.altAnimeNames ?? song.songInfo?.altAnimeNames ?? [].concat(animeRomajiName, animeEnglishName, song.animeAltName || []);
-        let altAnimeNamesAnswers = song.altAnimeNamesAnswers ?? song.songInfo?.altAnimeNamesAnswers ?? [];
-        let songArtist = song.songArtist ?? song.artist ?? song.songInfo?.artist ?? song.artistInfo?.name ?? "";
-        /*let songArtistIds = {
-            artistId: song.songArtistIds?.artistId ?? song.artistInfo?.artistId,
-            groupId: song.songArtistIds?.groupId ?? song.artistInfo?.groupId
-        };*/
-        let songArranger = song.songArranger ?? song.arrangerInfo?.name ?? "";
-        /*let songArrangerIds = {
-            artistId: song.songArrangerIds?.artistId ?? song.arrangerInfo?.artistId,
-            groupId: song.songArrangerIds?.groupId ?? song.arrangerInfo?.groupId
-        };*/
-        let songComposer = song.songComposer ?? song.composerInfo?.name ?? "";
-        /*let songComposerIds = {
-            artistId: song.songComposerIds?.artistId ?? song.composerInfo?.artistId,
-            groupId: song.songComposerIds?.groupId ?? song.composerInfo?.groupId
-        };*/
-        let songName = song.songName ?? song.name ?? song.songInfo?.songName ?? "";
-        let songType = song.songType ?? song.type ?? song.songInfo?.type ?? null;
-        let songTypeNumber = song.songTypeNumber ?? song.songInfo?.typeNumber ?? null;
-        let songDifficulty = parseFloat(song.songDifficulty ?? song.difficulty ?? song.songInfo?.animeDifficulty) || null;
-        let animeType = song.animeType ?? song.songInfo?.animeType ?? "";
-        let animeVintage = song.animeVintage ?? song.vintage ?? song.songInfo?.vintage ?? null;
-        let annId = song.annId ?? song.siteIds?.annId ?? song.songInfo?.siteIds?.annId ?? null;
-        let malId = song.malId ?? song.linked_ids?.myanimelist ?? song.siteIds?.malId ?? song.songInfo?.siteIds?.malId ?? null;
-        let kitsuId = song.kitsuId ?? song.linked_ids?.kitsu ?? song.siteIds?.kitsuId ?? song.songInfo?.siteIds?.kitsuId ?? null;
-        let aniListId = song.aniListId ?? song.linked_ids?.anilist ?? song.siteIds?.aniListId ?? song.songInfo?.siteIds?.aniListId ?? null;
-        let animeTags = song.animeTags ?? song.tags ?? song.songInfo?.animeTags ?? [];
-        let animeGenre = song.animeGenre ?? song.genre ?? song.songInfo?.animeGenre ?? [];
-        let rebroadcast = song.rebroadcast ?? song.isRebroadcast ?? song.songInfo?.rebroadcast ?? null;
-        let dub = song.dub ?? song.isDub ?? song.songInfo?.dub ?? null;
-        let startPoint = song.startPoint ?? song.startSample ?? null;
-        let annSongId = song.annSongId ?? null;
-        let length = parseFloat(song.songLength ?? parseFloat(song.length)) || null;
-        let D = song.D === undefined || song.D === null ? 8 : song.D;
-        let audio = song.audio ?? song.videoUrl ?? song.urls?.catbox?.[0] ?? song.songInfo?.videoTargetMap?.catbox?.[0] ?? song.songInfo?.urlMap?.catbox?.[0] ?? song.LinkMp3 ?? "";
-        let video480 = song.video480 ?? song.MQ ?? song.videoUrl ?? song.urls?.catbox?.[480] ?? song.songInfo?.videoTargetMap?.catbox?.[480] ?? song.songInfo?.urlMap?.catbox?.[480] ?? "";
-        let video720 = song.video720 ?? song.HQ ?? song.videoUrl ?? song.urls?.catbox?.[720] ?? song.songInfo?.videoTargetMap?.catbox?.[720] ?? song.songInfo?.urlMap?.catbox?.[720] ?? song.LinkVideo ?? "";
-        let correctGuess = song.correctGuess ?? null;
-        let incorrectGuess = song.incorrectGuess ?? null;
-        if (correctGuess === null && typeof song.correct === "boolean") { //joseph script check
-            correctGuess = song.correct;
-            incorrectGuess = !song.correct;
-        }
-        if (typeof songType === "string") { //convert songtype string to amq integers
-            if (songType.startsWith("O")) {
-                songTypeNumber = parseInt(songType.split(" ")[1]) || null;
-                songType = 1;
-            }
-            else if (songType.startsWith("E")) {
-                songTypeNumber = parseInt(songType.split(" ")[1]) || null;
-                songType = 2;
-            }
-            else if (songType.startsWith("I")) {
-                songTypeNumber = null;
-                songType = 3;
-            }
-        }
-        if (audio || video480 || video720) {
-            songList.push({
-                animeRomajiName,
-                animeEnglishName,
-                altAnimeNames,
-                altAnimeNamesAnswers,
-                songArtist,
-                //songArtistIds,
-                songArranger,
-                //songArrangerIds,
-                songComposer,
-                //songComposerIds,
-                songName,
-                songType,
-                songTypeNumber,
-                songDifficulty,
-                animeType,
-                animeVintage,
-                annId,
-                malId,
-                kitsuId,
-                aniListId,
-                animeTags,
-                animeGenre,
-                rebroadcast,
-                dub,
-                startPoint,
-                annSongId,
-                length,
-                D,
-                audio,
-                video480,
-                video720,
-                correctGuess,
-                incorrectGuess
-            });
-        }
-    }
-    for (const song of songList) {
-        const otherAnswers = new Set();
-        for (const s of songList) {
-            if (s.songName === song.songName && s.songArtist === song.songArtist) {
-                s.altAnimeNames.forEach(x => otherAnswers.add(x));
-            }
-        }
-        song.altAnimeNamesAnswers = Array.from(otherAnswers).filter(x => !song.altAnimeNames.includes(x));
-    }
-}
-
-// create song list table
-function createSongListTable(skipSort) {
-    $("#cslgSongListCount").text("Songs: " + songList.length);
-    $("#cslgMergeCurrentCount").text(`Current song list: ${songList.length} song${songList.length === 1 ? "" : "s"}`);
-    $("#cslgSongListWarning").text("");
-    const language = options.useRomajiNames ? "animeRomajiName" : "animeEnglishName";
-    const $thead = $("#cslgSongListTable thead").empty();
-    const $tbody = $("#cslgSongListTable tbody").empty();
-    if (!skipSort) {
-        if (songListTableSort.mode === "songName") {
-            songList.sort((a, b) => a.songName.localeCompare(b.songName));
-        }
-        else if (songListTableSort.mode === "artist") {
-            songList.sort((a, b) => a.songArtist.localeCompare(b.songArtist));
-        }
-        else if (songListTableSort.mode === "difficulty") {
-            songList.sort((a, b) => a.songDifficulty - b.songDifficulty);
-        }
-        else if (songListTableSort.mode === "anime") {
-            songList.sort((a, b) => a[language].localeCompare(b[language]));
-        }
-        else if (songListTableSort.mode === "songType") {
-            songList.sort((a, b) => songTypeSortValue(a, b));
-        }
-        else if (songListTableSort.mode === "vintage") {
-            songList.sort((a, b) => vintageSortValue(a, b));
-        }
-        else if (songListTableSort.mode === "mp3") {
-            songList.sort((a, b) => a.audio.localeCompare(b.audio));
-        }
-        else if (songListTableSort.mode === "480") {
-            songList.sort((a, b) => a.video480.localeCompare(b.video480));
-        }
-        else if (songListTableSort.mode === "720") {
-            songList.sort((a, b) => a.video720.localeCompare(b.video720));
-        }
-        if (!songListTableSort.ascending) {
-            songList.reverse();
-        }
-    }
-    if (songListTableView === 0) {
-        $thead.append($("<tr>")
-            .append($("<th>", { class: "number", text: "#" }))
-            .append($("<th>", { class: "song clickAble", text: "Song", "data-sort": "songName" }))
-            .append($("<th>", { class: "artist clickAble", text: "Artist", "data-sort": "artist" }))
-            .append($("<th>", { class: "difficulty clickAble", text: "Dif", "data-sort": "difficulty" }))
-            .append($("<th>", { class: "action" }))
-        );
-        songList.forEach((song, i) => {
-            $tbody.append($("<tr>")
-                .append($("<td>", { class: "number", text: i + 1 }))
-                .append($("<td>", { class: "song", text: song.songName }))
-                .append($("<td>", { class: "artist", text: song.songArtist }))
-                .append($("<td>", { class: "difficulty", text: Number.isFinite(song.songDifficulty) ? Math.floor(song.songDifficulty) : "" }))
-                .append($("<td>", { class: "action" })
-                    .append(`<i class="fa fa-plus clickAble" aria-hidden="true"></i>`)
-                    .append(`<i class="fa fa-trash clickAble" aria-hidden="true"></i>`)
-                )
-            );
-        });
-    }
-    else if (songListTableView === 1) {
-        $thead.append($("<tr>")
-            .append($("<th>", { class: "number", text: "#" }))
-            .append($("<th>", { class: "anime clickAble", text: "Anime", "data-sort": "anime" }))
-            .append($("<th>", { class: "songType clickAble", text: "Type", "data-sort": "songType" }))
-            .append($("<th>", { class: "vintage clickAble", text: "Vintage", "data-sort": "vintage" }))
-            .append($("<th>", { class: "action" }))
-        );
-        songList.forEach((song, i) => {
-            $tbody.append($("<tr>")
-                .append($("<td>", { class: "number", text: i + 1 }))
-                .append($("<td>", { class: "anime", text: song[language] }))
-                .append($("<td>", { class: "songType", text: songTypeText(song.songType, song.songTypeNumber) }))
-                .append($("<td>", { class: "vintage", text: song.animeVintage }))
-                .append($("<td>", { class: "action" })
-                    .append(`<i class="fa fa-plus clickAble" aria-hidden="true"></i>`)
-                    .append(`<i class="fa fa-trash clickAble" aria-hidden="true"></i>`)
-                )
-            );
-        });
-    }
-    else if (songListTableView === 2) {
-        $thead.append($("<tr>")
-            .append($("<th>", { class: "number", text: "#" }))
-            .append($("<th>", { class: "link clickAble", text: "MP3", "data-sort": "mp3" }))
-            .append($("<th>", { class: "link clickAble", text: "480", "data-sort": "480" }))
-            .append($("<th>", { class: "link clickAble", text: "720", "data-sort": "720" }))
-            .append($("<th>", { class: "action" }))
-        );
-        songList.forEach((song, i) => {
-            $tbody.append($("<tr>")
-                .append($("<td>", { class: "number", text: i + 1 }))
-                .append($("<td>", { class: "link" })
-                    .append(createLinkElement(song.audio)))
-                .append($("<td>", { class: "link" })
-                    .append(createLinkElement(song.video480)))
-                .append($("<td>", { class: "link" })
-                    .append(createLinkElement(song.video720)))
-                .append($("<td>", { class: "action" })
-                    .append(`<i class="fa fa-plus clickAble" aria-hidden="true"></i>`)
-                    .append(`<i class="fa fa-trash clickAble" aria-hidden="true"></i>`)
-                )
-            );
-        });
-    }
-}
-
-// create merged song list table
-function createMergedSongListTable() {
-    $("#cslgMergedSongListCount").text("Merged: " + mergedSongList.length);
-    $("#cslgMergeTotalCount").text(`Merged song list: ${mergedSongList.length} song${mergedSongList.length === 1 ? "" : "s"}`);
-    const $tbody = $("#cslgMergedSongListTable tbody").empty();
-    const language = options.useRomajiNames ? "animeRomajiName" : "animeEnglishName";
-    mergedSongList.forEach((song, i) => {
-        $tbody.append($("<tr>")
-            .append($("<td>", { class: "number", text: i + 1 }))
-            .append($("<td>", { class: "anime", text: song[language] }))
-            .append($("<td>", { class: "songType", text: songTypeText(song.songType, song.songTypeNumber) }))
-            .append($("<td>", { class: "action" })
-                .append(`<i class="fa fa-chevron-up clickAble" aria-hidden="true"></i>`)
-                .append(`<i class="fa fa-chevron-down clickAble" aria-hidden="true"></i>`)
-                .append(`<i class="fa fa-trash clickAble" aria-hidden="true"></i>`)
-            )
-        );
-    });
-}
-
-// create answer table
-function createAnswerTable() {
-    const $tbody = $("#cslgAnswerTable tbody").empty();
-    if (songList.length === 0) {
-        $("#cslgAnswerText").text("No list loaded");
-    }
-    else if (animeListLower.size === 0) {
-        $("#cslgAnswerText").text("Fetch autocomplete first");
-    }
-    else {
-        const animeList = new Set();
-        const missingAnimeList = [];
-        for (const song of songList) {
-            const answers = [song.animeEnglishName, song.animeRomajiName].concat(song.altAnimeNames, song.altAnimeNamesAnswers);
-            answers.forEach(x => animeList.add(x));
-        }
-        for (const anime of animeList) {
-            if (!animeListLower.has(anime.toLowerCase())) {
-                missingAnimeList.push(anime);
-            }
-        }
-        missingAnimeList.sort((a, b) => a.localeCompare(b));
-        $("#cslgAnswerText").text(`Found ${missingAnimeList.length} anime missing from AMQ's autocomplete`);
-        for (const anime of missingAnimeList) {
-            $tbody.append($("<tr>")
-                .append($("<td>", { class: "oldName", text: anime }))
-                .append($("<td>", { class: "newName", text: replacedAnswers[anime] || "" }))
-                .append($("<td>", { class: "edit" })
-                    .append(`<i class="fa fa-pencil clickAble" aria-hidden="true"></i>`))
-            );
-        }
-    }
-}
-
-// create link element for song list table
-function createLinkElement(link) {
-    if (!link) return "";
-    const $a = $("<a>", { target: "_blank" });
-    if (link.startsWith("http")) {
-        $a.text(link.includes("animemusicquiz") || link.includes("catbox") ? link.split("/").slice(-1)[0] : link);
-        $a.attr("href", link);
-    }
-    else if (/^\w+\.\w{3,4}$/.test(link)) {
-        $a.text(link);
-        if (fileHostOverride) {
-            $a.attr("href", "https://" + hostDict[fileHostOverride] + "/" + link);
-        }
-        else {
-            $a.attr("href", "https://naedist.animemusicquiz.com/" + link);
-        }
-    }
-    return $a;
-}
-
-// change sort mode or toggle sort order
-function setSongListTableSort(mode) {
-    if (mode) {
-        if (songListTableSort.mode === mode) {
-            songListTableSort.ascending = !songListTableSort.ascending;
-        }
-        else {
-            songListTableSort.mode = mode;
-            songListTableSort.ascending = true;
-        }
-    }
-    else {
-        songListTableSort.mode = "";
-        songListTableSort.ascending = true;
-    }
-}
-
-// get sorting value for anime vintage
-function vintageSortValue(a, b) {
-    if (!a.animeVintage && !b.animeVintage) return 0;
-    if (!a.animeVintage) return 1;
-    if (!b.animeVintage) return -1;
-    const [seasonA, yearA] = a.animeVintage.split(" ");
-    const [seasonB, yearB] = b.animeVintage.split(" ");
-    if (yearA !== yearB) {
-        return yearA - yearB;
-    }
-    const seasonOrder = { "Winter": 1, "Spring": 2, "Summer": 3, "Fall": 4 };
-    return seasonOrder[seasonA] - seasonOrder[seasonB];
-}
-
-// get sorting value for song type
-function songTypeSortValue(a, b) {
-    if (a.songType !== b.songType) {
-        return a.songType - b.songType;
-    }
-    if (a.songType !== 3 && b.songType !== 3) {
-        return (a.songTypeNumber || 0) - (b.songTypeNumber || 0);
-    }
-    return 0;
-}
-
-// filter the song list
-function filterSongList() {
-    const keep = $("#cslgFilterModeSelect").val() === "Keep";
-    const key = $("#cslgFilterKeySelect").val();
-    let text = $("#cslgFilterListInput").val();
-    const caseSensitive = $("#cslgFilterListCaseCheckbox").prop("checked");
-    const customIncludes = (string, sub) => {
-        return caseSensitive ? string.includes(sub) : string.toLowerCase().includes(sub.toLowerCase());
-    }
-    if (key === "Anime") {
-        if (!text) return;
-        songList = songList.filter((song) => {
-            const match = customIncludes(song.animeRomajiName, text) || customIncludes(song.animeEnglishName, text);
-            return keep ? match : !match;
-        });
-    }
-    else if (key === "Artist") {
-        if (!text) return;
-        songList = songList.filter((song) => {
-            const match = customIncludes(song.songArtist, text);
-            return keep ? match : !match;
-        });
-    }
-    else if (key === "Song Name") {
-        if (!text) return;
-        songList = songList.filter((song) => {
-            const match = customIncludes(song.songName, text);
-            return keep ? match : !match;
-        });
-    }
-    else if (key === "Song Type") {
-        text = text.toLowerCase().trim();
-        if (!text) return;
-        let option;
-        const number = parseInt(text.match(/[0-9]+/)?.[0]) || null;
-        if (text.startsWith("o")) {
-            option = { songType: 1, songTypeNumber: number };
-        }
-        else if (text.startsWith("e")) {
-            option = { songType: 2, songTypeNumber: number };
-        }
-        else if (text.startsWith("i")) {
-            option = { songType: 3, songTypeNumber: null };
-        }
-        else return;
-        songList = songList.filter((song) => {
-            const matchesType = song.songType === option.songType;
-            const matchesNumber = !option.songTypeNumber || option.songTypeNumber === song.songTypeNumber;
-            const match = matchesType && matchesNumber;
-            return keep ? match : !match;
-        });
-    }
-    else if (key === "Anime Type") {
-        text = text.toLowerCase().trim();
-        if (!text) return;
-        songList = songList.filter((song) => {
-            const match = song.animeType && text === song.animeType.toLowerCase();
-            return keep ? match : !match;
-        });
-    }
-    else if (key === "Difficulty") {
-        text = text.toLowerCase().trim();
-        if (!text) return;
-        if (text === "null") {
-            songList = songList.filter((song) => {
-                const match = song.songDifficulty === null;
-                return keep ? match : !match;
-            });
-        }
-        else {
-            const [low, high] = text.split(/[\s-]+/).map(Number);
-            if (isNaN(low) || isNaN(high) || low > high) return;
-            songList = songList.filter((song) => {
-                const match = song.songDifficulty && song.songDifficulty >= low && song.songDifficulty <= high;
-                return keep ? match : !match;
-            });
-        }
-    }
-    else if (key === "Vintage") {
-        text = text.toLowerCase().trim();
-        if (!text) return;
-        if (text === "null") {
-            songList = songList.filter((song) => {
-                const match = song.animeVintage === null;
-                return keep ? match : !match;
-            });
-        }
-        else if (/^[0-9]{4}[\s-]+[0-9]{4}$/.test(text)) {
-            const [low, high] = text.split(/[\s-]+/).map(Number);
-            if (isNaN(low) || isNaN(high) || low > high) return;
-            songList = songList.filter((song) => {
-                const year = song.animeVintage ? Number(song.animeVintage.split(" ")[1]) : NaN;
-                const match = Number.isInteger(year) && year >= low && year <= high;
-                return keep ? match : !match;
-            });
-        }
-        else {
-            songList = songList.filter((song) => {
-                const match = song.animeVintage && song.animeVintage.toLowerCase().includes(text);
-                return keep ? match : !match;
-            });
-        }
-    }
-    else if (key === "Rebroadcast") {
-        songList = songList.filter((song) => {
-            const match = Boolean(song.rebroadcast);
-            return keep ? match : !match;
-        });
-    }
-    else if (key === "Dub") {
-        songList = songList.filter((song) => {
-            const match = Boolean(song.dub);
-            return keep ? match : !match;
-        });
-    }
-    else if (key === "Correct") {
-        songList = songList.filter((song) => {
-            const match = song.correctGuess === true;
-            return keep ? match : !match;
-        });
-    }
-    else if (key === "Incorrect") {
-        songList = songList.filter((song) => {
-            const match = song.incorrectGuess === true;
-            return keep ? match : !match;
-        });
-    }
-    createSongListTable(true);
-    createAnswerTable();
-}
-
-// reset all tabs and switch to the inputted tab
-function switchTab(tab) {
-    const $w = $("#cslgSettingsModal");
-    $w.find(".tab").removeClass("selected");
-    $w.find(".tabSection").hide();
-    $w.find(`#${tab}Tab`).addClass("selected");
-    $w.find(`#${tab}Container`).show();
-}
-
-// convert full url to target data
-function formatTargetUrl(url) {
-    if (url && url.startsWith("http")) {
-        return url.split("/").slice(-1)[0];
-    }
-    return url;
-}
-
-// translate type and typeNumber ids to shortened type text
-function songTypeText(type, typeNumber) {
-    if (type === 1) return "OP" + typeNumber;
-    if (type === 2) return "ED" + typeNumber;
-    if (type === 3) return "IN";
-    return "";
-};
-
-// input 3 links, return formatted catbox link object
-function createCatboxLinkObject(audio, video480, video720) {
-    const links = {};
-    if (fileHostOverride) {
-        if (audio) links["0"] = "https://" + hostDict[fileHostOverride] + "/" + audio.split("/").slice(-1)[0];
-        if (video480) links["480"] = "https://" + hostDict[fileHostOverride] + "/" + video480.split("/").slice(-1)[0];
-        if (video720) links["720"] = "https://" + hostDict[fileHostOverride] + "/" + video720.split("/").slice(-1)[0];
-    }
-    else {
-        if (audio) links["0"] = audio;
-        if (video480) links["480"] = video480;
-        if (video720) links["720"] = video720;
-    }
-    return links;
-}
-
-// load hotkey from local storage, input optional default values
-function loadHotkey(action, key = "", ctrl = false, alt = false, shift = false) {
-    const item = saveData.hotKeys?.[action];
-    return {
-        key: (item?.key ?? key).toUpperCase(),
-        ctrl: item?.ctrl ?? item?.ctrlKey ?? ctrl,
-        alt: item?.alt ?? item?.altKey ?? alt,
-        shift: item?.shift ?? item?.shiftKey ?? shift
-    }
-}
-
-// create hotkey rows and add to table
-function createHotkeyTable(data) {
-    const $tbody = $("#cslgHotkeyTable tbody");
-    for (const { action, title } of data) {
-        const $input = $("<input>", { type: "text", class: "hk-input", readonly: true, "data-action": action })
-            .val(bindingToText(hotKeys[action]))
-            .on("click", startHotkeyRecord);
-        $tbody.append($("<tr>")
-            .append($("<td>", { text: title }))
-            .append($("<td>").append($input)));
-    }
-}
-
-// begin hotkey capture on click
-function startHotkeyRecord() {
-    const $input = $(this);
-    if ($input.hasClass("recording")) return;
-    const action = $input.data("action");
-    const capture = (e) => {
-        e.stopImmediatePropagation();
-        e.preventDefault();
-        if (!e.key) return;
-        if (["Shift", "Control", "Alt", "Meta"].includes(e.key)) return;
-        if ((e.key === "Delete" || e.key === "Backspace" || e.key === "Escape") && !e.altKey && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
-            hotKeys[action] = {
-                key: "",
-                ctrl: false,
-                alt: false,
-                shift: false
-            };
-        }
-        else {
-            hotKeys[action] = {
-                key: e.key.toUpperCase(),
-                ctrl: e.ctrlKey,
-                alt: e.altKey,
-                shift: e.shiftKey
-            };
-        }
-        saveSettings();
-        finish();
-    };
-    const finish = () => {
-        document.removeEventListener("keydown", capture, true);
-        $input.removeClass("recording").val(bindingToText(hotKeys[action])).off("blur", finish);
-    };
-    document.addEventListener("keydown", capture, true);
-    $input.addClass("recording").val("Press keys…").on("blur", finish);
-}
-
-// input hotKeys[action] and convert the data to a string for the input field
-function bindingToText(b) {
-    if (!b) return "";
-    const keys = [];
-    if (b.ctrl) keys.push("CTRL");
-    if (b.alt) keys.push("ALT");
-    if (b.shift) keys.push("SHIFT");
-    if (b.key) keys.push(b.key === " " ? "SPACE" : b.key);
-    return keys.join(" + ");
-}
-
-// return true if you are in a ranked lobby or quiz
-function isQuizOfTheDay() {
-    const types = ["Ranked", "Themed"];
-    if (lobby.inLobby) {
-        if (types.includes(lobby.settings.gameMode)) {
-            return true;
-        }
-    }
-    if (quiz.inQuiz) {
-        if (types.includes(quiz.gameMode)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-// safeguard against people putting valid javascript in the song json
-function preventCodeInjection(text) {
-    if (/<script/i.test(text)) {
-        cslMessage("⚠️ code injection attempt detected, ending quiz");
-        quizOver();
-        console.warn("CSL CODE INJECTION ATTEMPT:\n" + text);
-        return "";
-    }
-    return text;
-}
-
-// split a string into chunks
-function splitIntoChunks(str, chunkSize) {
-    const chunks = [];
-    for (let i = 0; i < str.length; i += chunkSize) {
-        chunks.push(str.slice(i, i + chunkSize));
-    }
-    return chunks;
-}
-
-// convert base 10 number to base 36
-function base10to36(number) {
-    if (number === 0) return 0;
-    const digits = "0123456789abcdefghijklmnopqrstuvwxyz";
-    let result = "";
-    while (number > 0) {
-        let remainder = number % 36;
-        result = digits[remainder] + result;
-        number = Math.floor(number / 36);
-    }
-    return result;
-}
-
-// convert base 36 number to base 10
-function base36to10(number) {
-    number = String(number);
-    const digits = "0123456789abcdefghijklmnopqrstuvwxyz";
-    let result = 0;
-    for (let i = 0; i < number.length; i++) {
-        const digit = digits.indexOf(number[i]);
-        if (digit === -1) return null;
-        result = result * 36 + digit;
-    }
-    return result;
-}
-
-// manage data for split messages
-class Chunk {
-    constructor() {
-        this.chunkMap = {};
-        this.isComplete = false;
-    }
-    append(text) {
-        const regex = /^§CSL\w(\w)/.exec(text);
-        if (regex) {
-            const index = base36to10(regex[1]);
-            if (text.endsWith("$")) {
-                this.chunkMap[index] = text.slice(6, -1);
-                this.isComplete = true;
-            }
-            else {
-                this.chunkMap[index] = text.slice(6);
-            }
-        }
-        else {
-            console.log("CSL ERROR: bad chunk\n" + text);
-        }
-    }
-    decode() {
-        if (this.isComplete) {
-            const result = Object.values(this.chunkMap).reduce((a, b) => a + b);
-            try {
-                return decodeURIComponent(atob(result));
-            }
-            catch {
-                sendSystemMessage("CSL chunk decode error");
-                console.log("CSL ERROR: could not decode\n" + result);
-            }
-        }
-        else {
-            sendSystemMessage("CSL incomplete chunk");
-            console.log("CSL ERROR: incomplete chunk\n", this.chunkMap);
-        }
-        return "";
-    }
-}
-
-// input myanimelist username, return list of mal ids
-async function getMalIdsFromMyanimelist(username) {
-    const malIds = [];
-    const statuses = [];
-    if ($("#cslgListImportWatchingCheckbox").prop("checked")) {
-        statuses.push("watching");
-    }
-    if ($("#cslgListImportCompletedCheckbox").prop("checked")) {
-        statuses.push("completed");
-    }
-    if ($("#cslgListImportHoldCheckbox").prop("checked")) {
-        statuses.push("on_hold");
-    }
-    if ($("#cslgListImportDroppedCheckbox").prop("checked")) {
-        statuses.push("dropped");
-    }
-    if ($("#cslgListImportPlanningCheckbox").prop("checked")) {
-        statuses.push("plan_to_watch");
-    }
-    for (const status of statuses) {
-        $("#cslgListImportText").text(`Retrieving Myanimelist: ${status}`);
-        let nextPage = `https://api.myanimelist.net/v2/users/${username}/animelist?offset=0&limit=1000&nsfw=true&status=${status}`;
-        while (nextPage) {
-            const result = await new Promise((resolve, reject) => {
-                GM_xmlhttpRequest({
-                    method: "GET",
-                    url: nextPage,
-                    headers: { "Content-Type": "application/json", "Accept": "application/json", "X-MAL-CLIENT-ID": malClientId },
-                    onload: (res) => resolve(JSON.parse(res.response)),
-                    onerror: (res) => reject(res)
-                });
-            });
-            if (result.error) {
-                nextPage = false;
-                $("#cslgListImportText").text(`MAL API Error: ${result.error}`);
-            }
-            else {
-                for (const anime of result.data) {
-                    malIds.push(anime.node.id);
-                }
-                nextPage = result.paging.next;
-            }
-        }
-    }
-    return malIds;
-}
-
-// input anilist username, return list of mal ids
-async function getMalIdsFromAnilist(username) {
-    const malIds = [];
-    const statuses = [];
-    let pageNumber = 1;
-    let hasNextPage = true;
-    if ($("#cslgListImportWatchingCheckbox").prop("checked")) {
-        statuses.push("CURRENT");
-    }
-    if ($("#cslgListImportCompletedCheckbox").prop("checked")) {
-        statuses.push("COMPLETED");
-    }
-    if ($("#cslgListImportHoldCheckbox").prop("checked")) {
-        statuses.push("PAUSED");
-    }
-    if ($("#cslgListImportDroppedCheckbox").prop("checked")) {
-        statuses.push("DROPPED");
-    }
-    if ($("#cslgListImportPlanningCheckbox").prop("checked")) {
-        statuses.push("PLANNING");
-    }
-    while (hasNextPage) {
-        if (pageNumber % 29 === 0) {
-            $("#cslgListImportText").text(`Large list: pausing 1 minute to avoid rate limit`);
-            await new Promise(r => setTimeout(r, 60000));
-        }
-        $("#cslgListImportText").text(`Retrieving Anilist: page ${pageNumber}`);
-        const data = await getAnilistData(username, statuses, pageNumber);
-        if (data) {
-            for (const item of data.mediaList) {
-                if (item.media.idMal) {
-                    malIds.push(item.media.idMal);
-                }
-            }
-            if (data.pageInfo.hasNextPage) {
-                pageNumber += 1;
-            }
-            else {
-                hasNextPage = false;
-            }
-        }
-        else {
-            $("#cslgListImportText").text("Anilist API Error");
-            hasNextPage = false;
-        }
-    }
-    return malIds;
-}
-
-// input username, status, and page number
-function getAnilistData(username, statuses, pageNumber) {
-    const query = `
-        query {
-            Page (page: ${pageNumber}, perPage: 50) {
-                pageInfo {
-                    currentPage
-                    hasNextPage
-                }
-                mediaList (userName: "${username}", type: ANIME, status_in: [${statuses}]) {
-                    status
-                    media {
-                        id
-                        idMal
-                    }
-                }
-            }
-        }
-    `;
-    const data = {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ query: query })
-    }
-    return fetch("https://graphql.anilist.co", data)
-        .then(res => res.json())
-        .then(json => json?.data?.Page)
-        .catch(error => console.log(error));
-}
-
-async function getAllMalIds(){
-  $("#cslgListImportText").text(`Retrieving All MalIds`);
-  const response = await fetch(apiBase + "annid_linked_ids");
-  const ann_song_ids = await response.json();
-  const malIdSet = new Set();
-  Object.values(ann_song_ids).forEach(song => {
-    const id = song.linked_ids.myanimelist;
-    if (id){
-      malIdSet.add(id);
-    }
-  })
-  const malIdArray = Array.from(malIdSet);
-  return malIdArray;
-}
-
-// convert list of mal ids to anisongdb song list
-async function getSongListFromMalIds(malIds) {
-    importedSongList = [];
-    if (!malIds) malIds = [];
-    if (malIds.length === 0) return;
-    $("#cslgListImportText").text(`Anime: 0 / ${malIds.length} | Songs: ${importedSongList.length}`);
-    const url = apiBase + "mal_ids_request";
-    let idsProcessed = 0;
-    for (let i = 0; i < malIds.length; i += 500) {
-        const segment = malIds.slice(i, i + 500);
-        idsProcessed += segment.length;
-        const data = {
-            method: "POST",
-            headers: { "Accept": "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({ "mal_ids": segment })
-        };
-        await fetch(url, data)
-            .then(res => res.json())
-            .then(json => {
-                if (Array.isArray(json)) {
-                    importedSongList = importedSongList.concat(json);
-                    $("#cslgListImportText").text(`Anime: ${idsProcessed} / ${malIds.length} | Songs: ${importedSongList.length}`);
-                }
-                else {
-                    importedSongList = [];
-                    $("#cslgListImportText").text("anisongdb error");
-                    console.log(json);
-                    throw new Error("did not receive an array from anisongdb");
+				}
+			})
+		}
+        else{
+            $(this.input).on("keydown", (e) => {
+                if (e.keyCode == 40 && this.index <= -2){
+                    this.next();
+                    this.next();
+                    this.next();
                 }
             })
-            .catch(res => {
-                importedSongList = [];
-                $("#cslgListImportText").text("anisongdb error");
-                console.log(res);
-            });
+        }
+	}
+
+	AmqAwesomeplete.prototype.evaluate = function () {
+		if (this.isAnimeAutocomplete == false || options.enabled == false) return oldEvaluate.call(this);
+        this.index = -3;
+		let suggestions = this.filterManager.filterBy(this.input.value, options.fuzzy.dropdown);
+
+		if (!this.filterManager.fuzzySearched) suggestions = suggestions.sort((a, b) => {
+		    if (options.defaultSort == false) {
+				if (a.priority < b.priority) return -1;
+				else if (a.priority > b.priority) return 1;
+				else if (a.entrySetIndex < b.entrySetIndex) return -1;
+				else if (a.entrySetIndex > b.entrySetIndex) return 1;
+				return a.match.originalIndex < b.match.originalIndex ? -1 : 1;
+			}
+            else if (this.sort !== false) {
+			    if (a.match.originalIndex < b.match.originalIndex) return -1;
+			}
+
+			return 1;
+		})
+
+		this.suggestions = suggestions.map(v => new Suggestion(this.data(v.listMatch.originalStr, v.lastQry)));
+
+		log(this.suggestions)
+
+		$("#qpAnswerInputLoadingContainer").removeClass("hide");
+		this.$ul.children('li').remove();
+
+		for (let i = this.suggestions.length - 1; i >= 0; i--) {
+            this.ul.insertBefore(this.item(this.suggestions[i], options.highlight ? RegExp.escape(suggestions[i].lastQry) : "", i), this.ul.firstChild);
+		}
+
+		if (this.ul.children.length === 0) {
+
+			this.status.textContent = "No results found";
+
+			this.close({ reason: "nomatches" });
+
+		} else {
+			this.open();
+
+			this.status.textContent = this.ul.children.length + " results found";
+		}
+
+		$("#qpAnswerInputLoadingContainer").addClass("hide");
+	};
+
+	//auto send incomplete answer
+	const proto = typeof QuizTypeAnswerInput != 'undefined' ? QuizTypeAnswerInput.prototype : AmqAwesomeplete.prototype;
+	var oldSendAnswer = proto.submitAnswer;
+
+	proto.submitAnswer = function () {
+	    try{
+			var awesome = this.autoCompleteController.awesomepleteInstance;
+//			if((!keyStates.ctrl || keyStates.shift) && options.enabled && awesome && awesome.input.value == awesome.filterManager.lastStr && awesome.suggestions && awesome.input.value.trim() && awesome.suggestions.slice(1).every(s => cleanString(s.value) != cleanString(awesome.input.value)) && (awesome.suggestions.length || (!options.fuzzy.dropdown && options.fuzzy.answer))) {
+			if((!keyStates.ctrl || keyStates.shift) && options.enabled && awesome && awesome.input.value == awesome.filterManager.lastStr && awesome.suggestions && awesome.input.value.trim()) {
+                //awesome.input.value = awesome.suggestions.length ? awesome.suggestions[0].value : awesome.filterManager.filterBy(awesome.input.value, true)[0].originalStr;
+                awesome.input.value = awesome.suggestions.length ? awesome.suggestions[0].value : "";
+			}
+            awesome.close();
+		} catch (ex) {
+	        console.log(ex);
+		}
+		oldSendAnswer.apply(this, Array.from(arguments));
+	}
+}
+
+var defaultDiacriticsRemovalMap = [
+    {'base':'A', 'letters':'\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F'},
+    {'base':'AA','letters':'\uA732'},
+    {'base':'AE','letters':'\u00C6\u01FC\u01E2'},
+    {'base':'AO','letters':'\uA734'},
+    {'base':'AU','letters':'\uA736'},
+    {'base':'AV','letters':'\uA738\uA73A'},
+    {'base':'AY','letters':'\uA73C'},
+    {'base':'B', 'letters':'\u0042\u24B7\uFF22\u1E02\u1E04\u1E06\u0243\u0182\u0181'},
+    {'base':'C', 'letters':'\u0043\u24B8\uFF23\u0106\u0108\u010A\u010C\u00C7\u1E08\u0187\u023B\uA73E'},
+    {'base':'D', 'letters':'\u0044\u24B9\uFF24\u1E0A\u010E\u1E0C\u1E10\u1E12\u1E0E\u0110\u018B\u018A\u0189\uA779\u00D0'},
+    {'base':'DZ','letters':'\u01F1\u01C4'},
+    {'base':'Dz','letters':'\u01F2\u01C5'},
+    {'base':'E', 'letters':'\u0045\u24BA\uFF25\u00C8\u00C9\u00CA\u1EC0\u1EBE\u1EC4\u1EC2\u1EBC\u0112\u1E14\u1E16\u0114\u0116\u00CB\u1EBA\u011A\u0204\u0206\u1EB8\u1EC6\u0228\u1E1C\u0118\u1E18\u1E1A\u0190\u018E'},
+    {'base':'F', 'letters':'\u0046\u24BB\uFF26\u1E1E\u0191\uA77B'},
+    {'base':'G', 'letters':'\u0047\u24BC\uFF27\u01F4\u011C\u1E20\u011E\u0120\u01E6\u0122\u01E4\u0193\uA7A0\uA77D\uA77E'},
+    {'base':'H', 'letters':'\u0048\u24BD\uFF28\u0124\u1E22\u1E26\u021E\u1E24\u1E28\u1E2A\u0126\u2C67\u2C75\uA78D'},
+    {'base':'I', 'letters':'\u0049\u24BE\uFF29\u00CC\u00CD\u00CE\u0128\u012A\u012C\u0130\u00CF\u1E2E\u1EC8\u01CF\u0208\u020A\u1ECA\u012E\u1E2C\u0197'},
+    {'base':'J', 'letters':'\u004A\u24BF\uFF2A\u0134\u0248'},
+    {'base':'K', 'letters':'\u004B\u24C0\uFF2B\u1E30\u01E8\u1E32\u0136\u1E34\u0198\u2C69\uA740\uA742\uA744\uA7A2'},
+    {'base':'L', 'letters':'\u004C\u24C1\uFF2C\u013F\u0139\u013D\u1E36\u1E38\u013B\u1E3C\u1E3A\u0141\u023D\u2C62\u2C60\uA748\uA746\uA780'},
+    {'base':'LJ','letters':'\u01C7'},
+    {'base':'Lj','letters':'\u01C8'},
+    {'base':'M', 'letters':'\u004D\u24C2\uFF2D\u1E3E\u1E40\u1E42\u2C6E\u019C'},
+    {'base':'N', 'letters':'\u004E\u24C3\uFF2E\u01F8\u0143\u00D1\u1E44\u0147\u1E46\u0145\u1E4A\u1E48\u0220\u019D\uA790\uA7A4'},
+    {'base':'NJ','letters':'\u01CA'},
+    {'base':'Nj','letters':'\u01CB'},
+    {'base':'O', 'letters':'\u004F\u24C4\uFF2F\u00D2\u00D3\u00D4\u1ED2\u1ED0\u1ED6\u1ED4\u00D5\u1E4C\u022C\u1E4E\u014C\u1E50\u1E52\u014E\u022E\u0230\u00D6\u022A\u1ECE\u0150\u01D1\u020C\u020E\u01A0\u1EDC\u1EDA\u1EE0\u1EDE\u1EE2\u1ECC\u1ED8\u01EA\u01EC\u00D8\u01FE\u0186\u019F\uA74A\uA74C'},
+    {'base':'OI','letters':'\u01A2'},
+    {'base':'OO','letters':'\uA74E'},
+    {'base':'OU','letters':'\u0222'},
+    {'base':'OE','letters':'\u008C\u0152'},
+    {'base':'oe','letters':'\u009C\u0153'},
+    {'base':'P', 'letters':'\u0050\u24C5\uFF30\u1E54\u1E56\u01A4\u2C63\uA750\uA752\uA754'},
+    {'base':'Q', 'letters':'\u0051\u24C6\uFF31\uA756\uA758\u024A'},
+    {'base':'R', 'letters':'\u0052\u24C7\uFF32\u0154\u1E58\u0158\u0210\u0212\u1E5A\u1E5C\u0156\u1E5E\u024C\u2C64\uA75A\uA7A6\uA782'},
+    {'base':'S', 'letters':'\u0053\u24C8\uFF33\u1E9E\u015A\u1E64\u015C\u1E60\u0160\u1E66\u1E62\u1E68\u0218\u015E\u2C7E\uA7A8\uA784'},
+    {'base':'T', 'letters':'\u0054\u24C9\uFF34\u1E6A\u0164\u1E6C\u021A\u0162\u1E70\u1E6E\u0166\u01AC\u01AE\u023E\uA786'},
+    {'base':'TZ','letters':'\uA728'},
+    {'base':'U', 'letters':'\u0055\u24CA\uFF35\u00D9\u00DA\u00DB\u0168\u1E78\u016A\u1E7A\u016C\u00DC\u01DB\u01D7\u01D5\u01D9\u1EE6\u016E\u0170\u01D3\u0214\u0216\u01AF\u1EEA\u1EE8\u1EEE\u1EEC\u1EF0\u1EE4\u1E72\u0172\u1E76\u1E74\u0244'},
+    {'base':'V', 'letters':'\u0056\u24CB\uFF36\u1E7C\u1E7E\u01B2\uA75E\u0245'},
+    {'base':'VY','letters':'\uA760'},
+    {'base':'W', 'letters':'\u0057\u24CC\uFF37\u1E80\u1E82\u0174\u1E86\u1E84\u1E88\u2C72'},
+    {'base':'X', 'letters':'\u0058\u24CD\uFF38\u1E8A\u1E8C'},
+    {'base':'Y', 'letters':'\u0059\u24CE\uFF39\u1EF2\u00DD\u0176\u1EF8\u0232\u1E8E\u0178\u1EF6\u1EF4\u01B3\u024E\u1EFE'},
+    {'base':'Z', 'letters':'\u005A\u24CF\uFF3A\u0179\u1E90\u017B\u017D\u1E92\u1E94\u01B5\u0224\u2C7F\u2C6B\uA762'},
+    {'base':'a', 'letters':'\u0061\u24D0\uFF41\u1E9A\u00E0\u00E1\u00E2\u1EA7\u1EA5\u1EAB\u1EA9\u00E3\u0101\u0103\u1EB1\u1EAF\u1EB5\u1EB3\u0227\u01E1\u00E4\u01DF\u1EA3\u00E5\u01FB\u01CE\u0201\u0203\u1EA1\u1EAD\u1EB7\u1E01\u0105\u2C65\u0250'},
+    {'base':'aa','letters':'\uA733'},
+    {'base':'ae','letters':'\u00E6\u01FD\u01E3'},
+    {'base':'ao','letters':'\uA735'},
+    {'base':'au','letters':'\uA737'},
+    {'base':'av','letters':'\uA739\uA73B'},
+    {'base':'ay','letters':'\uA73D'},
+    {'base':'b', 'letters':'\u0062\u24D1\uFF42\u1E03\u1E05\u1E07\u0180\u0183\u0253'},
+    {'base':'c', 'letters':'\u0063\u24D2\uFF43\u0107\u0109\u010B\u010D\u00E7\u1E09\u0188\u023C\uA73F\u2184'},
+    {'base':'d', 'letters':'\u0064\u24D3\uFF44\u1E0B\u010F\u1E0D\u1E11\u1E13\u1E0F\u0111\u018C\u0256\u0257\uA77A'},
+    {'base':'dz','letters':'\u01F3\u01C6'},
+    {'base':'e', 'letters':'\u0065\u24D4\uFF45\u00E8\u00E9\u00EA\u1EC1\u1EBF\u1EC5\u1EC3\u1EBD\u0113\u1E15\u1E17\u0115\u0117\u00EB\u1EBB\u011B\u0205\u0207\u1EB9\u1EC7\u0229\u1E1D\u0119\u1E19\u1E1B\u0247\u025B\u01DD'},
+    {'base':'f', 'letters':'\u0066\u24D5\uFF46\u1E1F\u0192\uA77C'},
+    {'base':'g', 'letters':'\u0067\u24D6\uFF47\u01F5\u011D\u1E21\u011F\u0121\u01E7\u0123\u01E5\u0260\uA7A1\u1D79\uA77F'},
+    {'base':'h', 'letters':'\u0068\u24D7\uFF48\u0125\u1E23\u1E27\u021F\u1E25\u1E29\u1E2B\u1E96\u0127\u2C68\u2C76\u0265'},
+    {'base':'hv','letters':'\u0195'},
+    {'base':'i', 'letters':'\u0069\u24D8\uFF49\u00EC\u00ED\u00EE\u0129\u012B\u012D\u00EF\u1E2F\u1EC9\u01D0\u0209\u020B\u1ECB\u012F\u1E2D\u0268\u0131'},
+    {'base':'j', 'letters':'\u006A\u24D9\uFF4A\u0135\u01F0\u0249'},
+    {'base':'k', 'letters':'\u006B\u24DA\uFF4B\u1E31\u01E9\u1E33\u0137\u1E35\u0199\u2C6A\uA741\uA743\uA745\uA7A3'},
+    {'base':'l', 'letters':'\u006C\u24DB\uFF4C\u0140\u013A\u013E\u1E37\u1E39\u013C\u1E3D\u1E3B\u017F\u0142\u019A\u026B\u2C61\uA749\uA781\uA747'},
+    {'base':'lj','letters':'\u01C9'},
+    {'base':'m', 'letters':'\u006D\u24DC\uFF4D\u1E3F\u1E41\u1E43\u0271\u026F'},
+    {'base':'n', 'letters':'\u006E\u24DD\uFF4E\u01F9\u0144\u00F1\u1E45\u0148\u1E47\u0146\u1E4B\u1E49\u019E\u0272\u0149\uA791\uA7A5'},
+    {'base':'nj','letters':'\u01CC'},
+    {'base':'o', 'letters':'\u006F\u24DE\uFF4F\u00F2\u00F3\u00F4\u1ED3\u1ED1\u1ED7\u1ED5\u00F5\u1E4D\u022D\u1E4F\u014D\u1E51\u1E53\u014F\u022F\u0231\u00F6\u022B\u1ECF\u0151\u01D2\u020D\u020F\u01A1\u1EDD\u1EDB\u1EE1\u1EDF\u1EE3\u1ECD\u1ED9\u01EB\u01ED\u00F8\u01FF\u0254\uA74B\uA74D\u0275'},
+    {'base':'oi','letters':'\u01A3'},
+    {'base':'ou','letters':'\u0223'},
+    {'base':'oo','letters':'\uA74F'},
+    {'base':'p','letters':'\u0070\u24DF\uFF50\u1E55\u1E57\u01A5\u1D7D\uA751\uA753\uA755'},
+    {'base':'q','letters':'\u0071\u24E0\uFF51\u024B\uA757\uA759'},
+    {'base':'r','letters':'\u0072\u24E1\uFF52\u0155\u1E59\u0159\u0211\u0213\u1E5B\u1E5D\u0157\u1E5F\u024D\u027D\uA75B\uA7A7\uA783'},
+    {'base':'s','letters':'\u0073\u24E2\uFF53\u00DF\u015B\u1E65\u015D\u1E61\u0161\u1E67\u1E63\u1E69\u0219\u015F\u023F\uA7A9\uA785\u1E9B'},
+    {'base':'t','letters':'\u0074\u24E3\uFF54\u1E6B\u1E97\u0165\u1E6D\u021B\u0163\u1E71\u1E6F\u0167\u01AD\u0288\u2C66\uA787'},
+    {'base':'tz','letters':'\uA729'},
+    {'base':'u','letters': '\u0075\u24E4\uFF55\u00F9\u00FA\u00FB\u0169\u1E79\u016B\u1E7B\u016D\u00FC\u01DC\u01D8\u01D6\u01DA\u1EE7\u016F\u0171\u01D4\u0215\u0217\u01B0\u1EEB\u1EE9\u1EEF\u1EED\u1EF1\u1EE5\u1E73\u0173\u1E77\u1E75\u0289'},
+    {'base':'v','letters':'\u0076\u24E5\uFF56\u1E7D\u1E7F\u028B\uA75F\u028C'},
+    {'base':'vy','letters':'\uA761'},
+    {'base':'w','letters':'\u0077\u24E6\uFF57\u1E81\u1E83\u0175\u1E87\u1E85\u1E98\u1E89\u2C73'},
+    {'base':'x','letters':'\u0078\u24E7\uFF58\u1E8B\u1E8D'},
+    {'base':'y','letters':'\u0079\u24E8\uFF59\u1EF3\u00FD\u0177\u1EF9\u0233\u1E8F\u00FF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF'},
+    {'base':'z','letters':'\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763'}
+];
+
+var diacriticsMap = {};
+
+for (var i=0; i < defaultDiacriticsRemovalMap.length; i++){
+    var letters = defaultDiacriticsRemovalMap[i].letters;
+    for (var j=0; j < letters.length ; j++){
+        diacriticsMap[letters[j]] = defaultDiacriticsRemovalMap[i].base;
     }
 }
 
-// start list import process
-async function startImport() {
-    if (importRunning) return;
-    importRunning = true;
-    $("#cslgListImportStartButton").addClass("disabled");
-    $("#cslgListImportActionContainer").hide();
-    const val = $("#cslgListImportSelect").val();
-    if (val === "myanimelist") {
-        if (malClientId) {
-            const username = $("#cslgListImportUsernameInput").val().trim();
-            if (username) {
-                const malIds = await getMalIdsFromMyanimelist(username);
-                await getSongListFromMalIds(malIds);
-            }
-            else {
-                const malIds = await getAllMalIds();
-                await getSongListFromMalIds(malIds);
-            }
-        }
-        else {
-            $("#cslgListImportText").text("Missing MAL Client ID");
-        }
-    }
-    else if (val === "anilist") {
-        const username = $("#cslgListImportUsernameInput").val().trim();
-        if (username) {
-            const malIds = await getMalIdsFromAnilist(username);
-            await getSongListFromMalIds(malIds);
-        }
-        else {
-            $("#cslgListImportText").text("Input Anilist Username");
-        }
-    }
-    if (importedSongList.length) $("#cslgListImportActionContainer").show();
-    $("#cslgListImportStartButton").removeClass("disabled");
-    importRunning = false;
+diacriticsMap["×"] = "x";
+diacriticsMap["³"] = "3";
+diacriticsMap["ß"] = "b";
+diacriticsMap["–"] = "-";
+diacriticsMap["²"] = "2";
+diacriticsMap["’"] = "'";
+diacriticsMap["@"] = "a";
+diacriticsMap["æ"] = "a";
+diacriticsMap["ñ"] = "n";
+
+
+
+// "what?" version ... http://jsperf.com/diacritics/12
+function removeDiacritics (str, except) {
+    return str.replace(/[^a-z]/gi, function(a){
+       return (except && except.includes(a)) ? a : (diacriticsMap[a] || a);
+    });
 }
 
-// input list and file name, download json file
-function downloadListJson(list, fileName) {
-    const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(list));
-    const element = document.createElement("a");
-    element.setAttribute("href", data);
-    element.setAttribute("download", fileName);
-    document.body.appendChild(element);
-    element.click();
-    element.remove();
-}
+if (isNode) {
+	Object.assign(options.entrySets[0], {startsWith: false, contains: true, partial: false});
 
-// validate json data in local storage
-function validateLocalStorage(item) {
-    try {
-        const json = JSON.parse(localStorage.getItem(item));
-        if (!json || typeof json !== "object") return {};
-        return json;
-    }
-    catch {
-        return {};
-    }
-}
+	escapeRegExp = (v) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	search = (str, len, first, fuzzy) => {
+		s = l.filterBy(str, fuzzy);
+		if (s.length != len || (len > 0 && first !== s[0].listMatch.originalStr)) {
+			throw console.log(s, str, len)
+		}
+		return s
+	}
 
-// save settings
-function saveSettings() {
-    localStorage.setItem("customSongListGame", JSON.stringify({
-        replacedAnswers,
-        CSLButtonCSS,
-        debug,
-        hotKeys,
-        malClientId
-    }));
-}
+	expect = (s, str) => {
+		if (l.filterBy(s)[0] !== str) console.log(str)
+	}
+	let l = new FilterManager(["shingeki season 2", "Shingeki Season 2: text"], 15);
+	search("shingeki 2", 2, "shingeki season 2")
 
-// apply styles
-function applyStyles() {
-    const tableHighlightColor = getComputedStyle(document.documentElement).getPropertyValue("--accentColorContrast") || "#4497ea";
-    let css = /*css*/ `
-        #lnCustomSongListButton {
-            right: ${CSLButtonCSS};
-            width: 80px;
-        }
-        #cslgSongListContainer input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            margin-left: 3px;
-            vertical-align: -5px;
-            cursor: pointer;
-        }
-        #cslgAnisongdbSearchRow input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-left: 3px;
-            vertical-align: -5px;
-            cursor: pointer;
-        }
-        #cslgFilterListRow input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-left: 3px;
-            vertical-align: -5px;
-            cursor: pointer;
-        }
-        #cslgSongListTopRow i.fa:hover {
-            opacity: .7;
-        }
-        #cslgSongListTable {
-            width: 100%;
-            table-layout: fixed;
-        }
-        #cslgSongListTable thead tr {
-            font-weight: bold;
-        }
-        #cslgSongListTable .number {
-            width: 30px;
-        }
-        #cslgSongListTable .difficulty {
-            width: 30px;
-        }
-        #cslgSongListTable .songType {
-            width: 45px;
-        }
-        #cslgSongListTable .vintage {
-            width: 100px;
-        }
-        #cslgSongListTable .action {
-            width: 35px;
-        }
-        #cslgSongListTable .action i.fa-trash {
-            margin-left: 4px;
-        }
-        #cslgSongListTable .action i.fa-plus:hover {
-            color: #5cb85c;
-        }
-        #cslgSongListTable .action i.fa-trash:hover {
-            color: #d9534f;
-        }
-        #cslgSongListTable th, #cslgSongListTable td {
-            padding: 0 4px;
-        }
-        #cslgSongListTable tr.selected td:not(.action) {
-            color: ${tableHighlightColor};
-        }
-        #cslgMergedSongListTable {
-            width: 100%;
-            table-layout: fixed;
-        }
-        #cslgMergedSongListTable thead tr {
-            font-weight: bold;
-        }
-        #cslgMergedSongListTable .number {
-            width: 30px;
-        }
-        #cslgMergedSongListTable .songType {
-            width: 45px;
-        }
-        #cslgMergedSongListTable .action {
-            width: 55px;
-        }
-        #cslgMergedSongListTable .action i.fa-trash {
-            margin-left: 4px;
-        }
-        #cslgMergedSongListTable .action i.fa-chevron-up:hover, #cslgMergedSongListTable .action i.fa-chevron-down:hover {
-            color: #f0ad4e;
-        }
-        #cslgMergedSongListTable .action i.fa-trash:hover {
-            color: #d9534f;
-        }
-        #cslgMergedSongListTable th, #cslgMergedSongListTable td {
-            padding: 0 4px;
-        }
-        #cslgMergedSongListTable tr.selected td:not(.action) {
-            color: ${tableHighlightColor};
-        }
-        #cslgQuizSettingsContainer input[type="text"] {
-            color: black;
-            font-weight: normal;
-            margin-left: 3px;
-        }
-        #cslgQuizSettingsContainer input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-left: 3px;
-            vertical-align: -5px;
-            cursor: pointer;
-        }
-        #cslgQuizSettingsContainer input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            margin-left: 3px;
-            vertical-align: -5px;
-            cursor: pointer;
-        }
-        #cslgAnswerTable {
-            width: 100%;
-            table-layout: fixed;
-        }
-        #cslgAnswerTable thead tr {
-            font-weight: bold;
-        }
-        #cslgAnswerTable .edit {
-            width: 20px;
-        }
-        #cslgAnswerTable tbody i.fa-pencil:hover {
-            opacity: .8;
-        }
-        #cslgAnswerTable th, #cslgAnswerTable td {
-            padding: 0 4px;
-        }
-        #cslgHotkeyTable th {
-            font-weight: bold;
-            padding: 0 20px 5px 0;
-        }
-        #cslgHotkeyTable td {
-            padding: 2px 20px 2px 0;
-        }
-        #cslgHotkeyTable input.hk-input {
-            width: 200px;
-            color: black;
-            cursor: pointer;
-            user-select: none;
-        }
-        table.styledTable thead tr {
-            background-color: #282828;
-        }
-        table.styledTable tbody tr:nth-child(odd) {
-            background-color: #424242;
-        }
-        table.styledTable tbody tr:nth-child(even) {
-            background-color: #353535;
-        }
-        #cslgListImportContainer input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-left: 3px;
-            vertical-align: -5px;
-            cursor: pointer;
-        }
-    `;
-    let style = document.getElementById("customSongListGameStyle");
-    if (style) {
-        style.textContent = css.trim();
-    }
-    else {
-        style = document.createElement("style");
-        style.id = "customSongListGameStyle";
-        style.textContent = css.trim();
-        document.head.appendChild(style);
-    }
+	l = new FilterManager(["o", "asd", "asd!", "asd!!*hi", "o", "tt", "oh my kokoro", "kokoro", "guura"], 15);
+	search("s", 3, "asd")
+	search("!s", 2, "asd!")
+	search("*", 1, "asd!!*hi")
+	search("*!", 1, "asd!!*hi")
+	search("!*", 1, "asd!!*hi")
+	search("!asd!*hi", 1, "asd!!*hi")
+	search("ko", 2, "oh my kokoro")
+	search("kororo", 2, "kokoro", true)
+	search("ads", 3, "asd", true)
+	search("gura", 1, "guura")
+
+	l = new FilterManager(["Kiss×sis", "idolm@aster"], 15)
+	search("kissx", 1, "Kiss×sis")
+
+	search("idolma", 1, "idolm@aster")
+
+	l = new FilterManager(["asd!", "asd!!*hi"], 15, {entrySets: [{contains: true, clean: semiCleanString}]});
+	search("!", 2, "asd!")
+	search("!*", 1, "asd!!*hi")
+	search("*!", 0, "")
+
+	module.exports = {FilterManager, options}
 }
