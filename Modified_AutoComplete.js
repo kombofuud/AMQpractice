@@ -510,6 +510,15 @@ if (!isNode) {
 				}
 			})
 		}
+        else{
+            $(this.input).on("keydown", (e) => {
+                if (e.keyCode == 40 && this.index <= -2){
+                    this.next();
+                    this.next();
+                    this.next();
+                }
+            })
+        }
 	}
 
 	AmqAwesomeplete.prototype.evaluate = function () {
@@ -540,7 +549,7 @@ if (!isNode) {
 		this.$ul.children('li').remove();
 
 		for (let i = this.suggestions.length - 1; i >= 0; i--) {
-            this.ul.insertBefore(this.item(this.suggestions[i], options.highlight ? suggestions[i].lastQry.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : "", i), this.ul.firstChild);
+            this.ul.insertBefore(this.item(this.suggestions[i], options.highlight ? RegExp.escape(suggestions[i].lastQry) : "", i), this.ul.firstChild);
 		}
 
 		if (this.ul.children.length === 0) {
