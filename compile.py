@@ -267,10 +267,11 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
     f.write(addedSongOrder)
 
 #Update all keys
-print("Missed Songs_______")
-for song in quizSongs:
+print("Missed Song Numbers_______")
+for i, song in enumerate(quizSongs):
     if quizIds[song["ID"]] > 0:
-        print(f"{song["SN"]} __from__ {song["EN"]}")
+        print(f"{i+1}", end = ' ')
+print()
 
 for ID, index in idIndices.items():
     if songPool[index]["D"] == dMax and quizIds[ID] > 0:
