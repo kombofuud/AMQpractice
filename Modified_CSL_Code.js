@@ -94,6 +94,7 @@ let songInfoChunk;
 let nextSongChunk;
 let importRunning = false;
 let attachedFile = "";
+let missedSongList = [];
 let hotKeys = {
     cslgWindow: loadHotkey("cslgWindow"),
     start: loadHotkey("start"),
@@ -1230,6 +1231,7 @@ function startQuiz() {
     }
     skipping = false;
     quiz.cslActive = true;
+    missedSongList = [];
     const date = new Date().toISOString();
     for (const player of Object.values(lobby.players)) {
         score[player.gamePlayerId] = 0;
@@ -1476,6 +1478,7 @@ function endGuessPhase(songNumber) {
                     correct[player.gamePlayerId] = isCorrect;
                     pose[player.gamePlayerId] = currentAnswers[player.gamePlayerId] ? (isCorrect ? 5 : 4) : 6;
                     if (isCorrect) score[player.gamePlayerId]++;
+                    if(quiz.soloMode && !isCorrect) missedSongList.push(songNumber);
                 }
             }
             if (quiz.soloMode) {
@@ -1628,7 +1631,7 @@ function endReplayPhase(songNumber) {
                 if (!quiz.pauseButton.pauseOn){
                     if (quiz.soloMode) {
                         if(attachedFile == "_quiz.json"){
-                            gameChat.systemMessage(score[0] + " points scored");
+                            gameChat.systemMessage(missedSongList.length+" missed: " + missedSongList);
                         }
                         quizOver();
                     }
