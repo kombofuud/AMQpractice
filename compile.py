@@ -19,7 +19,7 @@ rngFile = "addSongRandomValue.txt"
 malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
 dMax = 8
-prepListMinSize = 100
+prepListMinSize = 150
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -337,7 +337,7 @@ if newSongCount > 0:
 
     #if a show had a final song, add a brand new show to replace it (assuming there aren't too many shows)
     if len(prepSongs) < prepListMinSize:
-        newShowCount = 100-len(prepSongs)
+        newShowCount = prepListMinSize-len(prepSongs)
         for song in songPool:
             newSongMalIds.add(song["malId"])
         for i in range(len(loadingSongs)-1,-1,-1):
