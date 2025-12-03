@@ -1,6 +1,9 @@
 import os
 import json
 import random
+from pathlib import Path
+
+downloadFile = Path.home() / "Downloads" / "merged.json"
 
 with open("pool.json", 'r', encoding = 'utf8') as f:
     known = json.load(f)
@@ -10,7 +13,7 @@ with open("preplist.json", 'r', encoding = 'utf8') as f:
 with open("loadingcutlist.json", 'r', encoding = 'utf8') as f:
     learning.extend(json.load(f))
 
-with open("../../../Downloads/merged.json", 'r', encoding = 'utf8') as f:
+with open(downloadFile, 'r', encoding = 'utf8') as f:
     playPool = json.load(f)
 
 playMalIds = set()
@@ -30,4 +33,4 @@ for song in known:
         print(song["malId"])
         playMalIds.add(song["malId"])
 
-os.remove("../../../Downloads/merged.json")
+os.remove(downloadFile)
