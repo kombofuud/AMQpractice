@@ -1,10 +1,13 @@
 import json
 import shutil
 import math
+from pathlib import Path
 
 #Move downloaded file to local directory and delete previous version
 
-shutil.move(r"..\\..\\..\\Downloads\\merged.json","merged.json")
+downloadFile = Path.home() / "Downloads" / "merged.json"
+shutil.move(downloadFile,"merged.json")
+
 fileMerged = "merged"
 filePool = "pool"
 fileLoad = "loadingcutlist"
