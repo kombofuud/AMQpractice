@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         AMQ Vivace! Shortcuts
 // @namespace    http://tampermonkey.net/
-// @version      1.71
-// @description  Displays at least 3 of the shortest shortcuts for an anime after guessing phase, defined as the shortest substrings of length 10 or less for which the target anime (or any of its alt names) is a suggestion in the dropdown list (a 1 character penalty represented by "↓" is applied for every position below the top that the name associated with the shortcut appears). Adapted from https://github.com/tutti-amq/amq-scripts/blob/main/animeShortcuts.user.js All shortcuts (that aren't longer version of shorter shortcuts) with the smallest length are displayed. Click on a shortcut to highlight it and move it to the front of the list.
+// @version      1.9
+// @description  Displays at least 10 of the shortest shortcuts for an anime after guessing phase, defined as the shortest substrings of length 10 or less for which the target anime (or any of its alt names) is a suggestion in the dropdown list (a 1 character penalty represented by "↓" is applied for every position below the top that the name associated with the shortcut appears). Adapted from https://github.com/tutti-amq/amq-scripts/blob/main/animeShortcuts.user.js All shortcuts (that aren't longer version of shorter shortcuts) with the smallest length are displayed. Click on a shortcut to highlight it and move it to the front of the list.
 // @author       Einlar, Tutti, kombofuud
 // @match        https://animemusicquiz.com/*
 // @match        https://*.animemusicquiz.com/*
@@ -15,6 +15,13 @@
 
 /**
  * CHANGELOG
+ *
+ * v1.9 (by kombofuud)
+ * - By default include shortcuts that contain only keyboard characters (ANSI 104 layout by default, configurable) unless KEYBOARD_LAYOUT_WHITELIST is set to null.
+ * - Add a few missing special characters to the DISALLOWED_SPECIAL_CHARACTERS list.
+ *
+ * v1.8 (by kombofuud)
+ * - Cap the maximum range of shortcuts length to 3, configurable via the MAX_LENGTH_DIFFERENTIAL variable. For instance, for a show where the shortest shortcut has length 5, only shortcuts up to length 8 will be shown. This avoids showing shortcuts that are too long (and thus not interesting).
  *
  * v1.7 (by kombofuud)
  * - Exclude shortcuts that contain a shorter shortcut as a subsequence (e.g. if "uron" is a shortcut, "uroun" wouldn't be added because it has the same letters in the same order + extra letters).
@@ -68,7 +75,26 @@ const TOP_SHORTCUTS_ONLY = false;
 /**
  * how much longer a shortcut can be than the shortest one (e.g. if there's a 3 length shortcut and the variable is set to 3, nothing longer than 6 will be suggested)
  */
-const MAX_LENGTH_DIFFERENTIAL = 10;
+const MAX_LENGTH_DIFFERENTIAL = 3;
+
+/**
+ * Supported keyboard layouts, to be used when KEYBOARD_LAYOUT_WHITELIST is set.
+ * (I hope I got the character sets right for JIS and ISO, if I got any of the characters wrong (or the wrong version of a character), please let @kombofuud know in the scripts-for-games channel on the AMQ Discord server)
+ */
+const KEYBOARD_LAYOUTS = {
+  CUSTOM: "Add your custom layout here",
+  ANSI_104:
+    "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/? ",
+  ISO: "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`¬!\"£$%^&*()-_=+[{]};:'@#~\\|',<.>/? ",
+  JIS: "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`¥!\"#$%^&'()-_=+[{｢]}｣\\|;:『'…』,<.>/?・° ",
+};
+
+/**
+ * If set to one of the supported keyboard layouts (e.g. "CUSTOM", "ANSI_104", "ISO", "JIS"), only characters present in that layout will be allowed in the shortcuts. Otherwise, the blacklist from DISALLOWED_SPECIAL_CHARACTERS will be used.
+ *
+ * @type {keyof typeof KEYBOARD_LAYOUTS | null}
+ */
+const KEYBOARD_LAYOUT_WHITELIST = "ANSI_104";
 
 /**
  * @see SEARCH_CHARACTER_REPLACEMENT_MAP from AMQ code
@@ -123,6 +149,7 @@ const NORMALIZATION_MAP = {
   "@": " ",
   _: " ",
   "#": " ",
+  "'": " ",
   é: "e",
   ê: "e",
   ë: "e",
@@ -155,15 +182,24 @@ const ALLOWED_SPECIAL_CHARACTERS = [
   "@",
   "_",
   "#",
+  "'",
 ];
 
 /**
  * These special characters are not matched by AMQ with a space, but they should still not be allowed in shortcuts.
+ * (only applicable when WHITELIST_CHARACTERS_INSTEAD_OF_BLACKLIST is false)
  *
  * @type {string[]}
  */
-const DISALLOWED_SPECIAL_CHARACTERS = ["∞", "△", "↓","°"];
+const DISALLOWED_SPECIAL_CHARACTERS = ["∞", "△", "↓", "°", "♡", "∬"];
 
+/**
+ * The active keyboard layout to be used when KEYBOARD_LAYOUT_WHITELIST. Null if the whitelist is not set. Defaults to ANSI_104 if the specified layout is not supported.
+ * @type {string | null}
+ */
+const ACTIVE_KEYBOARD_LAYOUT = KEYBOARD_LAYOUT_WHITELIST
+  ? KEYBOARD_LAYOUTS[KEYBOARD_LAYOUT_WHITELIST] || KEYBOARD_LAYOUTS["ANSI_104"]
+  : null;
 /**
  * Shortcuts to be shown
  *
@@ -193,7 +229,7 @@ const getSuggestions = (search) => {
     );
 
   filteredList.sort((a, b) => {
-    return a.length - b.length || a.localeCompare(b);
+    return a.length - b.length || (a < b ? -1: 1);
   });
 
   return filteredList.slice(0, MAX_DROPDOWN_ITEMS);
@@ -228,16 +264,29 @@ const mapToAlternativeSubstrings = (substring) => {
   const alternatives = new Set();
 
   // Add the AMQ replacement
-  alternatives.add(
-    replaceCharactersForSeachCharacters(substring).replace(
-      new RegExp(DISALLOWED_SPECIAL_CHARACTERS.join("|"), "g"),
-      ""
-    )
-  );
+  if (ACTIVE_KEYBOARD_LAYOUT){
+      alternatives.add(
+          replaceCharactersForSeachCharacters(substring).replace(
+              new RegExp(`[^${RegExp.escape(ACTIVE_KEYBOARD_LAYOUT)}]`, "gu"),
+              ""
+          )
+      );
+  } else {
+      alternatives.add(
+          replaceCharactersForSeachCharacters(substring).replace(
+              new RegExp(DISALLOWED_SPECIAL_CHARACTERS.join("|"), "g"),
+              ""
+          )
+      );
+  }
 
   // Apply mandatory replacements
   let normalized = substring.replace(/./g, (char) => {
-    if (DISALLOWED_SPECIAL_CHARACTERS.includes(char)) return "";
+    if (ACTIVE_KEYBOARD_LAYOUT) {
+      if (!ACTIVE_KEYBOARD_LAYOUT.includes(char)) return "";
+    } else {
+      if (DISALLOWED_SPECIAL_CHARACTERS.includes(char)) return "";
+    }
     if (ALLOWED_SPECIAL_CHARACTERS.includes(/** @type {any} */ (char)))
       return char;
     return NORMALIZATION_MAP[char] || char;
@@ -344,6 +393,9 @@ const optimizedShortcuts = (targets) => {
   let altShortcuts = [];
   let currentLength = 0;
   let shortestLength = 999;
+  let highlightedShortcuts = JSON.parse(
+    localStorage.getItem(LOCAL_STORAGE_KEY) || "[]"
+  );
 
   for (let substring of sortedSubstrings) {
     const newLength = substring.length;
@@ -361,7 +413,11 @@ const optimizedShortcuts = (targets) => {
         return true;
       });
       // Re-check the stopping condition after moving the altShortcuts to the shortcuts list
-      if (shortcuts.length >= NUM_SHORTCUTS || newLength > shortestLength + MAX_LENGTH_DIFFERENTIAL) break;
+      if (
+        shortcuts.length >= NUM_SHORTCUTS ||
+        newLength > shortestLength + MAX_LENGTH_DIFFERENTIAL
+      )
+        break;
     }
 
     const suggestions = getSuggestions(substring);
@@ -378,6 +434,11 @@ const optimizedShortcuts = (targets) => {
         bestSubstring = substring + "↓".repeat(pos);
       }
       substring = substring + "↓".repeat(pos);
+      if (highlightedShortcuts.includes(substring)){
+        shortcuts.push(substring);
+        shortestLength = shortcuts[0].length;
+        continue;
+      }
       if (
         substring.length > MAX_SUBSTRING_LENGTH ||
         (TOP_SHORTCUTS_ONLY && pos > 0)
@@ -414,7 +475,11 @@ const optimizedShortcuts = (targets) => {
     const maxAltLength = altShortcuts[neededCount - 1].length;
     // Take all the altShortcuts with the same length as the longest that is needed
     shortcuts = shortcuts.concat(
-      altShortcuts.filter((s) => s.length <= Math.min(maxAltLength, shortestLength + MAX_LENGTH_DIFFERENTIAL))
+      altShortcuts.filter(
+        (s) =>
+          s.length <=
+          Math.min(maxAltLength, shortestLength + MAX_LENGTH_DIFFERENTIAL)
+      )
     );
   }
   return shortcuts.length ? shortcuts : [bestSubstring];
@@ -569,7 +634,7 @@ const setupMetadata = () => {
     version: "1.7",
     link: "https://github.com/Einlar/AMQScripts",
     description: `
-      <p>Displays 3 or more shortest dropdown shortcuts during the results phase.</p>
+      <p>Displays 10 or more shortest dropdown shortcuts during the results phase.</p>
       <p>The shortcuts displayed are the shortest substrings of length 10 or less for which the target anime (or any of its alt names) is the first suggestion in the dropdown list (or one of the top ones, in case it is not possible to do better).</p>
       <p>Shortcuts account for romaji/english names, and exploit the AMQ replacement rules for the dropdown (for instance, an optimal shortcut for "Kaguya-sama wa Kokurasetai?: Tensai-tachi no Renai Zunousen" is "? t", because a single space can be used to match any number of consecutive special characters).</p>
       <p>A few special characters are now allowed in the shortcuts (currently any of /*=+:;-?,.!@_#). Also all the characters that AMQ does not match with a space are allowed (e.g. "°", so you can use it as a shortcut for "Gintama°")</p>
