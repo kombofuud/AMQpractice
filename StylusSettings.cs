@@ -1,0 +1,3422 @@
+/* ==UserStyle==
+@name         Elodie's AMQ Style Script
+@version      10.2
+@namespace    userstyles.world/user/melodyelodie
+@description  A custom theme for animemusicquiz.com
+@author       melodyelodie
+@homepageURL  https://userstyles.world/user/melodyelodie
+@license      MIT License
+==/UserStyle== */
+
+
+/*=============================================================================================
+
+Additional code credits: Klem, Juvian, Reborn, Tsukassa, LolCats, Husa, Kempanator
+You can pretty much change any element here. Feel free to message me if you want to find a certain thing to change.
+
+- MelodyElodie
+
+
+Changelog:
+  10.0
+    - more complete styling
+    - midnight and twilight scripts merged
+    - all colors are now controlled by variables
+  10.1
+    - added more variables
+  10.2
+    - styled new log in page
+    - styled new nexus features
+    - game chat + other backgrounds now support images
+    - fixed border color on right/wrong answers
+    - fixed readability on autocomplete dropdown
+
+
+Installing:
+  1. Install the Stylus browser extension
+  2. Go to one of these links
+    https://userstyles.world/style/1435/elodies-amq-script-midnight
+    https://userstyles.world/style/7990/elodies-amq-script-twilight
+  3. Click "Install"
+  4. A Stylus window should pop up
+  5. Click "Install style"
+
+Editing:
+  1. After installing, click "Edit"
+  2. Change variables in :root to whatever color scheme you want
+
+Finding the edit menu after closing this window:
+  1. Click the Stylus extension icon
+  2. Click "Manage"
+  3. Click "Elodie's AMQ Style Script"
+
+
+Color Variable Explanations:
+mainBackground                 url of background image
+gameChatBackground             background color of game chat
+nexusChatBackground            background color of nexus chat
+dmBackground                   background color of private messages
+avatarStoreBackground          background of avatar store
+battleRoyaleBackground         background color of battle royale map
+
+windowBackground               background color of modals and draggable windows
+containerBackground            background color of main menu buttons and quiz side windows
+videoBackground                background color of quiz video player
+answerInputBackground          background color answer input bar
+avatarBackground               background color of avatars in quiz
+avatarStoreAvatarBackground    background color of avatars in avatar store
+lobbyAvatarNameBackground      background color of player name in lobby 
+
+textColor                      text color of <body>
+textShadowColor                shadow color for text
+boxShadowColor                 shadow color for all windows and containers
+borderRadius:                  border radius for all windows and containers
+
+primaryColor                   top/bottom menu bars - #1b1b1b
+secondaryColor                 gray stuff in default AMQ - #424242
+accentColor                    blue stuff in default AMQ - #4497ea
+glowColor                      correct answer highlight, particles, lives - #b6ff00
+
+correctAnswerColor             avatar border color for correct answers in quiz
+wrongAnswerColor               avatar border color for wrong answers in quiz
+waitingAnswerColor             avatar border color for answers during guess phase in quiz
+statusWatchingColor            line color of watching status after answer reveal
+statusCompletedColor           line color of completed status after answer reveal
+statusHoldColor                line color of hold status after answer reveal
+statusDroppedColor             line color of dropped status after answer reveal
+statusPlanningColor            line color of planning status after answer reveal
+songHistoryCorrectColor        table row color for correct answers in song history window
+songHistoryWrongColor          table row color for wrong answers in song history window
+rankedChallengerColor          player name color in chat if they are a ranked challenger
+
+*DO NOT TOUCH THE VARIABLES AFTER THIS
+
+
+Other recommended scripts:
+Joseph's Song List UI: https://github.com/TheJoseph98/AMQ-Scripts/raw/master/amqSongListUI.user.js
+Klem's Expand Library Player: https://github.com/Klemkinis/AMQ-Expand-Library-Radio/raw/main/Expand%20Library%20Radio.user.js
+Kempanator's Chat Plus: https://github.com/kempanator/amq-scripts/raw/main/amqChatPlus.user.js
+
+
+Link for development:
+https://github.com/kempanator/amq-scripts/raw/main/elodieStyleScript.user.css
+
+=============================================================================================*/
+
+
+@-moz-document domain("animemusicquiz.com") {
+    
+    
+    :root {
+        --mainBackground: url(https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpapers.com%2Fimages%2Ffeatured%2Famh1tqh06166z417.jpg&f=1&nofb=1&ipt=a85c53ae93de36225e225c3abbf5fbceca02f3663f3d166fdbbb28a2ceb7bd9d);
+        --gameChatBackground: #00000080;
+        --nexusChatBackground: #1b1b1bdd;
+        --dmBackground: #1b1b1bdd;
+        --avatarStoreBackground: var(--mainBackground);
+        --battleRoyaleBackground: #00000080;
+        
+        --windowBackground: #1b1b1bdd;
+        --containerBackground: #1b1b1bcc;
+        --videoBackground: #00000080;
+        --answerInputBackground: #1b1b1bdd;
+        --avatarBackground: transparent;
+        --avatarStoreAvatarBackground: #1b1b1bcc;
+        --lobbyAvatarNameBackground: var(--secondaryColor);
+        
+        --textColor: #8b0000;
+        --textShadowColor: #00000080;
+        --boxShadowColor: #00000080;
+        --borderRadius: 10px;
+        
+        --primaryColor: #1b1b1b;
+        --secondaryColor: #424242;
+        --accentColor: #a577bf;
+        --glowColor: #f096ff;
+        
+        --correctAnswerColor: #00a223;
+        --wrongAnswerColor: #000;
+        --waitingAnswerColor: #a5a5a5;
+        --statusWatchingColor: #3cff4e;
+        --statusCompletedColor: #2e69ff;
+        --statusHoldColor: #f7ff32;
+        --statusDroppedColor: #ff070c;
+        --statusPlanningColor: #ffffff;
+        --songHistoryCorrectColor: #144314;
+        --songHistoryWrongColor: #4c1111;
+        --rankedChallengerColor: #0cd5f7;
+        
+        --colorMod: black;
+        --colorModOpposite: #ffffff;
+        --brightnessMod: 1;
+        --textColorTransparent: color-mix(in srgb, var(--textColor), transparent 50%);
+        --primaryColorContrast: color-mix(in srgb, var(--primaryColor), var(--colorModOpposite) 5%);
+        --primaryColorContrast2: color-mix(in srgb, var(--primaryColor), var(--colorModOpposite) 12%);
+        --primaryColorTransparent: color-mix(in srgb, var(--primaryColor), transparent 20%);
+        --secondaryColorDark: color-mix(in srgb, var(--secondaryColor), black 50%);
+        --accentColorLight: color-mix(in srgb, var(--accentColor), white 40%);
+        --accentColorDark: color-mix(in srgb, var(--accentColor), black 20%);
+        --accentColorContrast: color-mix(in srgb, var(--accentColor), var(--colorModOpposite) 40%);
+        --accentColorTransparent: color-mix(in srgb, var(--accentColor), transparent 50%);
+        --correctAnswerColorTransparent: color-mix(in srgb, var(--correctAnswerColor), transparent 80%);
+        --wrongAnswerColorTransparent: color-mix(in srgb, var(--wrongAnswerColor), transparent 80%);
+        --songHistoryCorrectColorHover: color-mix(in srgb, var(--songHistoryCorrectColor), white 5%);
+        --songHistoryWrongColorHover: color-mix(in srgb, var(--songHistoryWrongColor), white 5%);
+    }
+    
+    
+    /* Basic Defaults */
+    body {
+        color: var(--textColor);
+    }
+    a {
+        color: var(--accentColorContrast);
+    }
+    a:visited {
+        color: var(--accentColorContrast);
+    }
+    a:hover {
+        color: var(--accentColor);
+    }
+    textarea {
+        background-color: var(--primaryColor);
+    }
+    .button:hover {
+        box-shadow: 0 0 10px 2px var(--accentColor);
+    }
+    .floatingContainer {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .tabContainer {
+        border-bottom: 1px solid var(--secondaryColor);
+    }
+    .tabContainer .tab::before {
+        background-color: var(--primaryColor);
+        box-shadow: 1px -3px 10px var(--boxShadowColor);
+    }
+    .tabContainer .tab.selected::before {
+        background-color: var(--secondaryColor);
+    }
+    .leftRightButtonTop {
+        box-shadow: 1px -3px 10px var(--boxShadowColor);
+    }
+    .leftRightButtonBottom {
+        box-shadow: 1px 3px 10px var(--boxShadowColor);
+    }
+    .rightLeftTopBottom {
+        box-shadow: 0 -3px 10px var(--boxShadowColor);
+    }
+    .rightLeftButtonBottom {
+        box-shadow: -1px 3px 10px var(--boxShadowColor);
+    }
+    .leftShadowBorder {
+        box-shadow: -1px 0 10px var(--boxShadowColor);
+    }
+    .rightShadowBorder {
+        box-shadow: 1px 0 10px var(--boxShadowColor);
+    }
+
+
+    /* JQuery */
+    .context-menu-list {
+        box-shadow: 0 2px 5px var(--boxShadowColor);
+    }
+    .context-menu-list.context-menu-root {
+        background-color: var(--primaryColor);
+    }
+    .context-menu-item {
+        background-color: var(--primaryColor);
+        color: var(--textColor);
+    }
+    .context-menu-item.context-menu-hover {
+        color: var(--textColor);
+        background-color: var(--accentColor);
+    }
+    .context-menu-item.context-menu-disabled {
+        background-color: var(--primaryColor);
+        color: var(--textColor);
+        opacity: .5;
+    }
+
+
+    /* Bootstrap */
+    .form-control:focus {
+        border-color: var(--accentColor);
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px var(--accentColorTransparent);
+    }
+    .popover {
+        background-color: var(--primaryColor);
+    }
+    .popover-title {
+        border-bottom: none;
+    }
+    .popover.top > .arrow:after {
+        border-top-color: var(--primaryColor);
+    }
+    .popover.bottom > .arrow:after {
+        border-bottom-color: var(--primaryColor);
+    }
+    .popover.left > .arrow:after {
+        border-left-color: var(--primaryColor);
+    }
+    .popover.right > .arrow:after {
+        border-right-color: var(--primaryColor);
+    }
+    .popover > .arrow:after {
+        opacity: 1;
+    }
+    .tooltip.top .tooltip-arrow {
+        border-top-color: var(--primaryColor);
+    }
+    .tooltip-inner {
+        color: var(--textColor);
+        background-color: var(--primaryColor);
+        opacity: 1;
+    }
+    .btn-primary {
+        color: #ffffff;
+        background-color: var(--accentColor);
+        border-color: var(--accentColorDark);
+        box-shadow: none;
+    }
+    .btn-primary:hover {
+        color: #ffffff;
+        background-color: var(--accentColor);
+        border-color: var(--accentColorDark);
+        box-shadow: none;
+        opacity: .8;
+    }
+    .btn-primary:focus,
+    .btn-primary:active,
+    .btn-primary:active:focus,
+    .btn-primary[disabled]:focus,
+    .btn-primary[disabled]:hover {
+        background-color: var(--accentColor);
+        border-color: var(--accentColorDark);
+    }
+    .customCheckbox label {
+        color: var(--accentColorDark);
+    }
+    .swFilterEntry > .customCheckbox {
+        background-image: none;
+    }
+    .switchContainer > .slider-tick-container > .switchOff,
+    .switchContainer > .slider-tick-container > .switchLeft {
+        background-color: var(--secondaryColor);
+    }
+    .slider-selection {
+        background-image: linear-gradient(to bottom, var(--accentColor) 0, var(--accentColorDark) 100%);
+    }
+    .slider-handle {
+        background-image: linear-gradient(to bottom, var(--accentColor) 0, var(--accentColorDark) 100%);
+    }
+    .slider-tick.in-selection {
+        background-image: linear-gradient(to bottom, var(--accentColor) 0, var(--accentColorDark) 100%);
+    }
+    .slider-selection.tick-slider-selection {
+        background-image: linear-gradient(to bottom, var(--accentColor) 0, var(--accentColorDark) 100%);
+    }
+    .slider.slider-disabled .slider-handle {
+        background-image: linear-gradient(to bottom, var(--accentColor) 0, var(--accentColorDark) 100%);
+    }
+    .switchContainer.active {
+        background-image: linear-gradient(to bottom, var(--accentColor) 0, var(--accentColorDark) 100%);
+    }
+    .switchContainer > .slider-tick-container > .switchOn {
+        background-image: linear-gradient(to bottom, var(--accentColor) 0, var(--accentColorDark) 100%);
+    }
+    .textAreaContainer:focus-within {
+        box-shadow: inset 0 0 1px rgba(0, 0, 0, .075), 0 0 1px var(--accentColorContrast);
+        border: 1px solid var(--accentColorContrast);
+    }
+    .progress-bar {
+        background-color: var(--accentColor);
+    }
+    .modal-header {
+        border-bottom: 1px solid var(--secondaryColor);
+    }
+    .modal-header .close {
+        color: var(--textColor);
+        text-shadow: none;
+        opacity: 1;
+    }
+    .modal-header .close:hover {
+        opacity: .7;
+    }
+    .modal-content {
+        background-color: var(--windowBackground);
+        border: none;
+        box-shadow: 0 5px 15px var(--boxShadowColor);
+    }
+    .modal-footer {
+        border-top: 1px solid var(--secondaryColor);
+    }
+    .tab-modal .modal-header {
+        background-color: var(--primaryColor);
+        border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+    }
+    .tab-modal .modal-body {
+        border-top: 1px solid var(--secondaryColor);
+    }
+    .tab-modal .tabContainer {
+        background-color: var(--primaryColor);
+    }
+
+
+    /* Swal2 */
+    .swal2-popup {
+        background: var(--primaryColor);
+    }
+    .swal2-popup .swal2-title {
+        color: var(--textColor);
+    }
+    .swal2-popup .swal2-content {
+        color: var(--textColor);
+    }
+    .swal2-popup .swal2-footer {
+        color: var(--textColor);
+    }
+    .swal2-popup .swal2-styled.swal2-confirm {
+        background: var(--accentColor) !important;
+    }
+    .swal2-popup .swal2-styled.swal2-confirm:hover {
+        opacity: .8;
+    }
+    .swal2-popup .swal2-styled:focus {
+        box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px var(--accentColorTransparent);
+    }
+    .swal2-popup .swal2-file:focus,
+    .swal2-popup .swal2-input:focus,
+    .swal2-popup .swal2-textarea:focus {
+        border: 1px solid var(--accentColorTransparent);
+        box-shadow: 0 0 3px var(--accentColor);
+    }
+    .swal2-input {
+        color: black;
+    }
+
+
+    /* Awesomplete */
+    .awesomplete > ul {
+        background: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .awesomplete > ul::before {
+        background: var(--primaryColor);
+        border: 1px solid var(--primaryColor);
+    }
+    .awesomplete > ul > li[aria-selected="true"] {
+        background: var(--accentColorDark);
+        color: var(--textColor);
+    }
+    .awesomplete li[aria-selected="true"] mark {
+        background: var(--accentColorDark);
+        color: var(--textColor);
+    }
+    .awesomplete mark {
+        color: var(--accentColor);
+    }
+    .awesomplete > ul > li:hover {
+        background: var(--accentColorLight);
+        color: var(--primaryColor);
+    }
+    .awesomplete > ul > li:hover mark {
+        background: var(--accentColorLight);
+        color: var(--primaryColor);
+    }
+
+
+    /* Popouts */
+    .popoutMessage {
+        background-color: var(--primaryColor);
+    }
+    .popoutMessage .close {
+        color: var(--textColor);
+        text-shadow: none;
+        opacity: 1;
+    }
+    .popoutMessage .close:hover {
+        opacity: .7;
+    }
+    .rankedPopoutTitle {
+        text-shadow: 2px 2px 4px var(--textShadowColor);
+    }
+    .rankedPopoutPositionText {
+        text-shadow: 2px 2px 4px var(--textShadowColor);
+    }
+    .rankedResultPopoutContent > h3 {
+        text-shadow: 2px 2px 4px var(--textShadowColor);
+    }
+    .rankedResultPopoutContent > h4 {
+        text-shadow: 2px 2px 4px var(--textShadowColor);
+    }
+    .rankedResultPopoutContent > .rankedPoputRankGlow {
+        text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px var(--accentColor), 0 0 35px var(--accentColor), 0 0 40px var(--accentColor), 0 0 50px var(--accentColor), 0 0 75px var(--accentColor);
+    }
+    .leftVoteButton {
+        background-color: var(--primaryColor);
+    }
+    .leftVoteButtonYes.selected {
+        background-color: var(--accentColor);
+    }
+    .leftVoteTimerBar {
+        background-color: var(--accentColorLight);
+    }
+
+
+    /* Log In Page */
+    #loginPage {
+        background-image: var(--mainBackground);
+        background-size: cover;
+        color: var(--textColor);
+    }
+    #lpTopBackground img {
+        content: var(--mainBackground);
+    }
+    .lpPlayButton {
+        background: var(--containerBackground);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+        border-radius: var(--borderRadius);
+        animation: none;
+    }
+    .lpPlayButton.login {
+        background: var(--accentColorTransparent);
+    }
+    .lpPlayButton:hover {
+        box-shadow: 0 0 10px 2px var(--accentColor);
+        transition: none;
+    }
+    #lpLoginBox {
+        background-color: var(--containerBackground);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+        border-radius: var(--borderRadius);
+    }
+    .lpSocialIcon {
+        background-color: var(--primaryColor);
+    }
+    .lpSocialIcon > i {
+        color: var(--textColor);
+    }
+    .lpSocialIcon > img {
+        filter: brightness(var(--brightnessMod));
+    }
+    #lpMainContainerFadeout {
+        background-image: linear-gradient(180deg, transparent 0%, var(--primaryColor) 100%);
+    }
+    #lpContainerInBetween {
+        background-color: var(--primaryColor);
+    }
+    #lpInfoContainerFadein {
+        background-image: linear-gradient(180deg, var(--primaryColor) 0%, transparent 100%);
+    }
+    #lpInfoContainer {
+        background: var(--secondaryColor);
+    }
+    .lpInfoBackdrop {
+        opacity: .2;
+        filter: grayscale(1);
+    }
+    #lpInfoContainerContent {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0px 15px 2px var(--boxShadowColor);
+    }
+    #lpInfoContainerTitle {
+        text-shadow: 0px 0px 20px var(--textShadowColor);
+        margin-top: 20px;
+    }
+    .lpInfoHalf {
+        text-shadow: 0px 0px 5px var(--textShadowColor);
+    }
+    .lpPicture {
+        filter: drop-shadow(0 0 5px var(--textShadowColor));
+    }
+    #lpFooter {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0px 15px 2px var(--boxShadowColor);
+    }
+    .cc-color-override-530831885.cc-window {
+        background-color: var(--secondaryColor);
+        color: var(--textColor);
+    }
+    .cc-color-override-530831885 .cc-btn {
+        background-color: var(--accentColor);
+    }
+    .cc-color-override-530831885 .cc-btn:hover, .cc-color-override-530831885 .cc-btn:focus {
+        background-color: var(--accentColorLight);
+    }
+    .cc-color-override-530831885 .cc-link, .cc-color-override-530831885 .cc-link:active, .cc-color-override-530831885 .cc-link:visited {
+        color: var(--accentColorContrast);
+    }
+    
+    
+    /* Main Menu */
+    #loadingScreen {
+        background-image: var(--mainBackground);
+        background-size: cover;
+    }
+    #gameContainer {
+        background-image: var(--mainBackground);
+        background-size: cover;
+    }
+    #mainMenu {
+        margin-top: 15vh !important;
+    }
+    .mainMenuButton {
+        background-color: var(--containerBackground);
+        border-radius: var(--borderRadius);
+    }
+    #mpRankedButton.off {
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    #mpRankedDescriptionButton,
+    #mpRankedTimer {
+        background-color: var(--containerBackground);
+    }
+    #mpRankedDescriptionButton > h1,
+    #mpRankedTimer > h3 {
+        color: var(--textColor);
+    }
+    #rankedModeSelector .modal-header {
+        background-color: var(--primaryColor);
+    }
+    .rmsModeContainer:hover {
+        background-color: var(--secondaryColor);
+    }
+    .rmsModeContainer {
+        border-right: none;
+    }
+    .rmsModeContainer.closed {
+        opacity: .6;
+    }
+    .rmsModeName {
+        color: var(--textColor);
+        text-shadow: 0 0 6px var(--textShadowColor), 0 0 4px var(--textShadowColor);
+    }
+    .rmsModeDescription {
+        text-shadow: 0 0 4px var(--textShadowColor);
+    }
+    .rmsModeClosed {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 7px 1px var(--boxShadowColor);
+        color: var(--textColor);
+    }
+    #mpAvatarDriveContainer {
+        background-color: var(--containerBackground);
+    }
+    #mpAvatarDriveHeaderShadowHider .floatingContainer {
+        background-color: var(--containerBackground);
+        border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+    }
+    #mpDriveDonationContainer .button {
+        background-color: var(--containerBackground);
+        border-radius: 3px;
+    }
+    #mpDriveFreeDonationHightlight {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 15px 4px var(--accentColor);
+    }
+    #admDonationButton {
+        border-radius: 3px;
+    }
+    #mpNewsContainer {
+        background-color: var(--containerBackground);
+    }
+    #mpNewsTitleShadowHider .floatingContainer {
+        background-color: var(--containerBackground);
+        border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+    }
+    .mpNewsBottomTab {
+        border-bottom: none;
+        border-top: none;
+    }
+    .mpNewsBottomTab > .leftRightButtonTop {
+        background-color: transparent;
+        box-shadow: none;
+    }
+    #mpPromoInnerContainer .floatingContainer {
+        background-color: var(--containerBackground);
+        border-radius: var(--borderRadius);
+    }
+    .mpSpringPromoContainer {
+        background-color: var(--containerBackground);
+    }
+    .mpSpringPromoContainer:hover {
+        background-color: var(--primaryColor);
+    }
+    .mpSpringPromoContainer h3 {
+        color: var(--textColor);
+        text-shadow: 0 0 3px var(--textShadowColor);
+    }
+    #mpSpringPromoCenterText {
+        color: var(--textColor);
+        text-shadow: 0 0 3px var(--textShadowColor);
+    }
+    #mpSocialRewardContainerImageDiscord {
+        filter: brightness(var(--brightnessMod));
+    }
+    #mpSocialRewardContainerImageTwitter {
+        color: var(--accentColor);
+        filter: none;
+    }
+    #mpPromoInnerContainer .floatingContainer h3 {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    #mpPatreonContainerInner > img {
+        filter: brightness(var(--brightnessMod));
+    }
+    #mpDriveTopTabContainer .leftRightButtonTop {
+        background-color: var(--primaryColor);
+    }
+    #mpDriveTopTabContainer .leftRightButtonTop.selected {
+        background-color: var(--secondaryColor);
+    }
+    .mpDriveEntry {
+        background-color: var(--secondaryColor);
+        overflow: hidden;
+    }
+    .mpDriveEntry:nth-child(2n) {
+        background-color: var(--primaryColor);
+    }
+    .mpDriveEntryName::after {
+        background-image: linear-gradient(to left, var(--secondaryColor), transparent);
+    }
+    .mpDriveEntry:nth-child(2n) .mpDriveEntryName::after {
+        background-image: linear-gradient(to left, var(--primaryColor), transparent);
+    }
+    .mpDrivenEntryTarget {
+        font-weight: normal;
+        opacity: .6;
+        float: left;
+        white-space: nowrap;
+    }
+    #mpDriveStandingHeaderShadowHider > .floatingContainer {
+        background-color: transparent;
+        box-shadow: none;
+    }
+    #mpDriveRecentHeaderShadowHider > .floatingContainer {
+        background-color: transparent;
+        box-shadow: none;
+    }
+    #mpDriveStatsContainer .floatingContainer {
+        border-radius: var(--borderRadius);
+    }
+    #mpDriveStatsContainer .mpMainTitleShadowHider > .floatingContainer {
+        border-radius: 3px 3px 0 0;
+    }
+    .mpHalfStatContainer .mpDriveEntry:first-of-type {
+        border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+    }
+    .mpHalfStatContainer .mpDriveEntry:last-of-type {
+        border-radius: 0 0 var(--borderRadius) var(--borderRadius);
+    }
+    #mpDriveRecentContainer .mpDriveEntry:first-of-type {
+        border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+    }
+    #mpDriveRecentContainer .mpDriveEntry:last-of-type {
+        border-radius: 0 0 var(--borderRadius) var(--borderRadius);
+    }
+    #mpNewsBody {
+        border-radius: var(--borderRadius);
+    }
+    #mpNewsContainer {
+        border-radius: var(--borderRadius);
+    }
+    #mpAvatarDriveContainer {
+        border-radius: var(--borderRadius);
+    }
+    .cycleEntry.active {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 10px 2px var(--accentColor);
+    }
+    #gameModeSelector .modal-header {
+        background-color: var(--primaryColor);
+        border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+    }
+    .gmsModeContainer {
+        border-right: none;
+    }
+    .gmsModeContainer:hover {
+        background-color: transparent;
+    }
+    .gmsModeName {
+        color: var(--textColor);
+        text-shadow: 0 0 6px var(--textShadowColor), 0 0 4px var(--textShadowColor);
+    }
+    .gmsModeDescription {
+        background: linear-gradient(var(--accentColor) 0%, transparent 100%);
+        text-shadow: 0 0 4px var(--textShadowColor);
+    }
+    .srmRewardIcon {
+        filter: brightness(var(--brightnessMod));
+    }
+    #guestAccountNoticeContainer {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+
+
+    /* Footer */
+    .menuBar {
+        background-color: var(--primaryColor);
+    }
+    .menuBar .popOut {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+        transition: transform .1s linear;
+    }
+    #mainMenuSocailButton {
+        background: var(--primaryColor);
+    }
+    #mainMenuSocailButton:hover {
+        box-shadow: 0 6px 10px 2px var(--accentColor);
+    }
+    .socialFooterTab {
+        background: var(--primaryColor);
+    }
+    #socailTabFooter > .selected {
+        background: var(--secondaryColor);
+    }
+    .stPlayerName {
+        background-color: var(--primaryColor);
+        border-bottom: 1px solid var(--primaryColor);
+    }
+    .socialTabPlayerEntry {
+        color: var(--textColor);
+        transition: transform .1s linear;
+    }
+    .stPlayerName > h4 {
+        transition: transform .1s linear;
+    }
+    .stPlayerName > h3 {
+        transition: transform .1s linear;
+    }
+    .stPlayerNameContainer {
+        transition: transform .1s linear;
+    }
+    .socialTabFriendPlayerEntry > .stPlayerName > h3 {
+        transition: transform .1s linear;
+    }
+    .socialTabFriendPlayerEntryPicture {
+        transition: transform .1s linear;
+    }
+    .socialTabPlayerSocialStatusOuterCircle {
+        transition: transform .1s linear;
+    }
+    #friendOfflineList .stPlayerName {
+        color: var(--textColorTransparent);
+    }
+    .socialTabPlayerEntry.profileOpen {
+        background-color: var(--secondaryColor);
+    }
+    #xpBarOuter {
+        background-color: var(--secondaryColor);
+    }
+    #xpBarInner {
+        background: var(--accentColor);
+        box-shadow: 1px 0 15px 1px var(--accentColor);
+    }
+    #xpBarAnimationContainer {
+        box-shadow: 0 0 10px #ffffff9e, 0 0 20px #ffffff9e, 0 0 40px var(--accentColor), 0 0 70px var(--accentColor), 0 0 80px var(--accentColor);
+    }
+    #rightMenuBarPartContainer::before {
+        background-color: var(--primaryColor);
+    }
+    #optionsContainer {
+        transition: transform .2s linear;
+    }
+    #optionsContainer li {
+        background-color: var(--primaryColor);
+        border-bottom: 1px solid transparent;
+    }
+    #optionsContainer li:hover {
+        background-color: var(--secondaryColor);
+    }
+    #avatarUserImgContainer {
+        background: transparent;
+        border: none;
+        opacity: .5;
+    }
+    #avatarUserImgContainer:hover {
+        background: var(--accentColor);
+        box-shadow: none;
+        opacity: 1;
+    }
+
+
+    /* Profile Container */
+    .ppHeader .close {
+        color: var(--textColor);
+        text-shadow: none;
+        opacity: 1;
+    }
+    .ppHeader .close:hover {
+        opacity: .7;
+    }
+    .ppImageContainer {
+        background-color: var(--primaryColor);
+    }
+    .ppStatsNameContainer {
+        background-color: var(--primaryColor);
+    }
+    .ppStatsValueContainer {
+        border-top: var(--primaryColor) 1px solid;
+    }
+    .ppPlayerLevelLine {
+        background-color: var(--secondaryColor);
+    }
+    .ppPlayerLevelContainerInnser {
+        background-color: var(--secondaryColor);
+        border-bottom: solid 2px var(--secondaryColor);
+    }
+    .ppPlayerLevelLowerBoarder > .ppPlayerLevelBoarderLineHider {
+        background-color: var(--secondaryColor);
+    }
+    .ppPlayerLevelLowerBoarder > .ppPlayerLevelBoarderTopShadowHider {
+        background-color: var(--secondaryColor);
+    }
+    .ppPlayerLevelLowerBoarder.left {
+        border-left: 2px solid var(--secondaryColor);
+    }
+    .ppPlayerLevelLowerBoarder.right {
+        border-right: 2px solid var(--secondaryColor);
+    }
+    .ppPlayerLevelLowerBoarder {
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .ppBadgeContainer {
+        background-color: var(--primaryColor);
+        box-shadow: inset 0 0 10px 2px var(--boxShadowColor);
+    }
+    .ppBadgeNoBadgeText {
+        color: var(--textColor);
+        text-shadow: 0 -1px 0 var(--textShadowColor);
+    }
+    .playerProfileContainer.edit .ppBadgeContainerInner .ppBadgeImageContainer {
+        border: 2px dashed var(--accentColor);
+    }
+    .ppFooterText {
+        background-color: var(--primaryColor);
+    }
+    .ppFooterOptionIcon {
+        background-color: var(--primaryColor);
+    }
+    .ppStatsHider {
+        background-color: var(--primaryColor);
+    }
+    .ppImageSelectorHeader {
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .ppBadgeOptions {
+        background-color: var(--primaryColor);
+    }
+    .ppBadgeOptionToggle.selected {
+        background-color: var(--secondaryColor);
+    }
+    .ppImageSelector {
+        background-color: var(--primaryColor);
+    }
+    .ppImageSelectorAvatar.selected {
+        background-color: var(--secondaryColor);
+    }
+    .ppImageSelectorEmote.selected {
+        background-color: var(--secondaryColor);
+    }
+    .badgePopoverTitle {
+        border-bottom: none;
+    }
+
+
+    /* Leaderboard */
+    .lbmBoardEntry:nth-child(2n) {
+        background-color: transparent;
+    }
+    .lbmBoardEntry.self > .lbmStandingNumber {
+        background-color: var(--accentColor);
+    }
+    .board {
+        background-color: var(--primaryColor);
+    }
+    .boardTab {
+        background-color: var(--primaryColor);
+    }
+    .boardTab.selected {
+        background-color: var(--secondaryColor);
+    }
+
+
+    /* Room Browser */
+    #rbMajorFilters {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 16px var(--boxShadowColor);
+        border-radius: 0 0 0 var(--borderRadius);
+    }
+    #rbMajorFilters h3 {
+        margin: 3px 0 0 8px;
+    }
+    #rbMajorFilters p {
+        margin: -9px 0 0 0;
+    }
+    #rbMajorFilters .customCheckbox {
+        margin: 3px 0 0 0;
+    }
+    #rbFilterContainer {
+        background-color: var(--primaryColor);
+        border-radius: 0 0 0 var(--borderRadius);
+    }
+    #rbSearchContainer {
+        background-color: var(--primaryColor);
+    }
+    #rbSearchInputContainer > input {
+        background-color: var(--primaryColor);
+    }
+    #rbSettingFilterContainer {
+        background-color: var(--windowBackground);
+        box-shadow: 0 3px 16px var(--boxShadowColor);
+        transition: transform 0.2s linear;
+    }
+    .rbRoom {
+        background-color: var(--containerBackground);
+        border-radius: var(--borderRadius);
+    }
+    .rbrRoomImageContainer {
+        background-color: transparent;
+    }
+    .rbrGameMode {
+        text-shadow: -1px 0 var(--primaryColor), 0 1px var(--primaryColor), 1px 0 var(--primaryColor), 0 -1px var(--primaryColor);
+    }
+    .rbrButton {
+        box-shadow: 1px 3px 8px var(--boxShadowColor);
+    }
+    .fa-friend {
+        color: var(--accentColor);
+    }
+
+
+    /* Top Bar */
+    .topMenuBar {
+        background-color: transparent;
+    }
+    .topMenuButton {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 16px var(--boxShadowColor);
+    }
+    .topMenuBar > .topMenuBack {
+        background-color: var(--primaryColor);
+    }
+    .topRightBackButton {
+        background-color: var(--primaryColor);
+    }
+    #qpOptionContainer {
+        background-color: var(--primaryColor);
+        box-shadow: -1px -1px 10px var(--boxShadowColor);
+    }
+    #qpOptionContainerHider {
+        background-color: var(--primaryColor);
+    }
+    #qpVolume {
+        color: var(--accentColor);
+    }
+    #qpVolumeBarIndicator {
+        background-color: var(--accentColor);
+    }
+    #qpQualityList {
+        background-color: var(--primaryColor);
+        box-shadow: 0 7px 10px 0 var(--boxShadowColor);
+        transition: transform .1s linear;
+    }
+    #qpQualityList > li.selected {
+        background-color: var(--secondaryColor);
+    }
+
+
+    /* Game Chat */
+    #gameChatContainer {
+        background: var(--gameChatBackground);
+        background-size: cover;
+    }
+    #gameChatPage > .col-xs-9 {
+        background-image: none;
+    }
+    .gcList > li:nth-child(2n) {
+        background: none;
+    }
+    #gcSpectateListButtonHostIcon {
+        background-color: var(--accentColor);
+    }
+    .gcSpectatorHostIcon {
+        background-color: var(--accentColor);
+    }
+    .gcQueueItem.highlight {
+        background-color: var(--accentColor) !important;
+    }
+    .playerCommandIcon {
+        background-color: transparent;
+    }
+    .gcUserName::after {
+        color: var(--textColor);
+    }
+    .gcUserName.gcNameColor {
+        color: var(--rankedChallengerColor);
+    }
+    .gcUserName.gcNameGlow {
+        text-shadow: 0 0 5px var(--rankedChallengerColor);
+    }
+    #gcMessageContainer > li.highlight {
+        background-color: var(--accentColorTransparent);
+    }
+    #gcMessageContainer > li .gcTeamMessageIcon {
+        background-color: var(--accentColorDark);
+    }
+    .gcInputContainer {
+        background: none;
+    }
+    #gcInputCooldownBar {
+        background-color: var(--accentColor);
+    }
+    #gcPlayerOnlyMessage {
+        background-color: var(--secondaryColor);
+    }
+    #gcEmojiLockInContainer {
+        border: 2px dashed var(--textColor);
+    }
+    #gcEmojiPickerButton > i {
+        color: var(--textColor);
+    }
+    #gcChatMenu > div {
+        background-color: var(--primaryColor);
+    }
+    #gcChatMenu > div.selected {
+        background-color: var(--secondaryColor);
+    }
+    #gcEmojiPickerContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px var(--boxShadowColor);
+    }
+    .gcEmojiPickerHeader {
+        border-bottom: none;
+    }
+    #qpModFlaggedMessagesIcon {
+        background-color: var(--primaryColor);
+        box-shadow: -1px -1px 10px var(--boxShadowColor);
+    }
+    #qpModFlaggedMessageCount {
+        color: var(--primaryColor);
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    #qpModFlaggedMessageContainer {
+        transition: none;
+    }
+    #qpModFlaggedMessageInnerContainer {
+        background-color: var(--containerBackground);
+        box-shadow: -1px -1px 10px var(--boxShadowColor);
+        visibility: hidden;
+    }
+    #qpModFlaggedMessageContainer.open #qpModFlaggedMessageInnerContainer {
+        visibility: visible;
+    }
+    #qpModFlaggedMessageClearAll {
+        border-top: 1px solid var(--secondaryColor);
+    }
+    #qpModFlaggedMessageClearAll:hover {
+        background-color: var(--secondaryColor);
+    }
+    .qpModFlaggedMessageEntryTopBar {
+        background-color: var(--primaryColor);
+    }
+    .qpModFlaggedMessageEntry .close {
+        color: var(--textColor);
+        text-shadow: none;
+        opacity: 1;
+    }
+    .qpModFlaggedMessageEntry .close:hover {
+        opacity: .7;
+    }
+    .qpModFlaggedMessageButtonWarn,
+    .qpModFlaggedMessageButtonBan,
+    .qpModFlaggedMessageResult {
+        background-color: var(--secondaryColor);
+        box-shadow: -1px -1px 10px var(--boxShadowColor);
+    }
+    .qpModFlaggedMessageButtonWarn:hover,
+    .qpModFlaggedMessageButtonBan:hover {
+        background-color: var(--accentColor);
+    }
+
+
+    /* Private Message */
+    .chatBoxTextGlow {
+        text-shadow: 0 0 10px var(--colorModOpposite), 0 0 20px var(--colorModOpposite), 0 0 30px var(--colorModOpposite), 0 0 40px var(--accentColor), 0 0 70px var(--accentColor), 0 0 80px var(--accentColor), 0 0 100px var(--accentColor), 0 0 150px var(--accentColor);
+    }
+    .chatBoxContainer {
+        background: var(--dmBackground);
+        background-size: cover;
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+        border-left: solid 2px var(--primaryColor);
+        border-right: solid 2px var(--primaryColor);
+        transition: transform 0.1s linear;
+    }
+    .disableChatLayer {
+        background-color: var(--primaryColor);
+        color: var(--textColor);
+    }
+    .chatTopBar {
+        background-color: var(--primaryColor);
+    }
+    .chatTopBar p:after {
+        background-image: none;
+    }
+    .chatBoxContainer .header {
+        background-color: var(--primaryColor);
+        box-shadow: 0 4px 10px -3px var(--boxShadowColor);
+        border-bottom: none;
+    }
+    .chatBox::before {
+        background-color: var(--primaryColor);
+    }
+    .chatBoxFooter {
+        background-color: var(--primaryColor);
+    }
+
+
+    /* Game Settings */
+    #mhQuickSelectContainer > .tab {
+        background-color: var(--primaryColor);
+    }
+    #mhQuickSelectContainer > .tab:hover {
+        background-color: var(--secondaryColor);
+    }
+    .mhSettingCategory {
+        background-color: var(--primaryColor);
+    }
+    .mhSettingContainer {
+        border-top: 5px solid var(--primaryColor);
+    }
+    .mhAdvancedContainerTitle {
+        background-color: transparent;
+    }
+    .mhCustomSliderContainer {
+        background-color: transparent;
+    }
+    .mhCheckTableContainer {
+        border: none;
+    }
+    .mhctRow {
+        border-bottom: none;
+    }
+    .mhctRowNameContainer {
+        background-color: var(--primaryColor);
+    }
+    .mhctRowItem:nth-child(2n) {
+        background-color: transparent;
+    }
+    .filterContainer {
+        background-color: var(--primaryColor);
+    }
+    .filterInput > .mhRangeSliderTextBox {
+        background-color: white;
+    }
+    .filterContent {
+        border-top: 3px solid var(--secondaryColor);
+    }
+    .flatTextInput {
+        background-color: var(--primaryColor);
+    }
+    #mhLoadContainer {
+        background-color: var(--windowBackground);
+    }
+    #mhLoadHeader {
+        background-color: var(--primaryColor);
+        border-bottom: 1px solid var(--secondaryColor);
+    }
+    #mhLoadHeader .close {
+        color: var(--textColor);
+        text-shadow: none;
+        opacity: 1;
+    }
+    #mhLoadHeader .close:hover {
+        opacity: .7;
+    }
+    .mhLoadListEntry {
+        background-color: var(--primaryColor);
+        border-bottom: 1px solid var(--primaryColor);
+    }
+    .mhLoadEntryName::after {
+        background-image: linear-gradient(to left, var(--primaryColor), transparent);
+    }
+    .mhLoadEntryNameContainer {
+        background-color: var(--primaryColor);
+    }
+    #mhLoadFromSaveCodeButton {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 6px 1px var(--boxShadowColor);
+    }
+    #settingsServerStatusTable tr {
+        background-color: var(--primaryColor);
+    }
+    #settingsServerStatusTable > tbody > tr:first-of-type {
+        background-color: var(--primaryColor);
+    }
+    #settingsServerStatusTable > tbody > tr > td {
+        border-top: none;
+    }
+    #settingsServerStatusTable > tbody > tr.online > .settingServerStatus {
+        color: var(--accentColorContrast);
+        text-shadow: 0 0 15px var(--accentColor);
+    }
+    .settingsHostPrioEntry {
+        background-color: var(--primaryColor) !important;
+        border-bottom: none;
+    }
+
+
+    /* In Lobby */
+    #lobbyShuffleTeamButton {
+        background-color: var(--primaryColor);
+    }
+    #lbDuoStart {
+        border-right: none;
+    }
+    .lbDueOption:hover {
+        background-color: var(--secondaryColor);
+    }
+    .lobbyAvatarHostSubTextContainer {
+        background-color: var(--accentColor);
+    }
+    .lobbyAvatarImgContainer {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor)
+    }
+    .lobbyAvatarOptionContainer {
+        background-color: var(--primaryColor);
+        transition: transform .1s linear;
+    }
+    .lobbyAvatarCommandIcon {
+        background-color: transparent;
+        border-radius: 0;
+    }
+    #lobbyCountContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 2px 10px 2px var(--boxShadowColor);
+        text-shadow: 0 0 8px var(--textShadowColor);
+        top: -15px;
+    }
+    #lobbyCountLoad {
+        background-color: var(--accentColor);
+        box-shadow: 0 1px 10px 1px var(--accentColor);
+    }
+    #lobbyReadyCountLoad {
+        background-color: var(--accentColorLight);
+    }
+    .lobbyAvatarTeamContainer {
+        background-color: var(--primaryColor);
+    }
+    .lobbyAvatarTeamSelector {
+        background-color: var(--primaryColor);
+    }
+    .lobbyAvatarTeamSelectorNumber.active {
+        color: var(--accentColor);
+        text-shadow: 0 0 5px var(--accentColor);
+    }
+    .lobbyAvatarSubTextContainer {
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .lobbyAvatarLevelContainer > .lobbyAvatarSubTextContainer {
+        background-color: var(--primaryColor);
+    }
+    .lobbyAvatarNameContainer {
+        background-color: var(--lobbyAvatarNameBackground);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .lbReady .lobbyAvatarImgContainer {
+        box-shadow: 0 0 10px 2px var(--accentColor);
+    }
+
+
+    /* Quiz Top Container */
+    #qpCounter {
+        background-color: var(--containerBackground);
+    }
+    #qpAnimeNameHider {
+        background-color: var(--primaryColor);
+        border-radius: var(--borderRadius);
+    }
+
+
+    /* Scoreboard */
+    #qpStandingCorrectCount {
+        text-shadow: 0 0 5px #ffffff, 0 0 15px var(--glowColor), 0 0 20px var(--glowColor), 0 0 25px var(--glowColor);
+    }
+    .qpsPlayerName.self {
+        color: var(--accentColorContrast);
+        text-shadow: 0 0 10px var(--accentColorTransparent);
+    }
+    .qpsPlayerScore.rightAnswer {
+        text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff, 0 0 20px var(--glowColor), 0 0 35px var(--glowColor), 0 0 40px var(--glowColor), 0 0 50px var(--glowColor), 0 0 75px var(--glowColor);
+    }
+    .qpTeamStandingItem {
+        background: none;
+    }
+    .qpScoreBoardGroupContainer.active {
+        box-shadow: 0 0 4px 2px var(--accentColorTransparent);
+        border: solid 2px var(--accentColor);
+    }
+    .qpSideContainer {
+        background-color: var(--containerBackground);
+        border-radius: var(--borderRadius);
+    }
+    .qpAnimeNameContainer {
+        background-color: var(--containerBackground);
+        border-radius: var(--borderRadius);
+    }
+
+
+    /* Song Info Container */
+    #qpInfoHider {
+        background-color: var(--primaryColor);
+        border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+        height: calc(100% - 30px);
+    }
+    #qpExtraSongInfo {
+        z-index: 1;
+    }
+    #qpInnerContainer {
+        width: 100%;
+        border-top: none;
+        border-radius: 0 0 var(--borderRadius) var(--borderRadius);
+    }
+    #qpReportContainer {
+        width: 60%;
+    }
+    #qpReportContainer.selected {
+        background-color: var(--primaryColor);
+    }
+    .qpSingleRateContainer {
+        background-color: transparent;
+        box-shadow: none;
+        height: 30px;
+        transform: none;
+    }
+    .qpSingleRateContainer > i,
+    .qpSingleRateContainer > p {
+        transform: none;
+    }
+    #qpFeedbackInput {
+        background-color: var(--primaryColor);
+    }
+    #qpUpvoteContainer {
+        width: 20%;
+        margin: 0;
+        border-radius: 0 0 0 10px;
+    }
+    #qpUpvoteContainer > i {
+        margin-left: 0;
+    }
+    #qpDownvoteContainer {
+        width: 20%;
+        margin: 0;
+        border-radius: 0 0 var(--borderRadius) 0;
+    }
+    #qpDownvoteContainer > i {
+        margin-left: 0;
+    }
+
+
+    /* Video Player */
+    .qpVideoTextOverlay {
+        color: var(--textColor);
+        text-shadow: -1px 0 var(--textShadowColor), 0 1px var(--textShadowColor), 1px 0 var(--textShadowColor), 0 -1px var(--textShadowColor);
+    }
+    #qpWaitBuffering {
+        background-color: var(--containerBackground);
+        box-shadow: none;
+        opacity: 0;
+    }
+    #qpHiderText {
+        background: transparent;
+    }
+    #qpVideoOverflowContainer {
+        background: var(--videoBackground);
+        background-size: cover;
+        border-radius: var(--borderRadius);
+    }
+    #qpVideoHider {
+        background-color: transparent;
+        border-radius: var(--borderRadius);
+    }
+    #qpVideoSoundOnly {
+        opacity: 0;
+    }
+    #qpVideosUserHidden {
+        background: var(--primaryColor);
+    }
+    #qpVideoProgressBar {
+        background-color: var(--accentColor);
+    }
+    #qpVideoTroubleshootingContainer {
+        background-color: var(--containerBackground);
+    }
+    #qpVideoTroubleshootingContainer .close {
+        color: var(--textColor);
+        text-shadow: none;
+        opacity: 1;
+    }
+    #qpVideoTroubleshootingContainer .close:hover {
+        opacity: .7;
+    }
+
+
+    /* Answer Input */
+    #qpAnswerInputContainer {
+        background-color: var(--answerInputBackground);
+        border-radius: 20px;
+    }
+    #qpAnswerInputContainer.focused {
+        box-shadow: 0 0 15px 1px var(--boxShadowColor);
+    }
+    #qpAnswerInputContainer .awesomplete {
+        width: 95%;
+    }
+    #qpAnswerInput {
+        background-color: transparent;
+    }
+    .qpVoteSkip {
+        background-color: var(--primaryColor);
+        border-radius: 20px;
+        left: 0;
+        transform: translateX(-110%) skewX(0);
+        transition: transform .1s linear;
+    }
+    .qpVoteSkip.toggled {
+        background-color: var(--accentColor);
+    }
+    .qpVoteSkip p {
+        transform: none;
+    }
+    .qpVoteState {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 5px var(--boxShadowColor);
+        width: 130px;
+        transition: transform .1s linear;
+    }
+    .qpSkipContainer.highlight .qpVoteSkip,
+    .qpSkipContainer:hover .qpVoteSkip {
+        transform: translateX(0%) skewX(0);
+    }
+    .qpSkipContainer.votePreview .qpVoteSkip,
+    .qpSkipContainer.preDisable .qpVoteSkip {
+        transform: translateX(-110%) skewX(0);
+    }
+    #qpVideoVoteSkip {
+        transform: skewX(0);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    .qpVoteShadowHider {
+        border-radius: 20px;
+    }
+    .qpVoteSkipGlowContainer {
+        box-shadow: none;
+    }
+    .qpVoteStateContainer {
+        border-radius: 20px;
+    }
+    #qpInputVoteState {
+        border-radius: 20px;
+    }
+    #qpVideoVoteState {
+        border-radius: 20px;
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    #qpAnswerStateContainerOuter {
+        border-radius: 0 20px 20px 0;
+    }
+    #qpAnswerStateContainerInner {
+        background-color: var(--accentColor);
+        box-shadow: 1px -3px 10px var(--boxShadowColor);
+    }
+    .qpMultipleChoiceEntry {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 4px 0 var(--boxShadowColor);
+        color: var(--textColor);
+    }
+    .qpMultipleChoiceEntryShadow {
+        box-shadow: none;
+    }
+    .qpMultipleChoiceEntryContainer.inactive .qpMultipleChoiceEntry {
+        background-color: var(--primaryColor);
+        color: var(--textColor);
+    }
+    .qpMultipleChoiceEntry:hover,
+    .qpMultipleChoiceEntryContainer.selected .qpMultipleChoiceEntry {
+        background-color: var(--secondaryColor);
+        color: var(--textColor);
+    }
+    .qpMultipleChoiceEntryContainer.registered .qpMultipleChoiceEntry {
+        box-shadow: none;
+    }
+    .qpMultipleChoiceEntryContainer.registered .qpMultipleChoiceEntryShadow {
+        box-shadow: none;
+    }
+    .qpMultipleChoiceEntryContainer.correct .qpMultipleChoiceEntry {
+        background-color: var(--songHistoryCorrectColor);
+        box-shadow: none;
+    }
+    .qpMultipleChoiceEntryContainer.correct .qpMultipleChoiceEntryShadow {
+        box-shadow: none;
+    }
+    .qpMultipleChoiceEntryContainer.wrong .qpMultipleChoiceEntry {
+        background-color: var(--songHistoryWrongColor);
+        box-shadow: none;
+    }
+    .qpMultipleChoiceEntryContainer.wrong .qpMultipleChoiceEntryShadow {
+        box-shadow: none;
+    }
+
+
+    /* Quiz Avatar */
+    .qpAvatarAnswerContainer {
+        background-color: var(--primaryColor);
+        border-radius: 3px;
+    }
+    .qpAvatarContainerOuter.correct .qpAvatarAnswerContainer {
+        box-shadow: inset 0 0 2px var(--correctAnswerColor), 0 0 5px var(--correctAnswerColor), 0 0 5px var(--correctAnswerColor), 0 0 5px var(--correctAnswerColor);
+    }
+    .qpAvatarContainerOuter.wrong .qpAvatarAnswerContainer,
+    .qpAvatarContainerOuter.noAnswer .qpAvatarAnswerContainer {
+        box-shadow: inset 0 0 2px var(--wrongAnswerColor), 0 0 5px var(--wrongAnswerColor), 0 0 5px var(--wrongAnswerColor), 0 0 5px var(--wrongAnswerColor);
+    }
+    .qpAvatarAnswerText {
+        border-right: 17px solid transparent;
+        border-left: 10px solid transparent;
+    }
+    .qpAvatarAnswerText.wrongAnswer,
+    .qpAvatarAnswerText.rightAnswer,
+    .qpAvatarAnswerText.goldGlow,
+    .qpAvatarAnswerText.silverGlow,
+    .qpAvatarAnswerText.bronzeGlow {
+        text-shadow: none;
+    }
+    .qpAvatarStatusOuterContainer {
+        border-radius: 0 3px 3px 0;
+    }
+    .qpAvatarStatusInnerContainer {
+        background-color: transparent;
+        box-shadow: 1px -3px 10px var(--boxShadowColor);
+        opacity: 1;
+        right: -10px;
+    }
+    .qpAvatarStatus {
+        color: var(--textColor);
+        text-shadow: 0 -1px 0 var(--textShadowColor);
+    }
+    .qpAvatarStatusBar.watching {
+        background-color: var(--statusWatchingColor);
+        opacity: 1;
+        left: 0;
+    }
+    .qpAvatarStatusBar.completed {
+        background-color: var(--statusCompletedColor);
+        opacity: 1;
+        left: 0;
+    }
+    .qpAvatarStatusBar.hold {
+        background-color: var(--statusHoldColor);
+        opacity: 1;
+        left: 0;
+    }
+    .qpAvatarStatusBar.dropped {
+        background-color: var(--statusDroppedColor);
+        opacity: 1;
+        left: 0;
+    }
+    .qpAvatarStatusBar.planning {
+        background-color: var(--statusPlanningColor);
+        opacity: 1;
+        left: 0;
+    }
+    .qpAvatarAnswerNumber {
+        color: var(--textColor);
+        text-shadow: none;
+    }
+    .qpAvatarAnswerNumberInnerContainer {
+        background-color: transparent;
+    }
+    .qpAvatarAnswerNumberInnerContainer.correct {
+        background-color: transparent;
+    }
+    .qpAvatarAnswerNumberInnerContainer.correct .qpAvatarAnswerNumber {
+        color: var(--correctAnswerColor);
+    }
+    .qpAvatarAnswerNumberInnerContainer.wrong {
+        background-color: transparent;
+    }
+    .qpAvatarAnswerNumberInnerContainer.wrong .qpAvatarAnswerNumber {
+        color: var(--wrongAnswerColor);
+    }
+    .qpAvatarLootedStatusOuterContainer {
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .qpAvatarLootedStatusInnerContainer {
+        background-color: var(--accentColor);
+        opacity: 1;
+    }
+    .qpAvatarLootedStatusText {
+        color: var(--textColor);
+        text-shadow: 0 -1px 0 var(--textShadowColor);
+    }
+    .qpAvatarImageContainer {
+        background-color: var(--avatarBackground);
+    }
+    .qpAvatarContainerOuter.wait .qpAvatarBackgroundContainer {
+        box-shadow: inset 0 0 10px var(--waitingAnswerColor), 0 0 10px var(--waitingAnswerColor), 0 0 10px var(--waitingAnswerColor), 0 0 10px var(--waitingAnswerColor);
+    }
+    .qpAvatarContainerOuter.correct .qpAvatarBackgroundContainer {
+        background-color: var(--correctAnswerColorTransparent);
+        box-shadow: inset 0 0 10px var(--correctAnswerColor), 0 0 10px var(--correctAnswerColor), 0 0 10px var(--correctAnswerColor), 0 0 10px var(--correctAnswerColor);
+    }
+    .qpAvatarContainerOuter.wrong .qpAvatarBackgroundContainer,
+    .qpAvatarContainerOuter.noAnswer .qpAvatarBackgroundContainer {
+        background-color: var(--wrongAnswerColorTransparent);
+        box-shadow: inset 0 0 10px var(--wrongAnswerColor), 0 0 10px var(--wrongAnswerColor), 0 0 10px var(--wrongAnswerColor), 0 0 10px var(--wrongAnswerColor);
+    }
+    .qpAvatarContainer.disabled .particleEmiter {
+        opacity: 0;
+    }
+    .qpAvatarScoreContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 5px 2px var(--boxShadowColor);
+    }
+    .qpAvatarScoreContainer::after {
+        background: none;
+    }
+    .qpAvatarInfoBar {
+        background-color: var(--primaryColor);
+    }
+    .qpAvatarLevelBar {
+        box-shadow: none;
+    }
+    .qpAvatarLevelOuter {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 5px 2px var(--boxShadowColor);
+    }
+    .qpAvatarHostIcon,
+    .qpAvatarHiddenIcon {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 5px 2px var(--boxShadowColor);
+    }
+    .qpAvatarMultiChoiceIcon {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 5px 2px var(--boxShadowColor);
+    }
+    .qpLife {
+        background-color: var(--secondaryColor);
+        box-shadow: none;
+    }
+    .qpLife:not(.active, .charge, .target) {
+        border: 2px solid var(--secondaryColorDark);
+    }
+    .qpLife.target {
+        background-color: var(--secondaryColor);
+    }
+    .qpOverlay {
+        border: 2px solid var(--secondaryColorDark);
+    }
+    .qpLifeActiveOverlay {
+        background-color: var(--glowColor);
+        box-shadow: inset 0 0 2px #ffffff80, 0 0 4px #ffffff80, 0 0 8px var(--glowColor);
+    }
+    .qpLifeChargeOverlay {
+        background-color: var(--accentColorDark);
+        box-shadow: inset 0 0 2px var(--accentColor), 0 0 4px var(--accentColorDark);
+    }
+    .qpLifeTargetOverlay {
+        background-color: var(--secondaryColor);
+    }
+    .qpLife.target > .qpLifeTargetOverlay {
+        opacity: 1;
+    }
+
+
+    /* Battle Royale */
+    #brMap {
+        background-color: transparent;
+        border: 2px solid var(--primaryColor);
+    }
+    #brMap:focus-within {
+        box-shadow: none;
+    }
+    #brMapContent {
+        background: var(--battleRoyaleBackground);
+        background-size: cover;
+    }
+    .brTile {
+        border: 2px solid var(--primaryColor);
+    }
+    .brTile > div {
+        background-color: var(--accentColor);
+    }
+    #brReturnToMapButton {
+        background-color: var(--primaryColor);
+    }
+    #brTileSpectatorCountContainer {
+        background-color: var(--primaryColor);
+    }
+    #brCollectionContainer {
+        transition: transform .1s linear;
+    }
+    #brCollectionHeader {
+        background-color: var(--primaryColor);
+    }
+    #brCollectedList {
+        background-color: var(--primaryColor);
+    }
+    #brCollectedList > li::after {
+        background-image: linear-gradient(to left, var(--primaryColor), transparent);
+    }
+    #brCollectionContainer.lowSlotsCount > #brCollectionHeader,
+    #brCollectionContainer.lowSlotsCount > #brCollectedList {
+        background-color: var(--songHistoryWrongColor);
+    }
+    #brCollectionContainer.lowSlotsCount > #brCollectedList > li::after {
+        background-image: linear-gradient(to left, var(--songHistoryWrongColor), transparent);
+    }
+    .brPlayerImage {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 4px 1px var(--boxShadowColor);
+    }
+    .brPlayer.self > .brPlayerImage {
+        box-shadow: 0 0 4px 1px var(--accentColor);
+    }
+    .brMapObject {
+        background-color: var(--primaryColor);
+        border: solid 1px var(--textColor);
+    }
+    .brMapObject.active {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 5px var(--accentColor);
+        border-color: var(--textColor);
+    }
+    .brContainerContent {
+        background-color: var(--primaryColor);
+        opacity: .8;
+    }
+    .brContainerContent > li::after {
+        background-image: linear-gradient(to left, var(--primaryColor), transparent);
+    }
+    .brTileGate {
+        background-color: transparent;
+    }
+    .brTileGate > i {
+        opacity: 1;
+    }
+    .brTileGate.active {
+        color: var(--accentColor);
+    }
+    #brInventoryFullMessage {
+        background-color: var(--primaryColorTransparent);
+    }
+    #brInventoryFullMessage.active {
+        opacity: 1;
+    }
+
+
+    /* Daily Quests */
+    #qcStickOut > i.highlight {
+        text-shadow: 0 0 5px #ffffff, 0 0 20px var(--accentColor), 0 0 40px var(--accentColor), 0 0 50px var(--accentColor);
+    }
+    .qcProgressBar {
+        background-color: var(--accentColor);
+    }
+    #questContainer {
+        background-color: var(--primaryColor);
+        transition: transform .1s linear;
+    }
+    #questContainer.open {
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+        transition: transform .1s linear;
+    }
+    #qcHeader {
+        background-color: var(--primaryColor);
+    }
+    #qcStickOut {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px var(--boxShadowColor);
+        right: -59px;
+    }
+    .qcQuestTypeContainer {
+        background-color: var(--primaryColor);
+    }
+    .qcProgressBarContainer {
+        background-color: var(--secondaryColor);
+    }
+    .qcQuestOuter {
+        border-top: 2px solid var(--secondaryColor);
+        border-bottom: none;
+    }
+    .qcQuestOuter.selected .qcQuestTypeContainer {
+        background-color: var(--accentColorLight);
+    }
+    #qcTokenCounterContainer {
+        text-shadow: 0 0 3px var(--primaryColor);
+    }
+
+
+    /* Expand Library */
+    #elCounterContainer {
+        background-color: var(--primaryColor);
+    }
+    #elQuestionFilter {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    #elQuestionFilterInput {
+        background-color: var(--secondaryColor);
+    }
+    #elInputContainer {
+        background-color: var(--primaryColor);
+        border-radius: var(--borderRadius);
+        width: 35%;
+    }
+    #elInputVideoContainer {
+        height: 378px;
+    }
+    #elQuestionNoSongSelectedText {
+        color: var(--textColor);
+        text-shadow: 0 -1px 0 var(--textShadowColor);
+    }
+    #elQuestionInputSongName::after,
+    #elQuestionInputArtistName::after {
+        background-image: none;
+    }
+    #elQuestionNoSongSelectedContainer {
+        background-color: var(--primaryColor);
+    }
+    #elQuestionInputState {
+        color: var(--accentColorContrast);
+    }
+    .elQuestionAnime {
+        background-color: var(--primaryColor);
+    }
+    .elQuestionAnimeName::after {
+        background-image: linear-gradient(to left, var(--primaryColor), transparent);
+    }
+    .elQuestionSong {
+        background-color: var(--secondaryColor);
+    }
+    .elQuestionSongNameContaniner::after,
+    .elQuestionSongArtistContainer::after {
+        background-image: linear-gradient(to left, var(--secondaryColor), transparent);
+    }
+    #elInputStatusBar {
+        border-top: 1px solid var(--primaryColor);
+        border-bottom: 1px solid var(--primaryColor);
+        background-color: var(--primaryColor);
+    }
+    .elStatusName {
+        background-color: var(--primaryColor);
+        width: 60px;
+    }
+    .elStatusName::after {
+        background-image: none;
+    }
+    .elResOption {
+        background-color: var(--primaryColor);
+    }
+    #elInputVideoPreviewContainer {
+        background-color: var(--primaryColor);
+    }
+    .elInputBackgroundText {
+        color: var(--textColor);
+        text-shadow: 0 -1px 0 var(--textShadowColor);
+    }
+    #elInputVideoSelector {
+        background-color: var(--primaryColorTransparent);
+        transition: height .1s linear;
+    }
+    .elSelectorOption {
+        opacity: .5;
+    }
+    .elSelectorOption.active {
+        color: var(--textColor);
+    }
+    #elFAQIndexContainer {
+        border-bottom: none;
+    }
+
+
+    /* Tutorial */
+    .tmRowName {
+        background-color: var(--primaryColor);
+    }
+    #tcMessageTopBar {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .tcTopBarButton:hover {
+        background-color: var(--secondaryColor);
+    }
+    #tcNextMessage {
+        text-shadow: 0 0 5px var(--accentColor), 0 0 10px var(--accentColor), 0 0 15px var(--accentColor);
+    }
+    #tcMessageImageContainer {
+        background-color: var(--primaryColor);
+    }
+    .tcOption {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--accentColor);
+    }
+    .tcOption:hover {
+        background-color: var(--secondaryColor);
+    }
+    .tcHighlightElement {
+        box-shadow: 0 0 10px 2px var(--accentColor) !important;
+        text-shadow: 0 0 5px var(--accentColor), 0 0 10px var(--accentColor), 0 0 15px var(--accentColor);
+    }
+
+
+    /* Patreon Modal */
+    #pmEmojiContainerInner {
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    #pmEmojiPreview {
+        background-color: var(--primaryColor);
+    }
+    #pmEmojiPreviewList {
+        transition: opacity .2s linear;
+    }
+    #pmEmojiManageButton {
+        background-color: var(--primaryColor);
+        transition: transform .2s linear;
+    }
+    .pmEmojiPopupButton {
+        background-color: var(--primaryColor);
+        transition: transform .2s linear;
+    }
+    #pmEmojiListContainer {
+        background-color: var(--primaryColor);
+        transition: max-height .2s linear;
+    }
+    .pmButton {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .pmButton:hover {
+        box-shadow: 0 0 10px 2px var(--accentColor);
+    }
+    #pmPatroenLink {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    #pmPatroenLink:hover {
+        box-shadow: 0 0 10px 2px var(--accentColor);
+    }
+    #pmPatroenLink > .patreonIcon {
+        background-color: var(--accentColor);
+    }
+    .lbBar {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 5px var(--boxShadowColor);
+    }
+    .lbPoint {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 5px var(--boxShadowColor);
+    }
+    .lbPoint::before,
+    .lbPoint::after {
+        background-color: var(--secondaryColor);
+    }
+    .lbEntry.active > .lbBar {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 5px var(--accentColor);
+    }
+    .lbEntry.active .lbPoint {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 5px var(--accentColor);
+    }
+    .lbEntry.active .lbPoint::before {
+        background-color: var(--accentColor);
+    }
+    .lbEntry.active label {
+        text-shadow: 0 0 5px var(--accentColor);
+    }
+
+
+    /* Avatar Store */
+    #storeWindow {
+        background: var(--avatarStoreBackground);
+        background-size: cover;
+    }
+    #swCloseButton {
+        background-color: var(--primaryColor);
+    }
+    .swTopBarAvatarContainer {
+        box-shadow: none;
+    }
+    .swTopBarImageContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 6px 3px 10px -5px var(--primaryColor);
+    }
+    .swTopBarAvatarImageContainer.selected,
+    .swTopBarSkinImageContainer.selected {
+        background-color: var(--accentColor);
+    }
+    .swMainMessageContainer {
+        color: var(--textColor);
+        text-shadow: 0 -1px 0 var(--textShadowColor);
+    }
+    #swNoSelectionContainer {
+        opacity: 0;
+    }
+    #swAvatarTokenContainer {
+        background-color: var(--primaryColor);
+    }
+    #swRhythmContainer {
+        background-color: var(--primaryColor);
+    }
+    #swAutoSwitchStateContainer {
+        background-color: var(--primaryColor);
+    }
+    .swInfoPopoutButton {
+        background-color: var(--primaryColor);
+    }
+    .swInfoPopoutContainer {
+        background-color: var(--primaryColor);
+        transition: transform .1s linear;
+    }
+    .swInfoPopoutContainer::after {
+        background-color: var(--primaryColor);
+    }
+    #swResonanceTargetContainer {
+        background-color: var(--avatarBackground);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    #swResonanceTargetName {
+        color: var(--textColor);
+        text-shadow: 0 0 6px var(--textShadowColor), 0 0 4px var(--textShadowColor);
+    }
+    #swResonanceProgressBarContainer {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    #swResonanceProgressBar {
+        background-color: var(--accentColor);
+    }
+    #swEmoteCollapseButton {
+        background-color: var(--primaryColor);
+    }
+    #swEmoteCollapseButton:hover {
+        background-color: var(--secondaryColor);
+    }
+    .swEmoteGroupNameContainer {
+        background-color: var(--primaryColor);
+    }
+    .swEmoteGroup {
+        border-top: solid 5px var(--primaryColor);
+    }
+    .swEmoteGroupContainer > .swAvatarTile {
+        margin: 5px;
+    }
+    .swEmoteGroupContainer > .swAvatarTile:nth-of-type(4n) {
+        margin-right: 5px;
+    }
+    .swTicketOptionButton > div {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    .swTicketOptionButton {
+        background-color: var(--primaryColor);
+    }
+    .swTicketOptionButton:hover {
+        background-color: var(--secondaryColor);
+    }
+    .swTicketOptionButton.active {
+        background-color: var(--secondaryColor);
+    }
+    #swTicketAvatarLockingPromoText {
+        text-shadow: 1px 0 0 var(--textShadowColor), 0 -1px 0 var(--textShadowColor), 0 1px 0 var(--textShadowColor), -1px 0 0 var(--textShadowColor);
+    }
+    #swTicketAvatarLockingContainer {
+        background-color: var(--primaryColor);
+        box-shadow: none;
+    }
+    #swTicketAvatarLockingContainer:hover {
+        background-color: var(--secondaryColor);
+    }
+    #swTicketAvatarLockingContainer:hover #swTicketAvatarLockingPromoContainer::before {
+        background-color: var(--secondaryColor);
+    }
+    #swTicketAvatarLockingPromoContainer::before {
+        background-color: var(--primaryColor);
+    }
+    #swTicketRewardCenter {
+        background-color: var(--primaryColor);
+    }
+    .swTicketRollContainer {
+        box-shadow: none;
+    }
+    .swTicketRollContainer:hover {
+        background-color: var(--secondaryColor);
+    }
+    .swTicketAvatarLockingPriceContainer {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    .swTicketRollText {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    .swRhythmIcon {
+        z-index: 1;
+    }
+    #swTicketAvatarLockingContainerOuter {
+        transition: top .2s linear;
+    }
+    #swTicketAvatarLockingCloseButton {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    #swTicketAvatarLockingCloseButton:hover {
+        background-color: var(--secondaryColor);
+    }
+    #swTicketAvatarLockingContentInner {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 5px var(--boxShadowColor);
+    }
+    .swTicketAvatarLockingItemInner {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 5px var(--boxShadowColor);
+    }
+    .swTicketAvatarLockingItemInner:hover {
+        background-color: var(--secondaryColor);
+    }
+    .swTicketAvatarLockingItemName {
+        text-shadow: 0 0 3px var(--textShadowColor);
+    }
+    #swTicketAvatarLockingFooter {
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    #swTicketRollExecuteCancal {
+        background-color: var(--primaryColor);
+    }
+    #swTicketRollExecuteCancal:hover {
+        background-color: var(--secondaryColor);
+    }
+    #swTicketRollExecuteInner {
+        background-color: var(--primaryColor);
+    }
+    #swTicketRollExecuteHoverInner:hover {
+        background-color: var(--secondaryColor);
+    }
+    #swTicketPromoContainerInner {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    #swTicketPromoFooter {
+        background-color: var(--primaryColorTransparent);
+    }
+    #swTicketPromoTimerContainer {
+        text-shadow: 0px 0px 6px var(--textShadowColor), 0px 0px 4px var(--textShadowColor);
+    }
+    #swContentAvatarContainer {
+        padding-top: 135px;
+    }
+    .swAvatarTile {
+        background-color: var(--avatarStoreAvatarBackground);
+        width: 170px;
+        margin: 10px;
+    }
+    .swAvatarTile:nth-of-type(4n) {
+        margin-right: 10px;
+    }
+    .swAvatarTileType {
+        background-color: var(--primaryColor);
+    }
+    .swAvatarTileTypeText {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    .swAvatarTilePriceContainer {
+        background-color: var(--primaryColor);
+        transition: transform .1s linear, height .1s linear;
+    }
+    .swAvatarTileFooter {
+        background-color: var(--primaryColor);
+        opacity: .6;
+    }
+    .swAvatarTile:hover > .swAvatarTileFooter {
+        opacity: 1;
+    }
+    .swAvatarTileFooterEdgeEffect {
+        background-color: var(--primaryColor);
+    }
+    #swPatreonContainer {
+        background-color: var(--primaryColor);
+        border-radius: var(--borderRadius);
+    }
+    #swPatreonContainerInner > img {
+        filter: brightness(var(--brightnessMod));
+    }
+    #swRightColumnTop {
+        background-color: var(--primaryColor);
+    }
+    #swRightColumnBottom {
+        background-color: var(--primaryColor);
+    }
+    #swRightColumnAvatarNameContainer {
+        background-color: var(--primaryColor);
+        border-bottom: 2px solid var(--primaryColor);
+    }
+    .swRightColumnEdgeEffect {
+        background-color: transparent;
+    }
+    #swRightColumnAvatarChangeBackgroundButton {
+        background-color: var(--primaryColor);
+    }
+    #swRightColumnAvatarChangeBackgroundButton:hover {
+        background-color: var(--secondaryColor);
+    }
+    #swRightColumnAvatarChangeBackgroundButton.active {
+        background-color: var(--accentColor);
+    }
+    #swRightColumnAvatarToggleButton {
+        background-color: var(--primaryColor);
+    }
+    #swRightColumnAvatarToggleButton:hover {
+        background-color: var(--secondaryColor);
+    }
+    #swRightColumnAvatarImageContainer {
+        background-color: var(--avatarBackground);
+    }
+    #swRightColumnAvatarPoseTextContainer {
+        background-color: var(--primaryColor);
+    }
+    #swRightColumnAvatarPoseContainer {
+        background-color: transparent;
+        border-top: 2px solid transparent;
+        border-bottom: 2px solid transparent;
+    }
+    .swRightColumnAvatarPoseContainer > img {
+        opacity: .5;
+        filter: brightness(var(--brightnessMod));
+    }
+    #swRightColumActionButtonMainContainer {
+        background-color: var(--accentColor);
+        opacity: 1;
+    }
+    #swRightColumActionButtonMainContainer:hover {
+        background-color: var(--accentColorLight);
+    }
+    .swRightColumnActionButton {
+        background-color: var(--accentColor);
+        border-left: solid 1px var(--primaryColor);
+    }
+    .swRightColumnActionButton:hover {
+        background-color: var(--accentColorLight);
+    }
+    .swRightColumnBonusCategory {
+        background-color: var(--primaryColor);
+    }
+    #swRightColumnAvatarBonusBar {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 5px var(--accentColor);
+    }
+    #swRightColumnBonusTrack {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 5px var(--boxShadowColor);
+    }
+    #swRightColumnBonusTrackEndpoint {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 5px var(--boxShadowColor);
+    }
+    #swRightColumnBonusTrackEndpoint::before {
+        background-color: var(--secondaryColor);
+    }
+    #swRightColumnAvatarBonusBar::after {
+        background-color: var(--accentColor);
+    }
+    #swRightColumnAvatarBonusEndpoint.active {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 5px var(--accentColor);
+    }
+    #swRightColumnSkinBonusBar {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 5px var(--accentColor);
+    }
+    #swRightColumnSkinBonusBar::after {
+        background-color: var(--accentColor);
+    }
+    #swRightColumnSkinBonusEndpoint.active {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 5px var(--accentColor);
+    }
+    #swRightColumnBonusContainer {
+        background-color: var(--primaryColor);
+    }
+    .swRightColumnExtraInfoOuter {
+        background-color: var(--primaryColor);
+        border-right: 2px solid var(--primaryColor);
+    }
+    #swRightColumnExtraInfoContainer {
+        border: 2px solid var(--primaryColor);
+    }
+    #swRightColumnLoreHeader {
+        background-color: var(--primaryColor);
+    }
+    #swRightColumnLoreContainer {
+        background-color: var(--primaryColor);
+    }
+    #swTicketStoreContentContainer > .swAvatarTile {
+        color: var(--textColor);
+    }
+    .swTicketStoreAvatarTokenText,
+    .swTicketStoreIconText,
+    .swTicketStorePrice {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    #swTicketStoreContentContainer > .swAvatarTile.swTicketStoreEntrySale {
+        box-shadow: inset var(--accentColor) 0 0 100px 5px, 0 0 10px 2px var(--boxShadowColor);
+    }
+    .swTicketStoreSaleRow,
+    .swTicketStoreSaleHighlight {
+        background-color: var(--accentColor);
+    }
+    #swPriceBuyButton {
+        background-color: var(--accentColor);
+    }
+
+
+    /* Scrollbar */
+    .ps > .ps__scrollbar-y-rail {
+        opacity: 1;
+    }
+    .ps > .ps__scrollbar-y-rail > .ps__scrollbar-y {
+        background-color: var(--textColor);
+    }
+    .ps:hover > .ps__scrollbar-y-rail:hover > .ps__scrollbar-y {
+        background-color: var(--accentColor);
+    }
+    .ps > .ps__scrollbar-x-rail {
+        opacity: 1;
+    }
+    .ps > .ps__scrollbar-x-rail > .ps__scrollbar-x {
+        background-color: var(--textColor);
+    }
+    .ps:hover > .ps__scrollbar-x-rail:hover > .ps__scrollbar-x {
+        background-color: var(--textColor);
+    }
+    #swTopBarContentContainer > .ps__scrollbar-x-rail {
+        opacity: 1;
+    }
+    #swTopBarContentContainer:hover > .ps__scrollbar-x-rail > .ps__scrollbar-x {
+        opacity: 1;
+    }
+    #swTopBarContentContainer:hover > .ps__scrollbar-x-rail {
+        opacity: 1;
+    }
+
+
+    /* Particle */
+    .particleEmiter {
+        box-shadow: 0 0 10px #ffffff, 0 0 20px var(--glowColor), 0 0 50px var(--glowColor);
+        text-shadow: 0 0 10px #ffffff, 0 0 20px var(--glowColor), 0 0 50px var(--glowColor);
+    }
+    .particle {
+        background-color: var(--accentColorLight);
+        box-shadow: 0 0 8px #ffffff, 0 0 15px var(--accentColorLight);
+    }
+    .particleShadow {
+        box-shadow: 0 0 8px #ffffff, 0 0 15px var(--accentColorLight);
+    }
+
+
+    /* Cheat Test */
+    #cheatChallengeNoticeContainer {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    #cheatChallengeTextHighlight {
+        text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff, 0 0 40px var(--accentColor), 0 0 70px var(--accentColor), 0 0 80px var(--accentColor), 0 0 100px var(--accentColor), 0 0 150px var(--accentColor);
+    }
+    #ctmMessageContainer {
+        background-color: var(--primaryColor);
+        border: 1px solid var(--secondaryColor);
+    }
+    #ctmMessageInputContainer {
+        background-color: var(--primaryColor);
+        border: 1px solid var(--secondaryColor);
+    }
+    #ctmModEntries > tbody {
+        border: 1px solid var(--secondaryColor);
+    }
+    #ctmModEntries > tbody > tr {
+        background-color: var(--primaryColorContrast);
+    }
+    #ctmModEntries > tbody > tr:first-child {
+        background-color: var(--primaryColor);
+    }
+    #ctmModEntries > tbody > tr:hover,
+    #ctmModEntries > tbody > tr.active {
+        background-color: var(--primaryColorContrast2);
+    }
+    #ctmModEntries > tbody > tr > td {
+        border-top: 1px solid var(--secondaryColor);
+    }
+
+
+    /* Troubleshooting */
+    #troubleshootingContainer {
+        background-image: var(--mainBackground);
+    }
+    #tsHelperBoxContainer {
+        background: var(--primaryColor);
+    }
+    #tsHelperButtonMenuContainer > div {
+        background: var(--primaryColor);
+        border-top: none;
+    }
+    #tsHelperButtonMenuContainer > div:hover {
+        background-color: var(--secondaryColor);
+    }
+    div#tsBackButtonContainer {
+        background-color: var(--primaryColor);
+    }
+    div#tsBackButtonContainer:hover {
+        background-color: var(--secondaryColor);
+    }
+
+
+    /* AMQ Song History Window */
+    .shSearchInputContainer {
+        border: none;
+    }
+    #shSearchInput {
+        background-color: var(--primaryColor);
+    }
+    #shSearchTab.open i {
+        color: var(--textColor);
+    }
+    .shGameTitleLine {
+        background-color: transparent;
+    }
+    .shSongTable a {
+        color: var(--textColor);
+        text-shadow: 0 0 4px var(--textShadowColor);
+    }
+    .shiEntryValue.playerHighlight {
+        color: var(--accentColor);
+        text-shadow: none;
+    }
+    .shGameTitleInner {
+        background-color: transparent;
+    }
+    .shGameLoadButton {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 5px 0 var(--boxShadowColor);
+    }
+    .shGameLoadButton:hover {
+        box-shadow: 0 0 5px 1px var(--accentColor);
+    }
+    .shGameSongContainer {
+        border-top: 1px solid var(--secondaryColor);
+    }
+    .shSongTable tr {
+        border-bottom: 1px solid var(--primaryColor);
+    }
+    .shSongTable tr:hover {
+        background-color: var(--secondaryColor);
+    }
+    .shSongTable tr:first-child {
+        background-color: var(--primaryColor);
+    }
+    .shSongTable tr:first-child:hover {
+        background-color: var(--primaryColor);
+    }
+    .shSongTable tr.correctGuess {
+        background-color: var(--songHistoryCorrectColor);
+    }
+    .shSongTable tr.shRow.correctGuess:hover {
+        background-color: var(--songHistoryCorrectColorHover);
+    }
+    .shSongTable tr.wrongGuess {
+        background-color: var(--songHistoryWrongColor);
+    }
+    .shSongTable tr.shRow.wrongGuess:hover {
+        background-color: var(--songHistoryWrongColorHover);
+    }
+
+
+    /* Nexus */
+    #nexusMapBackdropCanvas {
+        background: var(--mainBackground);
+        background-size: cover;
+    }
+    .nexusMapWindow {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 15px 5px var(--boxShadowColor);
+        color: var(--textColor);
+        text-shadow: 0 0 6px var(--textShadowColor);
+    }
+    .nexusMapWindow::before {
+        background-image: none;
+    }
+    .nexusTileInfoContainer {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+    }
+    .ncdwType {
+        background-color: var(--primaryColor);
+    }
+    .ncdwType:hover {
+        background-color: var(--accentColor);
+    }
+    .ncdwTypeOptionContainer {
+        box-shadow: 0 0 15px 5px var(--boxShadowColor);
+    }
+    .ncdwTypeSolo {
+        border-bottom: none;
+    }
+    .ncdwTypeCoopOptionButton {
+        background-color: var(--primaryColor);
+    }
+    .ncdwTypeCoopOptionButton:hover {
+        background-color: var(--accentColor);
+    }
+    .ncdwTypeOptionContainer.coopMenu .ncdwType:hover {
+        background-color: var(--primaryColor);
+    }
+    .ncwTopBar {
+        background-color: var(--primaryColor);
+    }
+    .ncwTab::after {
+        background-color: var(--secondaryColor);
+    }
+    .ncwRightMainContainer {
+        border: none;
+    }
+    .ncwTopBarTitleContainer {
+        background-color: var(--primaryColor);
+        border-right: 8px solid var(--primaryColor);
+    }
+    .ncwHideWindow {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 15px 5px var(--boxShadowColor);
+    }
+    .nexusStorePrice {
+        text-shadow: 0 0 6px var(--textShadowColor);
+    }
+    .nexusMapRewardArtifactTargetContainer {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 15px 5px var(--boxShadowColor);
+    }
+    .nexusMapRewardArtifact {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 15px 5px var(--boxShadowColor);
+    }
+    .nexusMapRewardArtifact:hover {
+        box-shadow: 0 0 15px 5px var(--accentColor);
+    }
+    .objectHighlight {
+        filter: drop-shadow(0px 0px 3px black) drop-shadow(0px 0px 3px black);
+    }
+    .nexusVoteIcon {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    .nexusMapRewardArtifactHighlightAvatarImage {
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    .nexusMapRewardArtifactSelectedTarget {
+        box-shadow: 0 0 5px 1px var(--boxShadowColor);
+    }
+    .ncdwPartySlotPlayerContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    .ncdwPartySlotProgressRow {
+        font-weight: bold;
+        text-shadow: -1px -1px 0 var(--colorMod), 1px -1px 0 var(--colorMod), -1px 1px 0 var(--colorMod), 1px 1px 0 var(--colorMod);
+    }
+    .ncdwPartySlotSideText {
+        text-shadow: 0 0 7px var(--textShadowColor);
+    }
+    .ncwStandardInfoContainer {
+        background: var(--primaryColorTransparent);
+        border: 2px solid var(--primaryColor);
+    }
+    .ncwContentContainer.topBarBorder {
+        border-top: 4px solid var(--secondaryColor);
+    }
+    .nexusMapWindowPreviewImageContainer {
+        background: var(--primaryColorTransparent);
+        border: 2px solid var(--accentColorDark);
+    }
+    .nexusMapWindowPreviewImage {
+        filter: drop-shadow(0 0 2px var(--boxShadowColor));
+    }
+    .ncwStandardInfoContainerHeader {
+        border-bottom: 2px solid var(--primaryColor);
+    }
+    .ncwAvatarPreview {
+        background-color: var(--avatarBackground);
+        border: none;
+    }
+    .ncwAvatarImageInfoContainer {
+        font-weight: bold;
+        text-shadow: 0 1px 0 var(--colorMod), 1px 0 0 var(--colorMod), 0 -1px 0 var(--colorMod), -1px 0 0 var(--colorMod), 0 0 5px var(--textShadowColor);
+    }
+    .nexusCityFilterSearchInput {
+        background-color: var(--primaryColor);
+        border-color: var(--secondaryColor);
+        color: var(--textColor);
+    }
+    .nexusCityFilterSearchInputContainer > i {
+        color: var(--textColor);
+    }
+    .nexusCityAvatarSelectorAvatar {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nexusCityAvatarSelectorAvatar:hover {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nexusCityAvatarSelectorAvatarLevel {
+        background-color: var(--primaryColorTransparent);
+    }
+    .ncwwRunePickerRuneContainer {
+        background-color: var(--primaryColor);
+    }
+    .ncwwRunePickerExpandButton::before,
+    .ncwwRunePickerExpandButton::after {
+        background-color: var(--primaryColor);
+    }
+    .ncwwRunePickerExpandButton {
+        background-color: var(--primaryColor);
+    }
+    .ncwwRunePicker::after {
+        background-color: var(--primaryColor);
+    }
+    .nexusCityFilterBar {
+        background-color: var(--primaryColor);
+        border: 1px solid var(--secondaryColor);
+        color: var(--textColor);
+    }
+    .nexusCityFilterBar.active {
+        background-color: var(--accentColor);
+        box-shadow: none;
+    }
+    .nexusCityFilterList {
+        background-color: var(--primaryColor);
+    }
+    .nexusCityFilterListCategoryName::after {
+        background-color: var(--secondaryColor);
+    }
+    .nexusCityFilterListOptionBox {
+        background-color: var(--secondaryColor);
+        box-shadow: none;
+    }
+    .nexusCityAvatarSelectorFilterContainer {
+        background-color: transparent;
+    }
+    .nexusPopoverContainer {
+        color: var(--textColor);
+    }
+    .nexusPopoverMainContainer {
+        background-color: var(--primaryColor);
+        border: 2px solid var(--secondaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nexusPopoverStatLineText {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nexusPopoverHeader {
+        border-bottom: solid 2px var(--secondaryColor);
+    }
+    .nexusPopoverImageContainer {
+        background-color: var(--primaryColor);
+        border: 2px solid var(--secondaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nexusMapButton {
+        background-color: var(--primaryColor);
+    }
+    .nexusMapButton:hover {
+        background-color: var(--primaryColor);
+    }
+    .nexusCityAvatarSelectorAvatarEmptySlots {
+        background-color: var(--accentColor);
+        border: 1px solid var(--textColor);
+        box-shadow: none;
+    }
+    .nexusCityAvatarSelectorAvatarFreeWeekIcon {
+        background-color: var(--accentColor);
+        box-shadow: none;
+        border: 1px solid var(--textColor);
+    }
+    .ncwwRunePickerRuneAmount {
+        background-color: var(--accentColorTransparent);
+        box-shadow: 0 0 2px 0 var(--boxShadowColor);
+    }
+    .ncwwRunePickerRune.selected .ncwwRunePickerRuneImage {
+        filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px var(--accentColor));
+    }
+    .ncwwRuneSetupButton {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 8px 1px var(--boxShadowColor);
+    }
+    .ncwwRuneSetupButton:hover {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 8px 1px var(--accentColor);
+    }
+    .ncwwRuneSetupPageButton.active {
+        background-color: var(--secondaryColor);
+    }
+    .ncwwRuneSetupRuneContainer {
+        background: var(--primaryColor);
+        border: 2px solid var(--secondaryColor);
+    }
+    #ncwwRuneSetupEnergyContainer {
+        background: var(--primaryColor);
+        border: 2px solid var(--secondaryColor);
+    }
+    #ncwwRuneSetupOpenSlotCounter {
+        text-shadow: 0 0 6px var(--textShadowColor);
+    }
+    #ncwwRuneSetupTooltipPopup {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 10px 5px var(--boxShadowColor);
+    }
+
+
+    /* Nexus Party Setup */
+    .ncdwPartySlot {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    .ncdwPartySlot:hover {
+        box-shadow: 0 0 10px 1px var(--accentColor);
+    }
+    .ncdwSetupMainButtonInner,
+    .ncdwSetupMainButton::before,
+    .ncdwSetupMainButton::after {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 8px 1px var(--boxShadowColor);
+    }
+    #ncdwPartySetupLoadTeamButton:hover .ncdwSetupMainButtonInner {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 8px 1px var(--accentColor);
+    }
+    #ncdwPartySetupLoadTeamButton:hover::after {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 8px 1px var(--accentColor);
+    }
+    #ncdwPartySetupLoadTeamButton:hover::before {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 8px 1px var(--accentColor);
+    }
+    .nsdwConfigOptionBlock.selected {
+        background-color: var(--accentColor);
+    }
+    .nsdwConfigOptionBlock {
+        background-color: var(--primaryColor);
+        box-shadow: none
+    }
+    .nsdwConfigOptionBlock:hover {
+        background-color: var(--accentColorLight);
+    }
+    .nsdwConfigCategoryNameContainer {
+        background-color: var(--primaryColor);
+    }
+    .nsdwConfigMainButton {
+        background-color: var(--primaryColor);
+    }
+    .nsdwConfigMainButton:hover {
+        background-color: var(--accentColor);
+    }
+
+
+    /* Nexus Inn*/
+    #nciwTeamSetupAddTeam {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 8px 1px var(--boxShadowColor);
+    }
+    #nciwTeamSetupAddTeam:hover {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 8px 1px var(--accentColorDark);
+    }
+    .nciwTeamSetupNameContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nciwTeamAvatarContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nciwTeamAvatarBackdrop {
+        background: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+        opacity: 1;
+    }
+    .nciwTeamAvatar:hover .nciwTeamAvatarBackdrop {
+        background: var(--accentColor);
+        box-shadow: 0 0 7px 0 var(--accentColor);
+    }
+    .nciwTeamAvatarSlotNumberEmpty {
+        text-shadow: 0 0 5px var(--textShadowColor);
+    }
+    .nciwTeamAvatarSlotNumberSelected {
+        text-shadow: 0 0 5px var(--textShadowColor);
+    }
+    #nciwAvatarSetupPreview {
+        background-color: var(--avatarBackground);
+        border: none;
+    }
+    .nciwAvatarSetupOption {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 8px 1px var(--boxShadowColor);
+    }
+    .nciwAvatarSetupOption:hover {
+        background-color: var(--accentColor);
+        box-shadow: 0 0 8px 1px var(--accentColor);
+    }
+    .nciwAvatarSkinSelectEntry {
+        background-color: var(--primaryColor);
+        border: 2px solid var(--secondaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nciwAvatarSkinSelectEntry:hover {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--accentColor);
+        border: 2px solid var(--accentColor);
+    }
+    .nciwAvatarSkinSelectEntry.locked:hover {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+        border: 2px solid var(--secondaryColor);
+    }
+    .nciwAvatarSkinSelectTextContainer {
+        text-shadow: 0 1px 0 var(--colorMod), 1px 0 0 var(--colorMod), 0 -1px 0 var(--colorMod), -1px 0 0 var(--colorMod), 0 0 5px var(--textShadowColor);
+        z-index: 1;
+    }
+    .nciwAvatarSkinSelectLocked {
+        color: var(--textColor);
+    }
+    .nciwAvatarBackgroundSelectEntryContainer {
+        background-color: var(--primaryColorTransparent);
+        border-color: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nciwAvatarBackgroundSelectEntryNameContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nciwAvatarBackgroundSelectEntryImageContainer {
+        background-color: var(--primaryColorTransparent);
+        border: none;
+        box-shadow: 0 0 5px var(--boxShadowColor);
+    }
+    .nciwAvatarBackgroundEntry {
+        background-color: var(--avatarBackground);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nciwAvatarBackgroundEntry:hover {
+        background-color: var(--avatarBackground);
+        box-shadow: 0 0 7px 0 var(--accentColor);
+    }
+    .nciwAvatarBackgroundEntry.locked:hover {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nciwAvatarBackgroundSelectEntryLockedContainer {
+        background: var(--primaryColorTransparent);
+        text-shadow: 0 0 5px var(--textShadowColor), 0 0 5px var(--textShadowColor);
+    }
+
+
+    /* Nexus Dungeon */
+    #nexusRuneContainerBody {
+        background-color: var(--primaryColor);
+        box-shadow: none;
+        text-shadow: 0 0 5px var(--textShadowColor);
+    }
+    #nexusRuneContainerNoRuneMessage {
+        color: var(--textColor);
+    }
+    #nexusRuneContainerUnlockMessage {
+        text-shadow: 0 0 5px var(--accentColor);
+    }
+    .naStatusMainBody {
+        background-color: var(--secondaryColor);
+        border: solid 1px var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .naArtifactBar {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+        border: solid 1px #00000054;
+    }
+
+    /* Nexus Quiz */
+    .naHpBar {
+        background-color: var(--accentColor);
+        box-shadow: inset 0 0 6px 3px var(--accentColorLight);
+        opacity: 1;
+    }
+    .qpAvatarHealthBar {
+        background-color: var(--accentColor);
+        box-shadow: inset 0 0 10px 7px var(--accentColorLight);
+    }
+    .qpAvatarShieldBar {
+        background-color: var(--accentColorDark);
+        box-shadow: none;
+        opacity: 1;
+    }
+    .qpAvatarShieldAmount {
+        color: var(--accentColorDark);
+        text-shadow: none;
+    }
+    #gameChatPage.nexusView .qpAvatarInfoBar {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 5px 2px var(--boxShadowColor);
+    }
+    .nexusDungeonCounterContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+        text-shadow: 0 0 5px var(--textShadowColor);
+    }
+    .naStatusAvatarImage {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: none;
+        border: none;
+    }
+    .naMainText {
+        color: var(--textColor);
+        text-shadow: 0 0 5px var(--textShadowColor);
+    }
+    #gameChatPage.nexusView #qpPauseButton {
+        background-color: var(--primaryColor);
+    }
+    #gameChatPage.nexusView .qpAvatarImageContainer {
+        background-color: var(--avatarBackground);
+    }
+    .qpAvatarContainerOuter.nexusTurn .qpAvatarNexusGlowContainer {
+        box-shadow: 0 0 5px 3px var(--accentColor), 0 0 20px 10px var(--accentColor), 0 0 30px 5px var(--accentColor);
+    }
+    #gameChatPage.nexusView .qpAvatarLevelBar {
+        background-color: var(--primaryColor);
+        box-shadow: 2px 3px 5px 0 var(--boxShadowColor);
+    }
+    .qpAvatarNexusTargetButton {
+        background-color: var(--primaryColorTransparent);
+    }
+    .qpAvatarTargetIcon {
+        background-color: var(--primaryColorTransparent);
+    }
+    .qpAvatarTargetIconSwapIcon {
+        text-shadow: 2px 2px 3px var(--textShadowColor);
+    }
+    .qpEnemySlot-0 .qpAvatarImageContainer,
+    .qpEnemySlot-0 .qpAvatarTargetIcon,
+    .qpAvatarTargetIconEnemy-0,
+    .qpAvatarTargetIconEnemy-0 .qpAvatarTagetLineGlow,
+    .qpAvatarTargetIconEnemy-0 .qpAvatarTargetCounter,
+    .qpEnemySlot-1 .qpAvatarImageContainer,
+    .qpEnemySlot-1 .qpAvatarTargetIcon,
+    .qpAvatarTargetIconEnemy-1,
+    .qpAvatarTargetIconEnemy-1 .qpAvatarTagetLineGlow,
+    .qpAvatarTargetIconEnemy-1 .qpAvatarTargetCounter,
+    .qpEnemySlot-2 .qpAvatarImageContainer,
+    .qpEnemySlot-2 .qpAvatarTargetIcon,
+    .qpAvatarTargetIconEnemy-2,
+    .qpAvatarTargetIconEnemy-2 .qpAvatarTagetLineGlow,
+    .qpAvatarTargetIconEnemy-2 .qpAvatarTargetCounter,
+    .qpEnemySlot-3 .qpAvatarImageContainer,
+    .qpEnemySlot-3 .qpAvatarTargetIcon,
+    .qpAvatarTargetIconEnemy-3,
+    .qpAvatarTargetIconEnemy-3 .qpAvatarTagetLineGlow,
+    .qpAvatarTargetIconEnemy-3 .qpAvatarTargetCounter {
+        box-shadow: none;
+    }
+    .qpAvatarTargetCounter {
+        background-color: var(--primaryColor);
+        box-shadow: none;
+    }
+    .nexusMainButtonContainer {
+        background-color: transparent;
+    }
+    #gameChatPage.nexusView .qpAvatarScoreContainer {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 5px 2px var(--boxShadowColor);
+    }
+    #gameChatPage.nexusView .qpAvatarNexusGlowContainer {
+        border: none;
+    }
+    #gameChatPage.nexusView #qpSongInfoContainer {
+        top: -115px;
+    }
+    .qpAvatarAbilityCooldownNumber {
+        text-shadow: 0 0 6px var(--textShadowColor);
+    }
+    #qpNexusAttackOrderContainer {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 10px 2px var(--boxShadowColor);
+        border-radius: var(--borderRadius);
+    }
+    .qpNexusAttackOrderNextAttackDevider {
+        border-top: 2px solid var(--secondaryColor);
+    }
+    #nexusAbandonRunVoteContainer {
+        background-color: var(--primaryColor);
+    }
+    #nexusAbandonRunVoteContainer .leftVoteButton {
+        background-color: var(--primaryColor);
+    }
+    #nexusAbandonRunVoteContainer .leftVoteButton.selected {
+        background-color: var(--accentColor);
+    }
+    #nexusAbandonRunVoteContainer .leftVoteTimerBar {
+        background-color: var(--accentColorLight);
+    }
+
+
+    /* Nexus Chat */
+    #nexusCoopContainer {
+        color: var(--textColor);
+    }
+    #nexusCoopMainContainer {
+        background: var(--nexusChatBackground);
+        background-size: cover;
+        border: 2px solid var(--primaryColor);
+        box-shadow: 0 0 5px 0 var(--boxShadowColor);
+    }
+    #nexusCoopChatInputContainer {
+        background-color: var(--primaryColor);
+    }
+    #nexusCoopChatInput {
+        background-color: var(--primaryColor);
+    }
+    .nexusCoopTab {
+        background-color: var(--primaryColor);
+        border: 2px solid var(--primaryColor);
+        box-shadow: 0 0 5px 0 var(--boxShadowColor);
+        border-right: none;
+        border-bottom: none;
+    }
+    .nexusCoopTab.selected {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 5px 0 var(--boxShadowColor), inset 0 0 2px 0 var(--boxShadowColor);
+    }
+    .nexusCoopPlayerImage {
+        background-color: transparent;
+    }
+    .nexusCoopPlayer {
+        border: none;
+    }
+    #nexusCoopEmojiPickerContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px var(--boxShadowColor);
+    }
+    #nexusCoopEmojiPickerContainer::before {
+        background-color: var(--primaryColor);
+    }
+
+
+    /* Nexus Event Container */
+    #nexusEventTextContainer {
+        border-right: 4px solid var(--secondaryColor);
+        text-shadow: 0 0 6px var(--textShadowColor), 0 0 4px var(--textShadowColor);
+    }
+    .nexusWindowButton {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 15px 5px var(--boxShadowColor);
+    }
+    .nexusWindowButton:hover {
+        box-shadow: 0 0 15px 5px var(--accentColor);
+    }
+    #nexusMapResultContainer {
+        text-shadow: 0 0 6px var(--textShadowColor);
+    }
+    .nexusMapResultCategoryRowBottomBorder {
+        background-color: transparent;
+        box-shadow: none;
+    }
+    .nexusMapResultAvatar {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    .nexusMapResultAvatar.levelUp {
+        box-shadow: 0 0 10px #ffffff9e, 0 0 20px #ffffff9e, 0 0 40px var(--accentColor), 0 0 70px var(--accentColor);
+    }
+    .nexusMapResultAvatarXpTextContainer {
+        text-shadow: 0 0 7px var(--textShadowColor), 0 0 3px var(--textShadowColor), 0 0 3px var(--textShadowColor);
+    }
+    .nexusMapResultAvatarLevelUpUnlockContainer {
+        text-shadow: 0 0 7px var(--accentColor), 0 0 3px var(--accentColor), 0 0 3px var(--textShadowColor), 0 0 10px var(--textShadowColor);
+    }
+    .nexusMapResultAvatarXpBarContainer {
+        background-color: var(--secondaryColor);
+        box-shadow: 0 0 7px 0 var(--boxShadowColor);
+    }
+    .nexusMapResultAvatarXpBar {
+        background-color: var(--accentColor);
+    }
+    .nexusMapResultAvatar.xpGaining .nexusMapResultAvatarXpBarContainer {
+        box-shadow: 0 0 10px #ffffff9e, 0 0 20px #ffffff9e, 0 0 40px var(--accentColorLight), 0 0 70px var(--accentColorLight), 0 0 80px var(--accentColorLight);
+    }
+    .nexusMapResultAvatar.xpGaining .nexusMapResultAvatarXpBar {
+        box-shadow: inset 0 0 2px #ffffff9e, inset 0 0 4px #ffffff9e, inset 0 0 8px var(--accentColorLight), inset 0 0 14px var(--accentColorLight), 0 0 16px var(--accentColorLight);
+    }
+    .nexusMapRewardRuneModName {
+        text-shadow: 0 0 7px var(--textShadowColor);
+    }
+    .nexusMapRewardRuneModImg {
+        box-shadow: 0 0 7px var(--boxShadowColor);
+    }
+    .nexusMapNextFloorAvatar {
+        background-color: var(--primaryColorTransparent);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    .nexusMapNextFloorAvatarHealthBar {
+        background-color: var(--secondaryColor);
+        box-shadow: 0px 0px 7px 0px var(--boxShadowColor);
+        border: solid 1px var(--primaryColor);
+    }
+    .nexusMapNextFloorAvatarHealthBarFill {
+        background-color: var(--accentColor);
+        box-shadow: inset 0px 0px 6px 3px var(--accentColorLight);
+        opacity: 1;
+    }
+    .nexusMapNextFloorAvatarHealthBarText {
+        text-shadow: 0px 0px 6px var(--textShadowColor);
+    }
+    .nexusMapNextFloorAvatarButton {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    .nexusMapNextFloorAvatarButton:hover {
+        box-shadow: 0 0 10px 1px var(--accentColor);
+    }
+    .nexusMapNextFloorAvatarArtifactContainer {
+        background-color: var(--primaryColorTransparent);
+        border: solid 2px var(--primaryColor);
+    }
+
+
+    /* Nexus Tutorial */
+    #nexusTutorialImageContainer {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+    #nexusTutorialText {
+        text-shadow: 0 0 4px var(--textShadowColor);
+    }
+    #nexusTutorialTextContainer::before {
+        background-color: var(--primaryColor);
+        box-shadow: 0 0 10px 1px var(--boxShadowColor);
+    }
+
+
+    /* Custom Windows */
+    .floatingWindow {
+        background-color: var(--windowBackground);
+        box-shadow: 0 0 15px var(--boxShadowColor);
+    }
+    .floatingWindowHeader {
+        background-color: var(--primaryColor);
+    }
+    .floatingWindow .close {
+        color: var(--textColor);
+        text-shadow: none;
+        opacity: 1;
+    }
+    .floatingWindow .close:hover {
+        opacity: .7;
+    }
+    .customWindow {
+        background-color: var(--windowBackground);
+        box-shadow: 0 5px 15px var(--boxShadowColor);
+    }
+    .customWindow .close {
+        color: var(--textColor);
+        text-shadow: none;
+        opacity: 1;
+    }
+    .customWindow .close:hover {
+        opacity: .7;
+    }
+
+
+    /* Joseph's Song List Script */
+    #listWindowOptions {
+        border-bottom: 1px solid var(--secondaryColor);
+    }
+    #listWindowTable {
+        background-color: var(--primaryColor);
+    }
+    #listWindowTable .header > td {
+        border: 1px solid black;
+    }
+    #listWindowTable .songData > td {
+        border: 1px solid black;
+    }
+    #listWindowTable tr.songData {
+        background-color: var(--windowBackground);
+    }
+    #listWindowTable tr.songData:hover {
+        background-color: var(--secondaryColor);
+        box-shadow: none;
+    }
+    #listWindowTable .songData.rowSelected {
+        box-shadow: none;
+    }
+    #listWindowTable tr.songData.guessHidden {
+        background-color: rgba(0, 0, 0, .8) !important;
+    }
+    #listWindowTable tr.songData.correctGuess {
+        background-color: var(--songHistoryCorrectColor);
+    }
+    #listWindowTable tr.songData.correctGuess:hover {
+        background-color: var(--songHistoryCorrectColorHover);
+    }
+    #listWindowTable tr.songData.incorrectGuess {
+        background-color: var(--songHistoryWrongColor);
+    }
+    #listWindowTable tr.songData.incorrectGuess:hover {
+        background-color: var(--songHistoryWrongColorHover);
+    }
+
+
+    /* Klem's Expand Library Player Script */
+    #openRadioButton {
+        background: var(--primaryColorTransparent) !important;
+        box-shadow: 0 0 10px 2px var(--boxShadowColor) !important;
+    }
+    #openRadioButton > div {
+        color: var(--textColor) !important;
+    }
+    #radioOverlay {
+        background-color: var(--primaryColorTransparent) !important;
+        box-shadow: 0 0 10px 2px var(--boxShadowColor) !important;
+    }
+    #radioOverlay div {
+        color: var(--textColor) !important;
+    }
+    
+    
+    /* 43D's Voice Universal Script */
+    #btnOpenVoiceSetting {
+        box-shadow: 1px 3px 10px var(--boxShadowColor) !important;
+    }
+
+
+    /* Kempanator's Chat Plus Script */
+    #gcGifSearchButton > i {
+        color: var(--textColor);
+    }
+    #gcGifContainer {
+        background-color: var(--primaryColorTransparent);
+    }
+
+
+    /* Kempanator's New Game Mode UI Script */
+    #qpNGM {
+        filter: brightness(var(--brightnessMod));
+    }
+
+
+    /* Kempanator's Play Button Shortcuts Script */
+    #mpPlayButtonPlay:hover {
+        color: var(--accentColor);
+    }
+    #mpPlayButton .gameModeShortcut:hover {
+        color: var(--accentColor);
+    }
+
+
+    /* Kempanator's Answer Stats Script */
+    .answerStatsHeaderButton {
+        border: 1px solid var(--textColor);
+    }
+    .answerStatsButton {
+        border: 1px solid var(--textColor);
+    }
+    #answerHistoryTable thead tr,
+    #answerCompareTable thead tr {
+        background-color: var(--primaryColor);
+    }
+    #answerHistoryTable tbody tr:nth-child(odd) {
+        background-color: var(--primaryColorContrast2);
+    }
+    #answerHistoryTable tbody tr:nth-child(even) {
+        background-color: var(--primaryColorContrast);
+    }
+    #answerCompareTable tbody tr:nth-child(odd) {
+        background-color: var(--primaryColorContrast2);
+    }
+    #answerCompareTable tbody tr:nth-child(even) {
+        background-color: var(--primaryColorContrast);
+    }
+    #answerCompareTable tbody tr.highlightCorrect {
+        background-color: var(--songHistoryCorrectColor);
+    }
+    #answerCompareTable tbody tr.highlightWrong {
+        background-color: var(--songHistoryWrongColor);
+    }
+
+
+    /* Kempanator's AnisongDB Search Script */
+    #anisongdbTable thead tr {
+        background-color: var(--primaryColor);
+    }
+    #anisongdbTable tbody tr:nth-child(odd) {
+        background-color: var(--primaryColorContrast2);
+    }
+    #anisongdbTable tbody tr:nth-child(even) {
+        background-color: var(--primaryColorContrast);
+    }
+    #anisongdbTable tbody tr:hover {
+        color: var(--accentColorContrast);
+    }
+
+
+    /* Kempanator's Custom Song List Game Script */
+    #cslgSongListTable thead tr {
+        background-color: var(--primaryColor);
+    }
+    #cslgSongListTable tbody tr:nth-child(odd) {
+        background-color: var(--primaryColorContrast2);
+    }
+    #cslgSongListTable tbody tr:nth-child(even) {
+        background-color: var(--primaryColorContrast);
+    }
+    #cslgAnswerTable thead tr {
+        background-color: var(--primaryColor);
+    }
+    #cslgAnswerTable tbody tr:nth-child(odd) {
+        background-color: var(--primaryColorContrast2);
+    }
+    #cslgAnswerTable tbody tr:nth-child(even) {
+        background-color: var(--primaryColorContrast);
+    }
+
+
+    /* Bully Text */
+    /*.mmSocialButtonOnlineCountContainer > h5 {
+        text-indent: -9999px;
+        line-height: 0;
+    }
+    .mmSocialButtonOnlineCountContainer::after {
+        content: "Bullies";
+        display: block;
+        line-height: initial;
+    }*/
+
+    /* Disable sliding animations */
+    /*.fade, .menuBar .popOut, .modal.fade .modal-dialog, .modal.in .modal-dialog, #optionsContainer, #questContainer, #questContainer.open, .chatBoxContainer {
+        transition: none;
+    }*/
+    
+    /* Move avatar name/info down */
+    /*.qpAvatarInfoBar {
+        bottom: -30px;
+    }*/
+    
+    /* Disable animated avatars */
+    /*.avatarSpine {
+        display: none;
+    }*/
+}
