@@ -393,6 +393,7 @@ const optimizedShortcuts = (targets) => {
   let altShortcuts = [];
   let currentLength = 0;
   let shortestLength = 999;
+  let highlightsOnly = false;
   let highlightedShortcuts = JSON.parse(
     localStorage.getItem(LOCAL_STORAGE_KEY) || "[]"
   );
@@ -416,8 +417,9 @@ const optimizedShortcuts = (targets) => {
       if (
         shortcuts.length >= NUM_SHORTCUTS ||
         newLength > shortestLength + MAX_LENGTH_DIFFERENTIAL
-      )
-        break;
+      ){
+        highlightsOnly = true;
+      }
     }
 
     const suggestions = getSuggestions(substring);
@@ -441,7 +443,8 @@ const optimizedShortcuts = (targets) => {
       }
       if (
         substring.length > MAX_SUBSTRING_LENGTH ||
-        (TOP_SHORTCUTS_ONLY && pos > 0)
+        (TOP_SHORTCUTS_ONLY && pos > 0) ||
+        highlightsOnly
       ) {
         continue;
       }
