@@ -28,6 +28,12 @@ fileQuiz = "dummyQuiz"
 targetDSum = 96
 desiredQuizSize = 4
 '''
+#check if quiz exists
+with open(fileQuiz+".json", "r", encoding="utf-8") as file:
+    quizList = json.load(file)
+if len(quizList) > 0:
+    print("Quiz Already Exists")
+    sys.exit(1)
 
 #Index all songs in pool, get their total weight and check that compile doesn't need to be run
 DList = []
@@ -48,130 +54,6 @@ for index, song in enumerate(poolSongList):
     DList.append(math.exp(song["D"])*len(song["sampleWeights"]))
     DMin = min(DMin, song["D"])
     songCounter += 1
-
-with open(fileQuiz+".json", "r", encoding="utf-8") as file:
-    quizList = json.load(file)
-if len(quizList) > 0:
-    print("Quiz Already Exists")
-    sys.exit(1)
-
-'''
-#read prep and loadingLists
-with open(filePrep+".json", "r", encoding="utf-8") as file:
-    prepList = json.load(file)
-with open(fileLoad+".json", "r", encoding="utf-8") as file:
-    loadingList = json.load(file)
-
-#read length of practice list
-with open(filePractice+".json", "r", encoding="utf-8") as file:
-    practiceList = json.load(file)
-
-#Get new songs if applicable
-newSongList = []
-newSongCount = desiredQuizSize+random.randint(0,gainPerSong-1)
-for song in practiceList:
-    newSongCount -= song["X"]
-newSongCount = math.floor(newSongCount/gainPerSong)
-malIds = set()
-if newSongCount > 0 and len(quizList) == 0:
-    
-    #get new songList: a mix of random songs and songs in prepList. also update weightlist and indexlist to account for their addition
-    prepListMalIds = set()
-    elementNull = prepList.pop(0)
-    for song in prepList:
-        prepListMalIds.add(song["malId"])
-    random.shuffle(prepList)
-    while newSongCount > 0:
-        newSongCount -= 1
-        if len(prepList) > 0 and len(loadingList) > 0:
-            if random.randint(0,1) and False:
-                newSong = loadingList.pop(0)
-            else:
-                newSong = prepList.pop(0)
-            newSongList.append(newSong)
-            totalDWeight += newSong["D"]
-            DList.append(math.exp(newSong["D"]))
-            DMin = min(newSong["D"], DMin)
-            indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
-            continue
-        elif len(loadingList) > 0:
-            newSong = loadingList.pop(0)
-            newSongList.append(newSong)
-            totalDWeight += newSong["D"]
-            DList.append(math.exp(newSong["D"]))
-            DMin = min(newSong["D"], DMin)
-            indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
-            continue
-        if len(prepList) > 0:
-            newSong = prepList.pop(0)
-            newSongList.append(newSong)
-            malIds.add(newSong["malId"])
-            totalDWeight += newSong["D"]
-            DList.append(math.exp(newSong["D"]))
-            DMin = min(newSong["D"], DMin)
-            indexMap[newSong["ID"]] = len(poolSongList)+len(newSongList)-1
-            continue
-        else:
-            print("Warning: Insufficient New Songs")
-            break
-    #Add new songs to filePrep
-    for i in range(len(loadingList)-1,-1,-1):
-        if loadingList[i]["malId"] in malIds:
-            malIds.remove(loadingList[i]["malId"])
-            prepList.append(loadingList.pop(i))
-            if len(malIds) == 0:
-                break
-    #add new shows to filePrep if there aren't enough
-    if random.randint(0,1):
-        loadingList.sort(key = lambda x : x["songDifficulty"])
-    else:
-        random.shuffle(loadingList)
-    if len(prepList) < prepListMinSize:
-        for i in range(len(loadingList)-1,-1,-1):
-            if loadingList[i]["malId"] not in prepListMalIds:
-                prepListMalIds.add(loadingList[i]["malId"])
-                prepList.append(loadingList.pop(i))
-        if len(prepList) < prepListMinSize:
-            print("Warning: Insufficient Anime Diversity")
-        
-    #rewrite fileLoad/prep without the added songs
-    with open(fileLoad+".json", "r+", encoding="utf-8") as file:
-        file.truncate(0)
-        file.seek(0)
-        json.dump(loadingList,file,ensure_ascii=False)
-        file.seek(0)
-        fileData = file.read()
-        fileData = fileData.replace(", {","\n,{")
-        fileData = fileData.replace("}]","}\n]")
-        file.seek(0)
-        file.write(fileData)
-
-    with open(filePrep+".json", "r+", encoding="utf-8") as file:
-        file.truncate(0)
-        file.seek(0)
-        prepList.insert(0, elementNull)
-        json.dump(prepList,file,ensure_ascii=False)
-        file.seek(0)
-        fileData = file.read()
-        fileData = fileData.replace(", {","\n,{")
-        fileData = fileData.replace("}]","}\n]")
-        file.seek(0)
-        file.write(fileData)
-
-    #add record added songs in record (contains the order in which songs were added since a certain point)
-    with open(fileAdd+".json", "r+", encoding="utf-8") as file:
-        knownList = json.load(file)
-        knownList.extend(newSongList)
-        file.truncate(0)
-        file.seek(0)
-        json.dump(knownList,file,ensure_ascii=False)
-        file.seek(0)
-        fileData = file.read()
-        fileData = fileData.replace(", {","\n,{")
-        fileData = fileData.replace("}]","}\n]")
-        file.seek(0)
-        file.write(fileData)
-poolSongList.extend(newSongList)'''
 
 #Pick Songs and Generate Song Section
 
