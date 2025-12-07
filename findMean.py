@@ -15,7 +15,7 @@ songCounter = 0
 for song in known:
     if song["D"] == DMax:
         maxWeightCount += 1
-    DList.append(math.exp(song["D"])*len(song["sampleWeights"]))
+    DList.append(math.exp(song["D"])*math.sqrt(len(song["sampleWeights"])))
     DMin = min(DMin, song["D"])
     songCounter += 1
 
