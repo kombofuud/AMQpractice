@@ -9,7 +9,7 @@ with open(filePrep+".json", 'r', encoding = 'utf8') as f:
     elementNull = prepSongs.pop(0)
 with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     loadingSongs = json.load(f)
-loadingSongs.sort(key = lambda x: (x["ST"], x["STN"], x["rebroadcast"]), reverse = True)
+loadingSongs.sort(key = lambda x: (x["ST"], x["STN"] if x["STN"] is not None else 0, x["rebroadcast"]), reverse = True)
 with open(filePool+".json", 'r', encoding = 'utf8') as f:
     songPool = json.load(f)
 
@@ -19,8 +19,8 @@ for song in prepSongs:
 
 loadingMap = {}
 for i, song in enumerate(loadingSongs):
-    loadingSet.add(song["malId"])
     loadingMap[song["malId"]] = i
+
 missingSet = set()
 for song in songPool:
     if song["malId"] not in includedSet and song["malId"] in loadingMap:
@@ -34,13 +34,17 @@ malids = sys.argv[1:]
 malids.extend(missingList)
 indexList = []
 for ID in malids:
+    ID = int(ID)
     if ID in includedSet:
         print(f"ID={ID} is already in preplist")
+        continue
+    if ID not in loadingMap:
+        print(f"ID={ID} has no songs")
         continue
     if loadingMap[ID] in indexList:
         print(f"ID={ID} was duplicated")
         continue
-    indexList.add(loadingMap[ID])
+    indexList.append(loadingMap[ID])
 indexList.sort(reverse = True)
 for ID in indexList:
     prepSongs.append(loadingSongs.pop(ID))
@@ -68,3 +72,5 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     fileData = fileData.replace("}]","}\n]")
     f.seek(0)
     f.write(fileData)
+
+print(f"{len(indexList)} songs added. {len(malids)-len(indexList)} skipped")
