@@ -73,12 +73,11 @@ randomSongList = randomSongList[:songCount]
 for index, song in enumerate(randomSongList):
     distribution = copy.deepcopy(song["sampleWeights"])
     #songWeightStrength = 1-math.pow(0.95,DMax-song["D"])
-    songWeightStrength = 0.5
-    for i in range(len(distribution)-1):
+    '''for i in range(len(distribution)-1):
         distribution[i+1] += song["sampleWeights"][i]/3
-        distribution[i] += song["sampleWeights"][i+1]/3
+        distribution[i] += song["sampleWeights"][i+1]/3'''
     for i in range(len(distribution)):
-        distribution[i] = math.pow(len(distribution),distribution[i]*songWeightStrength)
+        distribution[i] = math.pow(math.e,distribution[i])
     section = random.choices(range(len(distribution)), weights=distribution, k=1)[0]
     if section == 0:
         samplePoint = 0
