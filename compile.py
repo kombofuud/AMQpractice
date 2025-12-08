@@ -138,7 +138,7 @@ for i, song in enumerate(songPool):
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
-                quizIds[song["ID"]] = 1.5
+                quizIds[song["ID"]] = 2
                 missedCount += 1
         if song["ID"] not in quizIds or quizIds[song["ID"]]+song["D"] >= dMax:
             diff8Q += 1
@@ -388,7 +388,7 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
 with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
-    loadingSongs.sort(key = lambda x : x["songDifficulty"])
+    loadingSongs.sort(key = lambda x : x["songDifficulty"], reverse=True)
     json.dump(loadingSongs,f,ensure_ascii=False)
     f.seek(0)
     fileData = f.read()
