@@ -1,6 +1,7 @@
 import json
 import shutil
 import math
+import copy
 from pathlib import Path
 
 #Move downloaded file to local directory and delete previous version
@@ -167,7 +168,7 @@ def translateLength(oldList, oldSize, size, annId):
 deadMap = {}
 for index, song in enumerate(deadList):
     if "annSongId" in song:
-        deadMap["annSongId"] = index
+        deadMap[song["annSongId"]] = index
 
 #replace songs in each list 1 by 1, but keep the old "D" value for songs in pool. Eliminate dead songs
 with open(fileMerged+".json", 'r+', encoding = 'utf8') as f:
@@ -205,7 +206,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], knownList[index]["annId"])
         if song["length"] is not None and knownList[index]["length"] is not None:
             if abs(song["length"]-knownList[index]["length"]) > 1:
-                print(f"ANNID={song["ID"]} {song["EN"]} by {song["SA"]} length increased by {song["length"]-knownList[index]["length"]} seconds")
+                print(f"ANNID={song["annSongId"]} {song["EN"]} by {song["SA"]} length increased by {knownList[index]["length"]-song["length"]} seconds")
                 knownList[index]["D"] = max(knownList[index]["D"],knownList[index]["D"]+song["length"]-knownList[index]["length"])
     deadIndices.reverse()
     for index in deadIndices:
@@ -214,7 +215,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     for song in songList:            
         if song["annSongId"] not in oldSongs and song["annSongId"] in deadMap:
             reviveSong = copy.deepcopy(deadList[deadMap[song["annSongId"]]])
-            if reviveSong["D"] == startingD and not any(song["sampleWeights"]):
+            if reviveSong["D"] == startingD and not any(reviveSong["sampleWeights"]):
                 continue
             reviveSong["sampleWeights"] = translateLength(reviveSong["sampleWeights"], reviveSong["length"], song["length"], song["annSongId"])
             knownList.append(song)
@@ -296,12 +297,13 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     for song in songList:            
         if song["annSongId"] not in oldSongs and song["malId"] in familiarMalIds and song["malId"] not in learningMalIds:
             song["sampleWeights"] = translateLength(None, None, song["length"], song["annSongId"])
-            newSongs.append(song)
             knownList.append(song)
             oldSongs.add(song["annSongId"])
             learningMalIds.add(song["malId"])
             if song["annSongId"] in deadMap:
                 revivedSongSet.add(deadMap[song["annSongId"]])
+            else:
+                newSongs.append(song)
             print(f"Previously learned MalID: {song["malId"]} gained at least 1 song.")
 
     f.truncate(0)
@@ -338,10 +340,11 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     for song in songList:
         if song["annSongId"] not in oldSongs:
             song["sampleWeights"] = translateLength(None, None, song["length"], song["annSongId"])
-            newSongs.append(song)
             knownList.append(song)
             if song["annSongId"] in deadMap:
                 revivedSongSet.add(deadMap[song["annSongId"]])
+            else:
+                newSongs.append(song)
 
     f.truncate(0)
     f.seek(0)
@@ -354,13 +357,15 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     f.write(fileData)
 
 #removed revived songs from dead.json
-revivedSongList = list(revivedSongSet)
-revivedSongList.sort(reverse=True)
-for value in revivedSongList:
-    deadSongs.pop(value)
 
 #add dead songs to dead song list if there are any
-if len(deadCount):
+if len(deadCount) or len(revivedSongSet):
+    print("\033[31mRevivedSongs:\033[0m_______________________")
+    revivedSongList = list(revivedSongSet)
+    revivedSongList.sort(reverse=True)
+    for value in revivedSongList:
+        poppedSong = deadList.pop(value)
+        print(poppedSong["songName"]+"__from__"+poppedSong["animeEnglishName"])
     print("\033[31mDeadSongs:\033[0m_______________________")
     for index in range(deadListInit-len(revivedSongList), len(deadList)):
         print(deadList[index]["songName"]+"__from__"+deadList[index]["animeEnglishName"])
