@@ -1206,6 +1206,12 @@ function validateStart() {
     }
     fastSkip = $("#cslgSettingsFastSkipCheckbox").prop("checked");
     fullSongRange = $("#cslgSettingsFullSongRangeCheckbox").prop("checked");
+    if (fullSongRange){
+        lobby.settings.modifiers.fullSongRange = true;
+    }
+    else{
+        lobby.settings.modifiers.fullSongRange = false;
+    }
     $("#cslgSettingsModal").modal("hide");
     //console.log(songOrder);
     if (lobby.soloMode) {
