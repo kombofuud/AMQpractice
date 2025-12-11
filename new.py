@@ -27,7 +27,7 @@ filePractice = "dummyPractice"
 fileQuiz = "dummyQuiz"
 '''
 
-startingD = 8
+startingD = 10
 
 #get list of all songs
 with open(fileMerged+".json", 'r', encoding = 'utf8') as f:
@@ -205,9 +205,9 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         familiarMalIds.add(knownList[index]["malId"])
         knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], knownList[index]["annId"])
         if song["length"] is not None and knownList[index]["length"] is not None:
-            if abs(song["length"]-knownList[index]["length"]) > 1:
+            if abs(song["sampleWeights"]-knownList[index]["length"]) > 1:
                 print(f"ANNID={song["annSongId"]} {song["EN"]} by {song["SA"]} length increased by {knownList[index]["length"]-song["length"]} seconds")
-                knownList[index]["D"] = max(knownList[index]["D"],knownList[index]["D"]+song["length"]-knownList[index]["length"])
+                knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)

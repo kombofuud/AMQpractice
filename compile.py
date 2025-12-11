@@ -18,8 +18,9 @@ filePrevAdd = "prevAddThese"
 rngFile = "addSongRandomValue.txt"
 malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
-dMax = 8
+dMax = 10
 prepListMinSize = 150
+weightMin = 10000000
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -132,13 +133,13 @@ errorQ = 0
 diff8Q = 0
 missedCount = 0
 for i, song in enumerate(songPool):
-    if song["ID"] in quizIds or song["D"] == dMax:
+    if song["ID"] in quizIds:
         if song["ID"] in quizIds:
             idIndices[song["ID"]] = i
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
-                quizIds[song["ID"]] = 2
+                quizIds[song["ID"]] = random.randint(1,2)
                 missedCount += 1
         if song["ID"] not in quizIds or quizIds[song["ID"]]+song["D"] >= dMax:
             diff8Q += 1
@@ -296,9 +297,17 @@ if randomValue < 0:
     with open(rngFile, 'w', encoding = 'utf8') as f:
         f.write(str(randomValue))
 
-newSongCount = max(10-diff8Q,0)
+currentWeightCount = 0
+for song in songPool:
+    currentWeightCount += math.exp(song["D"])*len(song["sampleWeights"])
+minSamplePoints = (weightMin-currentWeightCount)/math.exp(10)
+newSongCount = 0
+sampleWeightSum = 0
+while sampleWeightSum < currentWeightCount and newSongCount < len(prepSongs):
+    sampleWeightSum += len(prepSongs[newSongCount]["sampleWeights"])
+    newSongCount += 1
 newSongs = []
-if newSongCount > len(prepSongs):
+if sampleWeightSum < currentWeightCount:
     print("Warning: Insufficient New Songs")
     newSongCount = len(prepSongs)
 

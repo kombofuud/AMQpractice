@@ -14,7 +14,6 @@ filePool = "pool"
 #fileAdd = "addThese"
 fileQuiz = "_quiz"
 #gainPerSong = 8
-desiredQuizSize = 40
 filePractice = "_practice"
 #prepListMinSize = 100
 rngFile = "addSongRandomValue.txt"
@@ -26,7 +25,6 @@ filePool = "dummyPool"
 fileAdd = "dummyAddThese"
 fileQuiz = "dummyQuiz"
 targetDSum = 96
-desiredQuizSize = 4
 '''
 #check if quiz exists
 with open(fileQuiz+".json", "r", encoding="utf-8") as file:
@@ -38,7 +36,7 @@ if len(quizList) > 0:
 #Index all songs in pool, get their total weight and check that compile doesn't need to be run
 DList = []
 DMin = 9999
-DMax = 8
+DMax = 10
 indexMap = dict()
 maxWeightCount = 0
 songCounter = 0
