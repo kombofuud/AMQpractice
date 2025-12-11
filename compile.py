@@ -309,6 +309,8 @@ for song in songPool:
     currentWeightCount += math.exp(song["D"])
 newSongCount = int(math.ceil((weightMin-currentWeightCount)/math.exp(dMax)))
 newSongCount = max(newSongCount, 0)
+songDistribution[0] += newSongCount
+
 newSongs = []
 if newSongCount > len(prepSongs):
     print("Warning: Insufficient New Songs")
