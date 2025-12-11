@@ -61,7 +61,7 @@ randomSongList = copy.deepcopy(randomSongList)
 songCount = 0
 for song in randomSongList:
     songCount += 1
-    if song["D"] == 8:
+    if song["D"] == DMax:
          maxWeightCount-= 1
     if maxWeightCount == 0:
         break

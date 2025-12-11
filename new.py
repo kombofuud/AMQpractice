@@ -205,7 +205,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         familiarMalIds.add(knownList[index]["malId"])
         knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], knownList[index]["annId"])
         if song["length"] is not None and knownList[index]["length"] is not None:
-            if abs(song["sampleWeights"]-knownList[index]["length"]) > 1:
+            if song["length"] != knownList[index]["length"]:
                 print(f"ANNID={song["annSongId"]} {song["EN"]} by {song["SA"]} length increased by {knownList[index]["length"]-song["length"]} seconds")
                 knownList[index]["D"] = startingD
     deadIndices.reverse()
