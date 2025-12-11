@@ -20,7 +20,7 @@ malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
 dMax = 10
 prepListMinSize = 150
-weightMin = 10000000
+weightMin = 500000
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -132,14 +132,26 @@ practice = []
 errorQ = 0
 diff8Q = 0
 missedCount = 0
+minD = dMax
+
+with open(rngFile, 'r', encoding = 'utf8') as f:
+    randomValue = float(f.read().strip())
+if randomValue < 0:
+    randomValue = random.random()
+    with open(rngFile, 'w', encoding = 'utf8') as f:
+        f.write(str(randomValue))
+initialMissModifier = 1+int(2*randomValue)
+
 for i, song in enumerate(songPool):
+    minD = min(minD, song["D"])
     if song["ID"] in quizIds:
         if song["ID"] in quizIds:
             idIndices[song["ID"]] = i
             if song["X"] == 1:
                 quizIds[song["ID"]] = -1
             elif song["X"] == 2:
-                quizIds[song["ID"]] = random.randint(1,2)
+                quizIds[song["ID"]] = initialMissModifier
+                initialMissModifier = 3-initialMissModifier
                 missedCount += 1
         if song["ID"] not in quizIds or quizIds[song["ID"]]+song["D"] >= dMax:
             diff8Q += 1
@@ -290,24 +302,15 @@ for ID, index in idIndices.items():
     songPool[index]["X"] = 0
 
 #Add new songs if appropriate
-with open(rngFile, 'r', encoding = 'utf8') as f:
-    randomValue = float(f.read().strip())
-if randomValue < 0:
-    randomValue = random.random()
-    with open(rngFile, 'w', encoding = 'utf8') as f:
-        f.write(str(randomValue))
-
 currentWeightCount = 0
+songDistribution = [0]*(dMax-minD+1)
 for song in songPool:
-    currentWeightCount += math.exp(song["D"])*len(song["sampleWeights"])
-minSamplePoints = (weightMin-currentWeightCount)/math.exp(10)
-newSongCount = 0
-sampleWeightSum = 0
-while sampleWeightSum < currentWeightCount and newSongCount < len(prepSongs):
-    sampleWeightSum += len(prepSongs[newSongCount]["sampleWeights"])
-    newSongCount += 1
+    songDistribution[dMax-song["D"]] += 1
+    currentWeightCount += math.exp(song["D"])
+newSongCount = int(math.ceil((weightMin-currentWeightCount)/math.exp(dMax)))
+newSongCount = max(newSongCount, 0)
 newSongs = []
-if sampleWeightSum < currentWeightCount:
+if newSongCount > len(prepSongs):
     print("Warning: Insufficient New Songs")
     newSongCount = len(prepSongs)
 
@@ -433,6 +436,12 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs)))
+print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs))+ ", Partial Gain = "+str(round((weightMin-currentWeightCount)/math.exp(dMax)-newSongCount, 3)))
+print("DValue distribution")
+for index in range(len(songDistribution)):
+    if index%4==0:
+        print(f"\033[31m{songDistribution[index]}\033[0m", end = " ")
+    else:
+        print(songDistribution[index], end = " ")
 for song in newSongs:
     print(f"Added ANSID={song["annSongId"]}: {song["songName"]}\n    from: {song["EN"]}")

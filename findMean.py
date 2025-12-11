@@ -8,7 +8,7 @@ with open("pool.json", 'r', encoding = 'utf8') as f:
 
 DList = []
 DMin = 9999
-DMax = 8
+DMax = 10
 indexMap = dict()
 maxWeightCount = 0
 songCounter = 0
@@ -30,7 +30,7 @@ for _ in range(1000):
     for song in randomSongList:
         songCount += 1
         songDistribution[DMax-song["D"]] += 1
-        if song["D"] == 8:
+        if song["D"] == DMax:
             testWeightCount-= 1
         if testWeightCount == 0:
             break
