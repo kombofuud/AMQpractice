@@ -1576,7 +1576,7 @@ function endGuessPhase(songNumber) {
             setTimeout(() => {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
-                    let timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,4-song.D)));
+                    let timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,song.D-4)));
                     if(!correct[0] || timerEnd > 300){
                         timerEnd = 300;
                     }
