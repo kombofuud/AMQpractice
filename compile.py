@@ -445,5 +445,6 @@ for index in range(len(songDistribution)):
         print(f"\033[31m{songDistribution[index]}\033[0m", end = " ")
     else:
         print(songDistribution[index], end = " ")
+print()
 for song in newSongs:
     print(f"Added ANSID={song["annSongId"]}: {song["songName"]}\n    from: {song["EN"]}")
