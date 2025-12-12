@@ -438,7 +438,7 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs))+ ", Partial Gain = "+str(round((weightMin-currentWeightCount)/math.exp(dMax)-newSongCount, 3)))
+print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs))+ ", Partial Gain = "+str(1+round((weightMin-currentWeightCount)/math.exp(dMax)-newSongCount, 4)))
 print("DValue distribution")
 for index in range(len(songDistribution)):
     if index%4==0:
