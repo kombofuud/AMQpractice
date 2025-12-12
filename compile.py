@@ -18,7 +18,6 @@ filePrevAdd = "prevAddThese"
 rngFile = "addSongRandomValue.txt"
 malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
-dMax = 10
 prepListMinSize = 150
 weightMin = 500000
 '''
@@ -132,7 +131,7 @@ practice = []
 errorQ = 0
 diff8Q = 0
 missedCount = 0
-minD = dMax
+maxD = -1
 
 with open(rngFile, 'r', encoding = 'utf8') as f:
     randomValue = float(f.read().strip())
@@ -140,20 +139,19 @@ if randomValue < 0:
     randomValue = random.random()
     with open(rngFile, 'w', encoding = 'utf8') as f:
         f.write(str(randomValue))
-initialMissModifier = 1+int(2*randomValue)
+initialMissModifier = -2+int(2*randomValue)
 
 for i, song in enumerate(songPool):
-    minD = min(minD, song["D"])
+    maxD = max(maxD, song["D"])
     if song["ID"] in quizIds:
-        if song["ID"] in quizIds:
-            idIndices[song["ID"]] = i
-            if song["X"] == 1:
-                quizIds[song["ID"]] = -1
-            elif song["X"] == 2:
-                quizIds[song["ID"]] = initialMissModifier
-                initialMissModifier = 3-initialMissModifier
-                missedCount += 1
-        if song["ID"] not in quizIds or quizIds[song["ID"]]+song["D"] >= dMax:
+        idIndices[song["ID"]] = i
+        if song["X"] == 1:
+            quizIds[song["ID"]] = 1
+        elif song["X"] == 2:
+            quizIds[song["ID"]] = initialMissModifier
+            initialMissModifier = -3-initialMissModifier
+            missedCount += 1
+        if quizIds[song["ID"]]+song["D"] <= 0:
             diff8Q += 1
             pSong = copy.deepcopy(song)
             pSong["startPoint"] = quizSamples[pSong["ID"]]
@@ -164,7 +162,7 @@ for i, song in enumerate(songPool):
             else:
                 sectionCount = len(pSong["sampleWeights"])-2
                 pSong["sampleWeights"][math.ceil(pSong["startPoint"]*sectionCount/100)] += 1-(1+pSong["X"])%3
-            #songWeightStrength = 1-math.pow(0.95,dMax-pSong["D"])
+            #songWeightStrength = 1-math.pow(0.95,pSong["D"])
             '''for i in range(len(pSong["sampleWeights"])-1):
                 pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/3
                 pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/3'''
@@ -172,7 +170,7 @@ for i, song in enumerate(songPool):
                 pSong["sampleWeights"][i] = math.pow(math.e,pSong["sampleWeights"][i])
             pSong["startPoint"] = pSong["sampleWeights"]
             pSong["sampleWeights"] = song["sampleWeights"]
-            pSong["D"] = 8
+            pSong["D"] = 0
             pSong["X"] = 2
             practice.append(pSong)
     elif song["X"] != 0:
@@ -182,12 +180,10 @@ for i, song in enumerate(songPool):
 
 #Ensure that the correct number of songs were accounted for
 countedKeys = 0
-countedTotalWeight = 0
 ignoredKeys = set()
 for song in quizSongs:
     if songPool[idIndices[song["ID"]]]["X"] != 0:
         countedKeys += 1
-        countedTotalWeight += song["D"]
     else:
         ignoredKeys.add(song["ID"])
 
@@ -286,12 +282,11 @@ for i, song in enumerate(quizSongs):
 print()
 
 for ID, index in idIndices.items():
-    if songPool[index]["D"] == dMax and quizIds[ID] > 0:
-        songPool[index]["D"] = dMax
+    if songPool[index]["D"] == 0 and quizIds[ID] < 0:
         songPool[index]["X"] = 0
         continue
     songPool[index]["D"] += quizIds[ID]
-    songPool[index]["D"] = min(songPool[index]["D"],dMax)
+    songPool[index]["D"] = max(songPool[index]["D"],0)
     if quizSamples[ID] == 0:
         songPool[index]["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
     elif quizSamples[ID] == 100:
@@ -303,11 +298,11 @@ for ID, index in idIndices.items():
 
 #Add new songs if appropriate
 currentWeightCount = 0
-songDistribution = [0]*(dMax-minD+1)
+songDistribution = [0]*(maxD+1)
 for song in songPool:
-    songDistribution[dMax-song["D"]] += 1
-    currentWeightCount += math.exp(song["D"])
-newSongCount = int(math.ceil((weightMin-currentWeightCount)/math.exp(dMax)))
+    songDistribution[song["D"]] += 1
+    currentWeightCount += math.exp(-song["D"])
+newSongCount = int(math.ceil(weightMin-currentWeightCount))
 newSongCount = max(newSongCount, 0)
 songDistribution[0] += newSongCount
 

@@ -35,8 +35,7 @@ if len(quizList) > 0:
 
 #Index all songs in pool, get their total weight and check that compile doesn't need to be run
 DList = []
-DMin = 9999
-DMax = 10
+DMax = -1
 indexMap = dict()
 maxWeightCount = 0
 songCounter = 0
@@ -46,11 +45,11 @@ for index, song in enumerate(poolSongList):
     if song["X"] != 0:
         print("Error: Previous quiz not compiled")
         sys.exit(1)
-    if song["D"] == DMax:
+    if song["D"] == 0:
         maxWeightCount += 1
     indexMap[song["ID"]] = index
-    DList.append(math.exp(song["D"])*len(song["sampleWeights"]))
-    DMin = min(DMin, song["D"])
+    DList.append(math.exp(-song["D"])*len(song["sampleWeights"]))
+    DMax = max(DMax, song["D"])
     songCounter += 1
 
 #Pick Songs and Generate Song Section
@@ -61,7 +60,7 @@ randomSongList = copy.deepcopy(randomSongList)
 songCount = 0
 for song in randomSongList:
     songCount += 1
-    if song["D"] == DMax:
+    if song["D"] == 0:
          maxWeightCount-= 1
     if maxWeightCount == 0:
         break
@@ -70,7 +69,7 @@ randomSongList = randomSongList[:songCount]
 #For each song, pick sample point
 for index, song in enumerate(randomSongList):
     distribution = copy.deepcopy(song["sampleWeights"])
-    #songWeightStrength = 1-math.pow(0.95,DMax-song["D"])
+    #songWeightStrength = 1-math.pow(0.95,song["D"])
     '''for i in range(len(distribution)-1):
         distribution[i+1] += song["sampleWeights"][i]/3
         distribution[i] += song["sampleWeights"][i+1]/3'''
@@ -129,12 +128,12 @@ if len(newSongList) > 0:
 '''
 print(f"Quiz of Size \033[31m{songCount}\033[0m created")
 print()
-print(f"Pool Size: {len(DList)} Min D: {DMin}")
-DList = [0]*(DMax-DMin+1)
+print(f"Pool Size: {len(DList)} Max D: {DMax}")
+DList = [0]*(DMax+1)
 for song in poolSongList:
-    if song["D"] > DMax:
-        song["D"] = DMax
-    DList[int(round(DMax-song["D"]+0.25))] += 1
+    if song["D"] < 0:
+        song["D"] = 0
+    DList[int(round(song["D"]+0.25))] += 1
 print("DValue distribution")
 for index in range(len(DList)):
     if index%4==0:
