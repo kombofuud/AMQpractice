@@ -19,7 +19,7 @@ rngFile = "addSongRandomValue.txt"
 malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
 prepListMinSize = 150
-weightMin = 500000
+weightMin = 23
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -277,7 +277,7 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
 #Update all keys
 print("Missed Song Numbers_______")
 for i, song in enumerate(quizSongs):
-    if quizIds[song["ID"]] > 0:
+    if quizIds[song["ID"]] < 0:
         print(f"{i+1}", end = ' ')
 print()
 
@@ -433,7 +433,7 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs))+ ", Partial Gain = "+str(round(1+(weightMin-currentWeightCount)/math.exp(dMax)-newSongCount, 4)))
+print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs))+ ", Partial Gain = "+str(round(1+weightMin-currentWeightCount-newSongCount, 4)))
 print("DValue distribution")
 for index in range(len(songDistribution)):
     if index%4==0:
