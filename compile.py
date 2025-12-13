@@ -19,7 +19,7 @@ rngFile = "addSongRandomValue.txt"
 malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
 prepListMinSize = 150
-weightMin = 23
+weightMin = 25
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -33,11 +33,13 @@ with open(filePool+".json", 'r', encoding = 'utf8') as f:
 
 quizIds = dict()
 quizSamples = dict()
+quizNumbers = dict()
 with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
     quizSongs = json.load(f)
-    for song in quizSongs:
+    for index, song in enumerate(quizSongs):
         quizIds[song["ID"]] = 0
         quizSamples[song["ID"]] = song["startPoint"]
+        quizNumbers[song["ID"]] = index+1
 
 with open(filePrep+".json", 'r', encoding = 'utf8') as f:
     prepSongs = json.load(f)
@@ -193,7 +195,7 @@ if countedKeys < argVal:
     print("_____________\n")
     for key in ignoredKeys:
         song = songPool[idIndices[key]]
-        print("ANNID="+str(song["ID"])+", "+song["SN"]+" _from_ "+song["EN"])
+        print(f"{quizNumbers[song["ID"]]}: ANNID={song["ID"]}, {song["SN"]} _from_ {song["EN"]}")
     errorQ = 1
 if countedKeys > argVal:
     print("More updates than expected."+str(countedKeys)+"/"+str(argVal))
