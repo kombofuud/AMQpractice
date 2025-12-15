@@ -45,6 +45,7 @@ for ID in malids:
         print(f"ID={ID} was duplicated")
         continue
     indexList.append(loadingMap[ID])
+    includedSet.add(loadingMap[ID])
 indexList.sort(reverse = True)
 for ID in indexList:
     prepSongs.append(loadingSongs.pop(ID))

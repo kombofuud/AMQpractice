@@ -3,6 +3,7 @@ import sys
 import math
 import copy
 import random
+import numpy
 
 fileQuiz = "_quiz"
 filePractice = "_practice"
@@ -144,14 +145,13 @@ if randomValue < 0:
 initialMissModifier = -2+int(2*randomValue)
 
 for i, song in enumerate(songPool):
-    maxD = max(maxD, song["D"])
+    maxD = int(math.ceil(max(maxD, song["D"])))
     if song["ID"] in quizIds:
         idIndices[song["ID"]] = i
         if song["X"] == 1:
             quizIds[song["ID"]] = 1
         elif song["X"] == 2:
-            quizIds[song["ID"]] = initialMissModifier
-            initialMissModifier = -3-initialMissModifier
+            quizIds[song["ID"]] = -math.sqrt(song["D"])
             missedCount += 1
         if quizIds[song["ID"]]+song["D"] <= 0:
             diff8Q += 1
@@ -182,12 +182,12 @@ for i, song in enumerate(songPool):
 
 #Ensure that the correct number of songs were accounted for
 countedKeys = 0
-ignoredKeys = set()
+ignoredKeys = []
 for song in quizSongs:
     if songPool[idIndices[song["ID"]]]["X"] != 0:
         countedKeys += 1
     else:
-        ignoredKeys.add(song["ID"])
+        ignoredKeys.append(song["ID"])
 
 if countedKeys < argVal:
     print("Insufficient songs updated: "+str(countedKeys)+"/"+str(argVal))
@@ -279,12 +279,12 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
 #Update all keys
 print("Missed Song Numbers_______")
 for i, song in enumerate(quizSongs):
-    if quizIds[song["ID"]] < 0:
+    if quizIds[song["ID"]] <= 0.0:
         print(f"{i+1}", end = ' ')
 print()
 
 for ID, index in idIndices.items():
-    if songPool[index]["D"] == 0 and quizIds[ID] < 0:
+    if songPool[index]["D"] == 0.0 and quizIds[ID] < 0:
         songPool[index]["X"] = 0
         continue
     songPool[index]["D"] += quizIds[ID]
@@ -302,7 +302,7 @@ for ID, index in idIndices.items():
 currentWeightCount = 0
 songDistribution = [0]*(maxD+1)
 for song in songPool:
-    songDistribution[song["D"]] += 1
+    songDistribution[int(math.ceil(song["D"]))] += 1
     currentWeightCount += math.exp(-song["D"])
 newSongCount = int(math.ceil(weightMin-currentWeightCount))
 newSongCount = max(newSongCount, 0)

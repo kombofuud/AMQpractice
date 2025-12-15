@@ -21,14 +21,14 @@ for song in known:
 minCount = len(DList)+1
 maxCount = -1
 songTotal = 0
-songDistribution = [0]*(DMax+1)
+songDistribution = [0]*(int(math.ceil(DMax))+1)
 for _ in range(1000):
     randomSongList = list(numpy.random.choice(known, size = len(DList), p = DList/numpy.sum(DList), replace = False))
     songCount = 0
     testWeightCount = maxWeightCount
     for song in randomSongList:
         songCount += 1
-        songDistribution[song["D"]] += 1
+        songDistribution[int(math.ceil(song["D"]))] += 1
         if song["D"] == 0:
             testWeightCount-= 1
         if testWeightCount == 0:
