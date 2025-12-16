@@ -642,9 +642,9 @@ function setup() {
                                 <button id="cslgListImportStartButton" style="color: black;">Go</button>
                             </div>
                             <div style="margin-top: 5px">
-                                <label class="clickAble">Watching<input id="cslgListImportWatchingCheckbox" type="checkbox"></label>
+                                <label class="clickAble">Watching<input id="cslgListImportWatchingCheckbox" type="checkbox checked"></label>
                                 <label class="clickAble" style="margin-left: 10px">Completed<input id="cslgListImportCompletedCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">On Hold<input id="cslgListImportHoldCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble" style="margin-left: 10px">On Hold<input id="cslgListImportHoldCheckbox" type="checkbox"></label>
                                 <label class="clickAble" style="margin-left: 10px">Dropped<input id="cslgListImportDroppedCheckbox" type="checkbox"></label>
                                 <label class="clickAble" style="margin-left: 10px">Planning<input id="cslgListImportPlanningCheckbox" type="checkbox"></label>
                             </div>
