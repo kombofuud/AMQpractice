@@ -284,7 +284,7 @@ for i, song in enumerate(quizSongs):
 print()
 
 for ID, index in idIndices.items():
-    if songPool[index]["D"] == 0.0 and quizIds[ID] < 0:
+    if songPool[index]["D"] == 0.0 and quizIds[ID] == 0.0:
         songPool[index]["X"] = 0
         continue
     songPool[index]["D"] += quizIds[ID]
