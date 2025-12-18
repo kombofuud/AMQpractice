@@ -169,7 +169,7 @@ for i, song in enumerate(songPool):
                 pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/3
                 pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/3'''
             for i in range(len(pSong["sampleWeights"])):
-                pSong["sampleWeights"][i] = math.pow(math.e,pSong["sampleWeights"][i])
+                pSong["sampleWeights"][i] = math.log(1+math.pow(math.e,pSong["sampleWeights"][i]))
             pSong["startPoint"] = pSong["sampleWeights"]
             pSong["sampleWeights"] = song["sampleWeights"]
             pSong["D"] = 0
