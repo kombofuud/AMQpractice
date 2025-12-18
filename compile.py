@@ -16,11 +16,11 @@ filePrevLoad = "prevLoading"
 fileLoad = "loadingcutlist"
 fileAdd = "addThese"
 filePrevAdd = "prevAddThese"
-rngFile = "addSongRandomValue.txt"
+gainFile = "prevgain.txt"
+prevGainFile = "prevprevgain.txt"
 malUpdateFile = "updateMal.txt"
 prevMalUpdateFile = "prevUpdateMal.txt"
 prepListMinSize = 150
-weightMin = 25
 '''
 fileQuiz = "dummyQuiz"
 filePractice = "dummyPractice"
@@ -58,7 +58,7 @@ else:
     argVal = len(quizSongs)
 
 #if quizSongs is empty, reset the pool list to before the update
-if len(quizSongs) == 0:
+if len(quizSongs) == 0 and len(songPool) > 0:
     with open(filePrevPool+".json", 'r', encoding = 'utf8') as f:
         prevSongs = json.load(f)
     with open(filePool+".json", 'r+', encoding = 'utf8') as f:
@@ -119,7 +119,13 @@ if len(quizSongs) == 0:
         f.truncate(0)
         f.seek(0)
         f.write(prevAddedSongOrder)
-    print("Pool+Quiz+Prep+Load+Update+AddedOrder Restored")
+    with open(gainFile, 'r', encoding = 'utf8') as f:
+        prevGains = f.read()
+    with open(prevGainFile, 'w', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        f.write(prevGains)
+    print("Pool+Quiz+Prep+Load+Update+AddedOrder+fileGains Restored")
     '''with open(filePractice+".json", 'r', encoding = 'utf8') as f:
         practiceSongs = json.load(f)
     for song in practiceSongs:
@@ -134,24 +140,20 @@ practice = []
 errorQ = 0
 diff8Q = 0
 missedCount = 0
-maxD = -1
-
-with open(rngFile, 'r', encoding = 'utf8') as f:
-    randomValue = float(f.read().strip())
-if randomValue < 0:
-    randomValue = random.random()
-    with open(rngFile, 'w', encoding = 'utf8') as f:
-        f.write(str(randomValue))
-initialMissModifier = -2+int(2*randomValue)
+maxD = -100
+minD = 0
+prevWeightCount = 0
 
 for i, song in enumerate(songPool):
     maxD = int(math.ceil(max(maxD, song["D"])))
+    minD = int(math.ceil(min(minD, song["D"])))
+    prevWeightCount += 2/(1+math.exp(song["D"]))
     if song["ID"] in quizIds:
         idIndices[song["ID"]] = i
         if song["X"] == 1:
-            quizIds[song["ID"]] = 1
+            quizIds[song["ID"]] = 1+math.sqrt(math.log(1+math.exp(-song["D"])))
         elif song["X"] == 2:
-            quizIds[song["ID"]] = -math.sqrt(song["D"])
+            quizIds[song["ID"]] = -1-math.sqrt(math.log(1+math.exp(song["D"])))
             missedCount += 1
         if quizIds[song["ID"]]+song["D"] <= 0:
             diff8Q += 1
@@ -215,7 +217,7 @@ if errorQ:
     sys.exit(1)
 
 
-#save copy of pool,quiz,prep,loading to prevPool,prevQuiz etc
+#save copy of pool,quiz,prep,loading,gain to prevPool,prevQuiz etc
 with open(filePrevPool+".json", 'r+', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
@@ -276,6 +278,13 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
     f.seek(0)
     f.write(addedSongOrder)
 
+with open(gainFile, 'r', encoding = 'utf8') as f:
+    gains = f.read()
+with open(prevGainFile, 'w', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    f.write(gains)
+
 #Update all keys
 print("Missed Song Numbers_______")
 for i, song in enumerate(quizSongs):
@@ -284,9 +293,6 @@ for i, song in enumerate(quizSongs):
 print()
 
 for ID, index in idIndices.items():
-    if songPool[index]["D"] == 0.0 and quizIds[ID] == 0.0:
-        songPool[index]["X"] = 0
-        continue
     songPool[index]["D"] += quizIds[ID]
     songPool[index]["D"] = max(songPool[index]["D"],0)
     if quizSamples[ID] == 0:
@@ -300,13 +306,31 @@ for ID, index in idIndices.items():
 
 #Add new songs if appropriate
 currentWeightCount = 0
-songDistribution = [0]*(maxD+1)
+songDistribution = [0]*(maxD-minD+1)
 for song in songPool:
-    songDistribution[int(math.ceil(song["D"]))] += 1
-    currentWeightCount += math.exp(-song["D"])
-newSongCount = int(math.ceil(weightMin-currentWeightCount))
-newSongCount = max(newSongCount, 0)
-songDistribution[0] += newSongCount
+    songDistribution[int(math.ceil(song["D"]-minD))] += 1
+    currentWeightCount += 2/(1+math.exp(song["D"]))
+newSongCount = prevWeightCount-currentWeightCount
+
+oldGains = float(gains.strip())
+if oldGains <= 0:
+    newSongCount += oldGains
+if newSongCount <= 0:
+    with open(prevGainFile, 'w', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        f.write(newSongCount)
+else:
+    with open(prevGainFile, 'w', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        f.write(prevWeightCount)
+    pNewSongCount = oldGains-prevWeightCount
+    if oldGains < 0 or (pNewSongCount > newSongCount and oldGains < prevWeightCount):
+        newSongCount = int(math.floor(newSongCount))
+    else:
+        newSongCount = int(math.ceil(newSongCount))
+    songDistribution[-minD] += newSongCount
 
 newSongs = []
 if newSongCount > len(prepSongs):
@@ -435,7 +459,7 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs))+ ", Partial Gain = "+str(round(1+weightMin-currentWeightCount-newSongCount, 4)))
+print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-max(0,newSongCount))+"+"+str(max(0,newSongCount))+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs))+ ", MeanWeight = "+str(currentWeightCount))
 print("DValue distribution")
 for index in range(len(songDistribution)):
     if index%4==0:
