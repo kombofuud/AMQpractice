@@ -35,7 +35,8 @@ if len(quizList) > 0:
 
 #Index all songs in pool, get their total weight and check that compile doesn't need to be run
 DList = []
-DMax = -1
+DMax = -100
+DMin = 0
 indexMap = dict()
 maxWeightCount = 0
 songCounter = 0
@@ -45,11 +46,12 @@ for index, song in enumerate(poolSongList):
     if song["X"] != 0:
         print("Error: Previous quiz not compiled")
         sys.exit(1)
-    if song["D"] == 0:
+    if song["D"] <= 0:
         maxWeightCount += 1
     indexMap[song["ID"]] = index
     DList.append(2/(1+math.exp(song["D"]))*len(song["sampleWeights"]))
     DMax = max(DMax, song["D"])
+    DMin = min(DMin, song["D"])
     songCounter += 1
 
 #Pick Songs and Generate Song Section
@@ -60,7 +62,7 @@ randomSongList = copy.deepcopy(randomSongList)
 songCount = 0
 for song in randomSongList:
     songCount += 1
-    if song["D"] == 0:
+    if song["D"] <= 0:
          maxWeightCount-= 1
     if maxWeightCount == 0:
         break
@@ -128,15 +130,17 @@ if len(newSongList) > 0:
 '''
 print(f"Quiz of Size \033[31m{songCount}\033[0m created")
 print()
-print(f"Pool Size: {len(DList)} Max D: {DMax}")
-DList = [0]*(int(math.ceil(DMax))+1)
+print(f"Pool Size: {len(DList)} Max D: {DMax} Min D: {DMin}")
+DMax = int(math.ceil(DMax))
+DMin = int(math.ceil(DMin))
+DList = [0]*(DMax-DMin+1)
 for song in poolSongList:
-    if song["D"] < 0:
-        song["D"] = 0
-    DList[int(math.ceil(song["D"]))] += 1
+    DList[int(math.ceil(song["D"]))-DMin] += 1
 print("DValue distribution")
 for index in range(len(DList)):
-    if index%4==0:
+    if index == -DMin:
+        print(f"\033[34m{DList[index]}\033[0m", end = " ")
+    elif index%4==0:
         print(f"\033[31m{DList[index]}\033[0m", end = " ")
     else:
         print(DList[index], end = " ")
