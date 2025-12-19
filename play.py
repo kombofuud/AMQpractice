@@ -139,7 +139,7 @@ for song in poolSongList:
 print("DValue distribution")
 for index in range(len(DList)):
     if index == -DMin:
-        print(f"\033[34m{DList[index]}\033[0m", end = " ")
+        print(f"\033[37m{DList[index]}\033[0m", end = " ")
     elif index%4==0:
         print(f"\033[31m{DList[index]}\033[0m", end = " ")
     else:
