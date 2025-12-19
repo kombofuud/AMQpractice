@@ -38,7 +38,7 @@ quizNumbers = dict()
 with open(fileQuiz+".json", 'r', encoding = 'utf8') as f:
     quizSongs = json.load(f)
     for index, song in enumerate(quizSongs):
-        quizIds[song["ID"]] = 0
+        quizIds[song["ID"]] = 0.0
         quizSamples[song["ID"]] = song["startPoint"]
         quizNumbers[song["ID"]] = index+1
 
@@ -143,11 +143,12 @@ missedCount = 0
 maxD = -100
 minD = 0
 prevWeightCount = 0
+prevNewSongs = 0
 
 for i, song in enumerate(songPool):
-    maxD = int(math.ceil(max(maxD, song["D"])))
-    minD = int(math.ceil(min(minD, song["D"])))
     prevWeightCount += 2/(1+math.exp(song["D"]))
+    if song["D"] == 0 and type(song["D"]) is int:
+        prevNewSongs += 1
     if song["ID"] in quizIds:
         idIndices[song["ID"]] = i
         if song["X"] == 1:
@@ -181,6 +182,9 @@ for i, song in enumerate(songPool):
         errorQ = 1
         extraIds.add(song["ID"])
         extraIndices[song["ID"]] = i
+    else:
+        maxD = int(math.ceil(max(maxD, song["D"])))
+        minD = int(math.ceil(min(minD, song["D"])))
 
 #Ensure that the correct number of songs were accounted for
 countedKeys = 0
@@ -329,7 +333,7 @@ else:
         f.truncate(0)
         f.seek(0)
         f.write(str(prevWeightCount))
-    pNewSongCount = oldGains-prevWeightCount
+    pNewSongCount = -oldGains+prevWeightCount+prevNewSongs
     if oldGains <= 0 or (pNewSongCount > newSongCount and oldGains < prevWeightCount):
         newSongCount = int(math.floor(newSongCount))
     else:
