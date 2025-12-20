@@ -183,8 +183,8 @@ for i, song in enumerate(songPool):
         extraIds.add(song["ID"])
         extraIndices[song["ID"]] = i
     else:
-        maxD = int(math.ceil(max(maxD, song["D"])))
-        minD = int(math.ceil(min(minD, song["D"])))
+        maxD = int(round(max(maxD, song["D"])))
+        minD = int(round(min(minD, song["D"])))
 
 #Ensure that the correct number of songs were accounted for
 countedKeys = 0
@@ -298,8 +298,8 @@ print()
 
 for ID, index in idIndices.items():
     songPool[index]["D"] += quizIds[ID]
-    maxD = int(math.ceil(max(maxD, songPool[index]["D"])))
-    minD = int(math.ceil(min(minD, songPool[index]["D"])))
+    maxD = int(round(max(maxD, songPool[index]["D"])))
+    minD = int(round(min(minD, songPool[index]["D"])))
     if quizSamples[ID] == 0:
         songPool[index]["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
     elif quizSamples[ID] == 100:
@@ -313,12 +313,14 @@ for ID, index in idIndices.items():
 currentWeightCount = 0
 songDistribution = [0]*(maxD-minD+1)
 for song in songPool:
-    songDistribution[int(math.ceil(song["D"]-minD))] += 1
+    songDistribution[int(round(song["D"]-minD))] += 1
     currentWeightCount += 2/(1+math.exp(song["D"]))
 newSongCount = prevWeightCount-currentWeightCount
 
 oldGains = float(gains.strip())
 if oldGains <= 0:
+    if newSongCount < 0:
+        newSongCount -= 0.5
     newSongCount += oldGains
 weightChange = newSongCount
 
@@ -334,7 +336,7 @@ else:
         f.seek(0)
         f.write(str(prevWeightCount))
     pNewSongCount = -oldGains+prevWeightCount+prevNewSongs
-    if oldGains <= 0 or (pNewSongCount > newSongCount and oldGains < prevWeightCount):
+    if oldGains <= 0 or (pNewSongCount < newSongCount != oldGains < prevWeightCount):
         newSongCount = int(math.floor(newSongCount))
     else:
         newSongCount = int(math.ceil(newSongCount))
