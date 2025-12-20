@@ -131,15 +131,15 @@ if len(newSongList) > 0:
 print(f"Quiz of Size \033[31m{songCount}\033[0m created")
 print()
 print(f"Pool Size: {len(DList)} Max D: {DMax} Min D: {DMin}")
-DMax = int(math.ceil(DMax))
-DMin = int(math.ceil(DMin))
+DMax = int(round(DMax))
+DMin = int(round(DMin))
 DList = [0]*(DMax-DMin+1)
 for song in poolSongList:
-    DList[int(math.ceil(song["D"]))-DMin] += 1
+    DList[int(round(song["D"]))-DMin] += 1
 print("DValue distribution")
 for index in range(len(DList)):
     if index == -DMin:
-        print(f"\033[37m{DList[index]}\033[0m", end = " ")
+        print(f"\033[94m{DList[index]}\033[0m", end = " ")
     elif index%4==0:
         print(f"\033[31m{DList[index]}\033[0m", end = " ")
     else:
