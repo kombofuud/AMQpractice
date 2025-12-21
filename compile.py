@@ -283,7 +283,7 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
     f.write(addedSongOrder)
 
 with open(gainFile, 'r', encoding = 'utf8') as f:
-    targetMean, oldWeight, prevGain = [float(line.strip()) for line in file.readlines()]
+    targetMean, oldWeight, prevGain = [float(line.strip()) for line in f.readlines()]
 with open(prevGainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
@@ -319,8 +319,8 @@ for song in songPool:
     currentWeightCount += 2/(1+math.exp(song["D"]))
 newSongCount = prevWeightCount-currentWeightCount
 
-targetMean, oldWeight, prevGain
-targetMean += min(2, max(-2, (newSongCount-prevGain)/(prevWeightCount-oldWeight)))
+targetGain = min(2, max(-2, (newSongCount-prevGain)/(prevWeightCount-oldWeight)))
+targetMean += targetGain
 weightChange = newSongCount
 
 newSongCount = max(0,int(math.ceil(targetMean-currentWeightCount)))
@@ -330,7 +330,7 @@ with open(gainFile, 'w', encoding = 'utf8') as f:
     f.seek(0)
     f.write(f"{targetMean}\n")
     f.write(f"{prevWeightCount}\n")
-    f.write(f"{newSongCount}\n")
+    f.write(f"{weightChange}\n")
 songDistribution[-minD] += newSongCount
 currentWeightCount += newSongCount
 
@@ -461,7 +461,7 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print("\033[31mPractice List Compiled:\033[0m Missed = "+str(missedCount)+", PracticeSize = "+str(len(practice)-newSongCount)+"+"+str(newSongCount)+", PoolSize = "+str(len(songPool))+", LoadingSize = "+str(len(loadingSongs)+len(prepSongs))+ ", Gain = "+str(round(weightChange,5))+", MeanWeight = "+str(round(currentWeightCount,5)))
+print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,5)}, TargetWeight = {round(targetMean,5)}, TargetGain = {round(targetGain,5)}")
 print("DValue distribution")
 for index in range(len(songDistribution)):
     if index==-minD:
