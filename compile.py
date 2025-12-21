@@ -283,11 +283,13 @@ with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
     f.write(addedSongOrder)
 
 with open(gainFile, 'r', encoding = 'utf8') as f:
-    gains = f.read()
+    targetMean, oldWeight, prevGain = [float(line.strip()) for line in file.readlines()]
 with open(prevGainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
-    f.write(gains)
+    f.write(f"{targetMean}\n")
+    f.write(f"{oldWeight}\n")
+    f.write(f"{prevGain}\n")
 
 #Update all keys
 print("Missed Song Numbers_______")
@@ -317,31 +319,20 @@ for song in songPool:
     currentWeightCount += 2/(1+math.exp(song["D"]))
 newSongCount = prevWeightCount-currentWeightCount
 
-oldGains = float(gains.strip())
-if oldGains <= 0:
-    if newSongCount < 0:
-        newSongCount -= 0.5
-    newSongCount += oldGains
+targetMean, oldWeight, prevGain
+targetMean += min(2, max(-2, (newSongCount-prevGain)/(prevWeightCount-oldWeight)))
 weightChange = newSongCount
 
-if newSongCount <= 0:
-    with open(gainFile, 'w', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        f.write(str(newSongCount))
-        newSongCount = 0
-else:
-    with open(gainFile, 'w', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        f.write(str(prevWeightCount))
-    pNewSongCount = -oldGains+prevWeightCount+prevNewSongs
-    if oldGains <= 0 or (pNewSongCount < newSongCount != oldGains < prevWeightCount):
-        newSongCount = int(math.floor(newSongCount))
-    else:
-        newSongCount = int(math.ceil(newSongCount))
-    songDistribution[-minD] += newSongCount
-    currentWeightCount += newSongCount
+newSongCount = max(0,int(math.ceil(targetMean-currentWeightCount)))
+
+with open(gainFile, 'w', encoding = 'utf8') as f:
+    f.truncate(0)
+    f.seek(0)
+    f.write(f"{targetMean}\n")
+    f.write(f"{prevWeightCount}\n")
+    f.write(f"{newSongCount}\n")
+songDistribution[-minD] += newSongCount
+currentWeightCount += newSongCount
 
 newSongs = []
 if newSongCount > len(prepSongs):
