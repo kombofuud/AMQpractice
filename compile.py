@@ -138,7 +138,6 @@ idIndices = dict()
 extraIndices = dict()
 practice = []
 errorQ = 0
-diff8Q = 0
 missedCount = 0
 maxD = -100
 minD = 0
@@ -156,8 +155,7 @@ for i, song in enumerate(songPool):
         elif song["X"] == 2:
             quizIds[song["ID"]] = -math.sqrt(1+math.log(1+math.exp(song["D"])))
             missedCount += 1
-        if quizIds[song["ID"]]+song["D"] <= 0:
-            diff8Q += 1
+        if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
             pSong = copy.deepcopy(song)
             pSong["startPoint"] = quizSamples[pSong["ID"]]
             if pSong["startPoint"] == 0:
@@ -175,7 +173,7 @@ for i, song in enumerate(songPool):
                 pSong["sampleWeights"][i] = math.log(1+math.pow(math.e,pSong["sampleWeights"][i]))
             pSong["startPoint"] = pSong["sampleWeights"]
             pSong["sampleWeights"] = song["sampleWeights"]
-            pSong["D"] = 0
+            pSong["D"] += quizIds[song["ID"]]
             pSong["X"] = 2
             practice.append(pSong)
     elif song["X"] != 0:
@@ -461,7 +459,7 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,5)}, TargetWeight = {round(targetMean,5)}, TargetGain = {round(targetGain,5)}")
+print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,3)}, TargetWeight = {round(targetMean,3)}, TargetGain = {round(targetGain,3)}")
 print("DValue distribution")
 for index in range(len(songDistribution)):
     if index==-minD:
