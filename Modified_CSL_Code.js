@@ -95,6 +95,7 @@ let nextSongChunk;
 let importRunning = false;
 let attachedFile = "";
 let missedSongList = [];
+let justPressed = true;
 let hotKeys = {
     cslgWindow: loadHotkey("cslgWindow"),
     start: loadHotkey("start"),
@@ -642,7 +643,7 @@ function setup() {
                                 <button id="cslgListImportStartButton" style="color: black;">Go</button>
                             </div>
                             <div style="margin-top: 5px">
-                                <label class="clickAble">Watching<input id="cslgListImportWatchingCheckbox" type="checkbox checked"></label>
+                                <label class="clickAble">Watching<input id="cslgListImportWatchingCheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">Completed<input id="cslgListImportCompletedCheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">On Hold<input id="cslgListImportHoldCheckbox" type="checkbox"></label>
                                 <label class="clickAble" style="margin-left: 10px">Dropped<input id="cslgListImportDroppedCheckbox" type="checkbox"></label>
@@ -1063,7 +1064,11 @@ function setup() {
                 hotkeyActions[action]();
             }
         }
-        if (event.keyCode == '222' && shift && ctrl){
+        if(event.keyCode=='188' && !quiz.isSpectator && event.ctrlKey && justPressed) {
+            justPressed = false;
+            quiz.skipClicked();
+        }
+        else if (event.keyCode == '222' && shift && ctrl){
             if (quiz.cslActive) {
                 if (quiz.soloMode) {
                     if (quiz.pauseButton.pauseOn) {
@@ -1100,6 +1105,11 @@ function setup() {
                 });
             }
         }
+    });
+    document.addEventListener("keyup", (event) => {
+      if (event.keyCode=='188'){
+        justPressed = true;
+      }
     });
 
     resultChunk = new Chunk();
@@ -1212,6 +1222,9 @@ function validateStart() {
     else{
         lobby.settings.modifiers.fullSongRange = false;
     }
+    if(attachedFile == "_practice.json"){
+        guessTime = 2;
+    }
     $("#cslgSettingsModal").modal("hide");
     //console.log(songOrder);
     if (lobby.soloMode) {
@@ -1320,10 +1333,13 @@ function startQuiz() {
 // check if all conditions are met to go to next song
 function readySong(songNumber) {
     if (songNumber === currentSong) return;
-    //console.log("Ready song: " + songNumber);
     nextVideoReadyInterval = setInterval(() => {
-        //console.log({nextVideoReady, previousSongFinished});
+        if (quizVideoController.moePlayers[0].player.bufferedEnd() >= quizVideoController.moePlayers[0].videoLength-0.2){
+            nextVideoReady = true;
+        }
+        console.log({nextVideoReady, previousSongFinished});
         if (nextVideoReady && !quiz.pauseButton.pauseOn && previousSongFinished) {
+            //console.log(songNumber);
             clearInterval(nextVideoReadyInterval);
             nextVideoReady = false;
             previousSongFinished = false;
@@ -1576,9 +1592,12 @@ function endGuessPhase(songNumber) {
             setTimeout(() => {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
-                    let timerEnd = Math.max(20*currentAnswerTime,60+240/(1+Math.pow(2,song.D-4)));
+                    let timerEnd = Math.max(20*currentAnswerTime,60+140/(1+Math.pow(2,song.D-4)));
                     if(!correct[0] || timerEnd > 300){
                         timerEnd = 300;
+                    }
+                    if (attachedFile == "_practice.json" && song.D != 0){
+                        timerEnd = Math.min(100, timerEnd);
                     }
                     if(song.length > 0){
                         timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100), 10*(song.length));
@@ -1586,10 +1605,10 @@ function endGuessPhase(songNumber) {
                     let defaultTimer = 13;
                     //console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
                     skipInterval = setInterval(() => {
-                        if (defaultTimer >= timerEnd-15){
+                        if (defaultTimer >= timerEnd-5){
                             fireListener("quiz overlay message", "About to Skip");
                         }
-                        if (quiz.skipController._toggled || defaultTimer >= timerEnd+10) {
+                        if (quiz.skipController._toggled || defaultTimer >= timerEnd+20) {
                             clearInterval(skipInterval);
                             currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
