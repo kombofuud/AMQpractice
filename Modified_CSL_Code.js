@@ -1326,7 +1326,7 @@ function startQuiz() {
         setTimeout(() => {
             previousSongFinished = true;
             readySong(1);
-        }, 400);
+        }, 1500);
     }
 }
 
@@ -1334,7 +1334,7 @@ function startQuiz() {
 function readySong(songNumber) {
     if (songNumber === currentSong) return;
     nextVideoReadyInterval = setInterval(() => {
-        if (quizVideoController.moePlayers[0].player.bufferedEnd() >= quizVideoController.moePlayers[0].videoLength-0.2){
+        if (quizVideoController.moePlayers[0].player.bufferedEnd() >= quizVideoController.moePlayers[0].videoLength-0.2 || quizVideoController.moePlayers[0].player.bufferedEnd()-quizVideoController.moePlayers[0].startPoint >= guessTime){
             nextVideoReady = true;
         }
         console.log({nextVideoReady, previousSongFinished});
