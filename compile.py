@@ -332,9 +332,9 @@ with open(gainFile, 'w', encoding = 'utf8') as f:
     f.write(f"{weightChange}\n")
 songDistribution[-minD] += newSongCount
 currentWeightCount += newSongCount
-if len(practice)+newSongCount > 20:
+if len(practice)+newSongCount > 15:
     practice.sort(key = lambda x: x["D"])
-    prepSongs = prepSongs[:20-newSongCount]
+    practice = practice[:15-newSongCount]
 
 newSongs = []
 if newSongCount > len(prepSongs):
