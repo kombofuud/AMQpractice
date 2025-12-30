@@ -293,7 +293,7 @@ with open(prevGainFile, 'w', encoding = 'utf8') as f:
 #Update all keys
 print("Missed Song Numbers_______")
 for i, song in enumerate(quizSongs):
-    if quizIds[song["ID"]] <= 0.0:
+    if quizIds[song["ID"]] < 0.0:
         print(f"{i+1}", end = ' ')
 print()
 
