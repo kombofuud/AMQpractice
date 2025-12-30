@@ -370,8 +370,8 @@ function setup() {
     }
     for (const videoPlayer of quizVideoController.moePlayers) {
         videoPlayer.player.on("ended", () => {
+            videoPlayer.allowSeeking = true;
             setTimeout(() => {
-                videoPlayer.allowSeeking = true;
                 videoPlayer.player.currentTime(0);
             }, 3000);
         });
@@ -1459,10 +1459,6 @@ function endGuessPhase(songNumber) {
         song = songList[songOrder[songNumber]];
     }
     fireListener("guess phase over");
-    //quizVideoController.moePlayers[0].allowSeeking = true;
-    //quizVideoController.moePlayers[0].player.currentTime(Math.max(0,currentStartPoint-500/song.length));
-    //console.log(currentStartPoint);
-    //console.log(quizVideoController.moePlayers[0].player.currentTime());
     if (!quiz.soloMode && quiz.inQuiz && !quiz.isSpectator) {
         const answer = currentAnswers[quiz.ownGamePlayerId];
         if (answer) {
@@ -1590,6 +1586,10 @@ function endGuessPhase(songNumber) {
                     });
                 }
                 fireListener("answer results", data);
+                quizVideoController.getCurrentPlayer().allowSeeking = true;
+                quizVideoController.getCurrentPlayer().pauseVideo();
+                quizVideoController.getCurrentPlayer().player.currentTime(Math.max(0,currentStartPoint*(song.length-guessTime)/100-5));
+                quizVideoController.getCurrentPlayer().player.play();
             }
             else if (quiz.isHost) {
                 const list = [];
