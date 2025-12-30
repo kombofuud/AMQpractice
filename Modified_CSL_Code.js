@@ -368,6 +368,14 @@ function setup() {
             oldHandleError.apply(this, arguments);
         }
     }
+    for (const videoPlayer of quizVideoController.moePlayers) {
+        videoPlayer.player.on("ended", () => {
+            setTimeout(() => {
+                videoPlayer.allowSeeking = true;
+                videoPlayer.player.currentTime(0);
+            }, 3000);
+        });
+    }
 
     $("#lobbyPage .topMenuBar").append(`<div id="lnCustomSongListButton" class="clickAble topMenuButton topMenuMediumButton"><h3>CSL</h3></div>`);
     $("#lnCustomSongListButton").on("click", openSettingsModal);
@@ -1337,7 +1345,6 @@ function readySong(songNumber) {
         if (quizVideoController.moePlayers[0].player.bufferedEnd() >= quizVideoController.moePlayers[0].videoLength-0.2 || quizVideoController.moePlayers[0].player.bufferedEnd()-quizVideoController.moePlayers[0].startPoint >= guessTime){
             nextVideoReady = true;
         }
-        console.log({nextVideoReady, previousSongFinished});
         if (nextVideoReady && !quiz.pauseButton.pauseOn && previousSongFinished) {
             //console.log(songNumber);
             clearInterval(nextVideoReadyInterval);
@@ -1452,6 +1459,10 @@ function endGuessPhase(songNumber) {
         song = songList[songOrder[songNumber]];
     }
     fireListener("guess phase over");
+    //quizVideoController.moePlayers[0].allowSeeking = true;
+    //quizVideoController.moePlayers[0].player.currentTime(Math.max(0,currentStartPoint-500/song.length));
+    //console.log(currentStartPoint);
+    //console.log(quizVideoController.moePlayers[0].player.currentTime());
     if (!quiz.soloMode && quiz.inQuiz && !quiz.isSpectator) {
         const answer = currentAnswers[quiz.ownGamePlayerId];
         if (answer) {
