@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         AMQ Custom Kombo Song Games
+// @name         AMQ Custom Song List Game
 // @namespace    https://github.com/kempanator
-// @version      0.92
+// @version      0.93
 // @description  Play a solo game with a custom song list
 // @author       kempanator
 // @match        https://*.animemusicquiz.com/*
@@ -52,8 +52,8 @@ let showCSLMessages = saveData.showCSLMessages ?? true;
 let replacedAnswers = saveData.replacedAnswers || {};
 let malClientId = saveData.malClientId ?? "";
 let debug = Boolean(saveData.debug);
-let fastSkip = true;
-let fullSongRange = true;
+let fastSkip = false;
+let fullSongRange = false;
 let nextVideoReady = false;
 let showSelection = 1;
 let guessTime = 20;
@@ -61,11 +61,8 @@ let extraGuessTime = 0;
 let currentSong = 0;
 let totalSongs = 0;
 let currentAnswers = {};
-let currentAnswerTime = 20;
-let currentStartPoint = 0;
-let nextStartPoint = 0;
 let score = {};
-let songListTableView = 2; //0: song + artist, 1: anime + song type + vintage, 2: video/audio links
+let songListTableView = 0; //0: song + artist, 1: anime + song type + vintage, 2: video/audio links
 let songListTableSort = { mode: "", ascending: true } //modes: songName, artist, difficulty, anime, songType, vintage, mp3, 480, 720
 let songList = [];
 let songOrder = {}; //{song#: index#, ...}
@@ -93,9 +90,6 @@ let resultChunk;
 let songInfoChunk;
 let nextSongChunk;
 let importRunning = false;
-let attachedFile = "";
-let missedSongList = [];
-let justPressed = true;
 let hotKeys = {
     cslgWindow: loadHotkey("cslgWindow"),
     start: loadHotkey("start"),
@@ -322,7 +316,6 @@ function setup() {
     QuizTypeAnswerInputController.prototype.submitAnswer = function (answer) {
         if (quiz.cslActive) {
             currentAnswers[quiz.ownGamePlayerId] = answer;
-            currentAnswerTime = Number(((Date.now() - songStartTime) / 1000).toFixed(3));
             this.skipController.highlight = true;
             fireListener("quiz answer", {
                 "answer": answer,
@@ -367,14 +360,6 @@ function setup() {
         else {
             oldHandleError.apply(this, arguments);
         }
-    }
-    for (const videoPlayer of quizVideoController.moePlayers) {
-        videoPlayer.player.on("ended", () => {
-            videoPlayer.allowSeeking = true;
-            setTimeout(() => {
-                videoPlayer.player.currentTime(0);
-            }, 3000);
-        });
     }
 
     $("#lobbyPage .topMenuBar").append(`<div id="lnCustomSongListButton" class="clickAble topMenuButton topMenuMediumButton"><h3>CSL</h3></div>`);
@@ -552,8 +537,8 @@ function setup() {
                             </div>
                             <div style="margin-top: 5px">
                                 <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Gameplay Options:</span>
-                                <label class="clickAble">Full Song Range<input id="cslgSettingsFullSongRangeCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 20px">Fast Skip<input id="cslgSettingsFastSkipCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble">Full Song Range<input id="cslgSettingsFullSongRangeCheckbox" type="checkbox"></label>
+                                <label class="clickAble" style="margin-left: 20px">Fast Skip<input id="cslgSettingsFastSkipCheckbox" type="checkbox"></label>
                             </div>
                             <div style="margin-top: 5px">
                                 <span style="font-size: 18px; font-weight: bold; margin: 0 10px 0 0;">Sample:</span>
@@ -574,7 +559,7 @@ function setup() {
                                     <option value="1">EU (eudist)</option>
                                     <option value="2">NA1 (nawdist)</option>
                                     <option value="3">NA2 (naedist)</option>
-
+                                    
                                 </select>
                             </div>
                             <p style="margin-top: 20px">Normal room settings are ignored. Only these settings will apply.</p>
@@ -653,9 +638,9 @@ function setup() {
                             <div style="margin-top: 5px">
                                 <label class="clickAble">Watching<input id="cslgListImportWatchingCheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">Completed<input id="cslgListImportCompletedCheckbox" type="checkbox" checked></label>
-                                <label class="clickAble" style="margin-left: 10px">On Hold<input id="cslgListImportHoldCheckbox" type="checkbox"></label>
-                                <label class="clickAble" style="margin-left: 10px">Dropped<input id="cslgListImportDroppedCheckbox" type="checkbox"></label>
-                                <label class="clickAble" style="margin-left: 10px">Planning<input id="cslgListImportPlanningCheckbox" type="checkbox"></label>
+                                <label class="clickAble" style="margin-left: 10px">On Hold<input id="cslgListImportHoldCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble" style="margin-left: 10px">Dropped<input id="cslgListImportDroppedCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble" style="margin-left: 10px">Planning<input id="cslgListImportPlanningCheckbox" type="checkbox" checked></label>
                             </div>
                             <h4 id="cslgListImportText" style="margin-top: 10px;"></h4>
                             <div id="cslgListImportActionContainer" style="display: none;">
@@ -721,19 +706,6 @@ function setup() {
                     $(this).val("");
                     console.error(error);
                     messageDisplayer.displayMessage("Upload Error");
-                }
-                attachedFile = this.files[0].name;
-                if(attachedFile == "_practice.json"){
-                    songListTableView = 1;
-                    songOrderType = "random";
-                }
-                if(attachedFile == "_quiz.json"){
-                    songListTableView = 2;
-                    songOrderType = "ascending";
-                }
-                if(attachedFile == "_split.json"){
-                    songListTableView = 2;
-                    songOrderType = "random";
                 }
                 setSongListTableSort();
                 createSongListTable(true);
@@ -939,7 +911,7 @@ function setup() {
         .on("mouseleave", "i.fa-chevron-up, i.fa-chevron-down, i.fa-trash", function () {
             $(this).closest("tr").removeClass("selected");
         });
-    $("#cslgSongListModeSelect").val("Load File").on("change", function () {
+    $("#cslgSongListModeSelect").val("Anisongdb").on("change", function () {
         const val = this.value;
         const idMap = {
             "Anisongdb": "#cslgAnisongdbSearchRow",
@@ -955,12 +927,12 @@ function setup() {
     $("#cslgAnisongdbModeSelect").val("Artist");
     $("#cslgAnisongdbMaxOtherPeopleInput").val("99");
     $("#cslgAnisongdbMinGroupMembersInput").val("0");
-    $("#cslgSettingsSongs").val("999");
-    $("#cslgSettingsGuessTime").val("15");
-    $("#cslgSettingsExtraGuessTime").val("7");
+    $("#cslgSettingsSongs").val("20");
+    $("#cslgSettingsGuessTime").val("20");
+    $("#cslgSettingsExtraGuessTime").val("0");
     $("#cslgSettingsStartPoint").val("0-100");
     $("#cslgSettingsDifficulty").val("0-100");
-    $("#cslgAnisongdbSearchRow").hide();
+    $("#cslgFileUploadRow").hide();
     $("#cslgPreviousGameRow").hide();
     $("#cslgFilterListRow").hide();
     $("#cslgCSLButtonCSSInput").val(CSLButtonCSS);
@@ -1072,52 +1044,6 @@ function setup() {
                 hotkeyActions[action]();
             }
         }
-        if(event.keyCode=='188' && !quiz.isSpectator && event.ctrlKey && justPressed) {
-            justPressed = false;
-            quiz.skipClicked();
-        }
-        else if (event.keyCode == '222' && shift && ctrl){
-            if (quiz.cslActive) {
-                if (quiz.soloMode) {
-                    if (quiz.pauseButton.pauseOn) {
-                        quiz.pauseButton.updateState(false);
-                        /*fireListener("quiz unpause triggered", {
-                            "playerName": selfName
-                        });*/
-                        /*fireListener("quiz unpause triggered", {
-                            "playerName": selfName,
-                            "doCountDown": true,
-                            "countDownLength": 3000
-                        });*/
-                    }
-                    else {
-                        quiz.pauseButton.updateState(true);
-                        /*fireListener("quiz pause triggered", {
-                            "playerName": selfName
-                        });*/
-                    }
-                }
-                else {
-                    if (quiz.pauseButton.pauseOn) {
-                        cslMessage("§CSL12");
-                    }
-                    else {
-                        cslMessage("§CSL11");
-                    }
-                }
-            }
-            else {
-                socket.sendCommand({
-                    type: "quiz",
-                    command: quiz.pauseButton.pauseOn ? "quiz unpause" : "quiz pause"
-                });
-            }
-        }
-    });
-    document.addEventListener("keyup", (event) => {
-      if (event.keyCode=='188'){
-        justPressed = true;
-      }
     });
 
     resultChunk = new Chunk();
@@ -1165,11 +1091,11 @@ function validateStart() {
         return messageDisplayer.displayMessage("Unable to start", "Invalid number of songs");
     }
     guessTime = parseInt($("#cslgSettingsGuessTime").val());
-    if (isNaN(guessTime) || guessTime < 1) {
+    if (isNaN(guessTime) || guessTime < 1 || guessTime > 99) {
         return messageDisplayer.displayMessage("Unable to start", "Invalid guess time");
     }
     extraGuessTime = parseInt($("#cslgSettingsExtraGuessTime").val());
-    if (isNaN(extraGuessTime) || extraGuessTime < 0) {
+    if (isNaN(extraGuessTime) || extraGuessTime < 0 || extraGuessTime > 15) {
         return messageDisplayer.displayMessage("Unable to start", "Invalid extra guess time");
     }
     const startPointText = $("#cslgSettingsStartPoint").val().trim();
@@ -1224,15 +1150,6 @@ function validateStart() {
     }
     fastSkip = $("#cslgSettingsFastSkipCheckbox").prop("checked");
     fullSongRange = $("#cslgSettingsFullSongRangeCheckbox").prop("checked");
-    if (fullSongRange){
-        lobby.settings.modifiers.fullSongRange = true;
-    }
-    else{
-        lobby.settings.modifiers.fullSongRange = false;
-    }
-    if(attachedFile == "_practice.json"){
-        guessTime = 2;
-    }
     $("#cslgSettingsModal").modal("hide");
     //console.log(songOrder);
     if (lobby.soloMode) {
@@ -1258,7 +1175,6 @@ function startQuiz() {
     }
     skipping = false;
     quiz.cslActive = true;
-    missedSongList = [];
     const date = new Date().toISOString();
     for (const player of Object.values(lobby.players)) {
         score[player.gamePlayerId] = 0;
@@ -1288,13 +1204,12 @@ function startQuiz() {
     });
     //console.log(data.players);
     fireListener("Game Starting", data);
-    currentStartPoint = getStartPoint(song.startPoint);
     setTimeout(() => {
         if (quiz.soloMode) {
             fireListener("quiz next video info", {
                 "playLength": guessTime,
                 "playbackSpeed": 1,
-                "startPoint": currentStartPoint,
+                "startPoint": getStartPoint(),
                 "fullSongRange": fullSongRange,
                 "videoInfo": {
                     "id": null,
@@ -1313,7 +1228,7 @@ function startQuiz() {
         }
         else {
             if (quiz.isHost) {
-                const message = `1§${currentStartPoint}§${song.audio || ""}§${song.video480 || ""}§${song.video720 || ""}`;
+                const message = `1§${getStartPoint()}§${song.audio || ""}§${song.video480 || ""}§${song.video720 || ""}`;
                 splitIntoChunks(btoa(encodeURIComponent(message)) + "$", 144).forEach((item, index) => {
                     cslMessage("§CSL3" + base10to36(index % 36) + item);
                 });
@@ -1334,19 +1249,17 @@ function startQuiz() {
         setTimeout(() => {
             previousSongFinished = true;
             readySong(1);
-        }, 1500);
+        }, 400);
     }
 }
 
 // check if all conditions are met to go to next song
 function readySong(songNumber) {
     if (songNumber === currentSong) return;
+    //console.log("Ready song: " + songNumber);
     nextVideoReadyInterval = setInterval(() => {
-        if (quizVideoController.moePlayers[0].player.bufferedEnd() >= quizVideoController.moePlayers[0].videoLength-0.2 || quizVideoController.moePlayers[0].player.bufferedEnd()-quizVideoController.moePlayers[0].startPoint >= guessTime){
-            nextVideoReady = true;
-        }
+        //console.log({nextVideoReady, previousSongFinished});
         if (nextVideoReady && !quiz.pauseButton.pauseOn && previousSongFinished) {
-            //console.log(songNumber);
             clearInterval(nextVideoReadyInterval);
             nextVideoReady = false;
             previousSongFinished = false;
@@ -1408,7 +1321,7 @@ function playSong(songNumber) {
                 clearTimeout(extraGuessTimer);
                 setTimeout(() => {
                     endGuessPhase(songNumber);
-                }, fastSkip ? 1 : 3000);
+                }, fastSkip ? 1000 : 3000);
             }
         }, 100);
     }
@@ -1417,11 +1330,10 @@ function playSong(songNumber) {
             if (quiz.soloMode) {
                 readySong(songNumber + 1);
                 const nextSong = songList[songOrder[songNumber + 1]];
-                nextStartPoint = getStartPoint(nextSong.startPoint);
                 fireListener("quiz next video info", {
                     "playLength": guessTime,
                     "playbackSpeed": 1,
-                    "startPoint": nextStartPoint,
+                    "startPoint": getStartPoint(),
                     "videoInfo": {
                         "id": null,
                         "videoMap": {
@@ -1441,7 +1353,7 @@ function playSong(songNumber) {
                 readySong(songNumber + 1);
                 if (quiz.isHost) {
                     const nextSong = songList[songOrder[songNumber + 1]];
-                    const message = `${songNumber + 1}§${nextStartPoint}§${nextSong.audio || ""}§${nextSong.video480 || ""}§${nextSong.video720 || ""}`;
+                    const message = `${songNumber + 1}§${getStartPoint()}§${nextSong.audio || ""}§${nextSong.video480 || ""}§${nextSong.video720 || ""}`;
                     splitIntoChunks(btoa(encodeURIComponent(message)) + "$", 144).forEach((item, index) => {
                         cslMessage("§CSL3" + base10to36(index % 36) + item);
                     });
@@ -1507,7 +1419,6 @@ function endGuessPhase(songNumber) {
                     correct[player.gamePlayerId] = isCorrect;
                     pose[player.gamePlayerId] = currentAnswers[player.gamePlayerId] ? (isCorrect ? 5 : 4) : 6;
                     if (isCorrect) score[player.gamePlayerId]++;
-                    if(quiz.soloMode && !isCorrect) missedSongList.push(songNumber);
                 }
             }
             if (quiz.soloMode) {
@@ -1548,10 +1459,8 @@ function endGuessPhase(songNumber) {
                         "highRisk": 0,
                         "animeScore": null,
                         "animeType": song.animeType,
-                        "vintage": song.animeVintage,
+                        "vintage": formatAmqVintage(song.animeVintage),
                         "animeDifficulty": song.songDifficulty,
-                        "length": song.length,
-                        "D": song.D,
                         "animeTags": song.animeTags,
                         "animeGenre": song.animeGenre,
                         "altAnimeNames": song.altAnimeNames,
@@ -1566,7 +1475,7 @@ function endGuessPhase(songNumber) {
                         }
                     },
                     "progressBarState": {
-                        "length": 15,
+                        "length": 25,
                         "played": 0
                     },
                     "groupMap": createGroupSlotMap(Object.keys(quiz.players)),
@@ -1586,10 +1495,6 @@ function endGuessPhase(songNumber) {
                     });
                 }
                 fireListener("answer results", data);
-                quizVideoController.getCurrentPlayer().allowSeeking = true;
-                quizVideoController.getCurrentPlayer().pauseVideo();
-                quizVideoController.getCurrentPlayer().player.currentTime(Math.max(0,currentStartPoint*(song.length-guessTime)/100-5));
-                quizVideoController.getCurrentPlayer().player.play();
             }
             else if (quiz.isHost) {
                 const list = [];
@@ -1603,28 +1508,11 @@ function endGuessPhase(songNumber) {
             setTimeout(() => {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
-                    let timerEnd = Math.max(20*currentAnswerTime,60+140/(1+Math.pow(2,song.D-4)));
-                    if(!correct[0] || timerEnd > 300){
-                        timerEnd = 300;
-                    }
-                    if (attachedFile == "_practice.json" && song.D != 0){
-                        timerEnd = Math.min(100, timerEnd);
-                    }
-                    if(song.length > 0){
-                        timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100), 10*(song.length));
-                    }
-                    let defaultTimer = 13;
-                    //console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
                     skipInterval = setInterval(() => {
-                        if (defaultTimer >= timerEnd-5){
-                            fireListener("quiz overlay message", "About to Skip");
-                        }
-                        if (quiz.skipController._toggled || defaultTimer >= timerEnd+20) {
+                        if (quiz.skipController._toggled) {
                             clearInterval(skipInterval);
-                            currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
-                        defaultTimer += 1;
                     }, 100);
                 }
             }, fastSkip ? 1000 : 2000);
@@ -1640,7 +1528,7 @@ function endReplayPhase(songNumber) {
         fireListener("quiz overlay message", "Skipping to Next Song");
         setTimeout(() => {
             previousSongFinished = true;
-        }, fastSkip ? 1 : 3000);
+        }, fastSkip ? 1000 : 3000);
     }
     else {
         fireListener("quiz overlay message", "Skipping to Final Standings");
@@ -1661,22 +1549,15 @@ function endReplayPhase(songNumber) {
                 });
             }
             fireListener("quiz end result", data);
-        }, fastSkip ? 1 : 5000);
+        }, fastSkip ? 2000 : 5000);
         setTimeout(() => {
-            skipInterval = setInterval(() => {
-                if (!quiz.pauseButton.pauseOn){
-                    if (quiz.soloMode) {
-                        if(attachedFile == "_quiz.json"){
-                            gameChat.systemMessage(missedSongList.length+" missed: " + missedSongList);
-                        }
-                        quizOver();
-                    }
-                    else if (quiz.isHost) {
-                        cslMessage("§CSL10");
-                    }
-                }
-            }, 100);
-        }, fastSkip ? 1 : 12000);
+            if (quiz.soloMode) {
+                quizOver();
+            }
+            else if (quiz.isHost) {
+                cslMessage("§CSL10");
+            }
+        }, fastSkip ? 5000 : 12000);
     }
 }
 
@@ -1792,7 +1673,7 @@ function parseMessage(content, sender) {
             clearTimeout(extraGuessTimer);
             setTimeout(() => {
                 endGuessPhase(currentSong);
-            }, fastSkip ? 1 : 3000);
+            }, fastSkip ? 1000 : 3000);
         }
     }
     else if (content === "§CSL16") { //skip replay phase
@@ -2030,25 +1911,8 @@ function isCorrectAnswer(songNumber, answer) {
 }
 
 // get start point value (0-100)
-function getStartPoint(sample) {
-    if (typeof sample === 'number' && !isNaN(sample) && isFinite(sample)) {
-        return Math.min(100, Math.max(0, sample));
-    }
-    else if (Array.isArray(sample)){
-        let totalWeight = 0;
-        for (let i = 0; i < sample.length; i++){
-            totalWeight += sample[i];
-        }
-        const randomIndex = totalWeight*Math.random();
-        let partialSum = 0;
-        for (let i = 0; i < sample.length; i++){
-            partialSum += sample[i];
-            if (partialSum > randomIndex){
-                return Math.min(100, Math.max(0, 100/(sample.length-2)*(i+Math.random()-1)));
-            }
-        }
-    }
-    return Math.random() * (startPointRange[1] - startPointRange[0] + 1) + startPointRange[0];
+function getStartPoint() {
+    return Math.floor(Math.random() * (startPointRange[1] - startPointRange[0] + 1)) + startPointRange[0];
 }
 
 // return true if song type is allowed
@@ -2119,10 +1983,8 @@ function reset() {
     cslState = 0;
     currentSong = 0;
     currentAnswers = {};
-    currentAnswerTime = 20;
     score = {};
     previousSongFinished = false;
-    fastSkip = true;
     skipping = false;
     songLinkReceived = {};
     answerChunks = {};
@@ -2381,8 +2243,6 @@ function handleData(data) {
         let dub = song.dub ?? song.isDub ?? song.songInfo?.dub ?? null;
         let startPoint = song.startPoint ?? song.startSample ?? null;
         let annSongId = song.annSongId ?? null;
-        let length = parseFloat(song.songLength ?? parseFloat(song.length)) || null;
-        let D = song.D === undefined || song.D === null ? 8 : song.D;
         let audio = song.audio ?? song.videoUrl ?? song.urls?.catbox?.[0] ?? song.songInfo?.videoTargetMap?.catbox?.[0] ?? song.songInfo?.urlMap?.catbox?.[0] ?? song.LinkMp3 ?? "";
         let video480 = song.video480 ?? song.MQ ?? song.videoUrl ?? song.urls?.catbox?.[480] ?? song.songInfo?.videoTargetMap?.catbox?.[480] ?? song.songInfo?.urlMap?.catbox?.[480] ?? "";
         let video720 = song.video720 ?? song.HQ ?? song.videoUrl ?? song.urls?.catbox?.[720] ?? song.songInfo?.videoTargetMap?.catbox?.[720] ?? song.songInfo?.urlMap?.catbox?.[720] ?? song.LinkVideo ?? "";
@@ -2391,6 +2251,9 @@ function handleData(data) {
         if (correctGuess === null && typeof song.correct === "boolean") { //joseph script check
             correctGuess = song.correct;
             incorrectGuess = !song.correct;
+        }
+        if (typeof animeVintage === "object" && animeVintage?.key && animeVintage?.data?.year) { //amq songinfo vintage is an object
+            animeVintage = localizationHandler.translate(animeVintage.key, animeVintage.data);
         }
         if (typeof songType === "string") { //convert songtype string to amq integers
             if (songType.startsWith("O")) {
@@ -2434,8 +2297,6 @@ function handleData(data) {
                 dub,
                 startPoint,
                 annSongId,
-                length,
-                D,
                 audio,
                 video480,
                 video720,
@@ -2819,6 +2680,21 @@ function switchTab(tab) {
     $w.find(`#${tab}Container`).show();
 }
 
+// convert vintage string into AMQ songInfo vintage object
+function formatAmqVintage(vintage) {
+    if (!vintage) return null;
+    if (typeof vintage === "object") return vintage;
+    vintage = String(vintage).toLowerCase();
+    const regex = /^(winter|spring|summer|fall) ([0-9]+)$/.exec(vintage);
+    if (!regex) return null;
+    return {
+        key: "song_library.anime_entry.vintage." + regex[1],
+        data: {
+            year: Number(regex[2])
+        }
+    }
+}
+
 // convert full url to target data
 function formatTargetUrl(url) {
     if (url && url.startsWith("http")) {
@@ -3152,21 +3028,6 @@ function getAnilistData(username, statuses, pageNumber) {
         .catch(error => console.log(error));
 }
 
-async function getAllMalIds(){
-  $("#cslgListImportText").text(`Retrieving All MalIds`);
-  const response = await fetch(apiBase + "annid_linked_ids");
-  const ann_song_ids = await response.json();
-  const malIdSet = new Set();
-  Object.values(ann_song_ids).forEach(song => {
-    const id = song.linked_ids.myanimelist;
-    if (id){
-      malIdSet.add(id);
-    }
-  })
-  const malIdArray = Array.from(malIdSet);
-  return malIdArray;
-}
-
 // convert list of mal ids to anisongdb song list
 async function getSongListFromMalIds(malIds) {
     importedSongList = [];
@@ -3220,8 +3081,7 @@ async function startImport() {
                 await getSongListFromMalIds(malIds);
             }
             else {
-                const malIds = await getAllMalIds();
-                await getSongListFromMalIds(malIds);
+                $("#cslgListImportText").text("Input Myanimelist Username");
             }
         }
         else {
