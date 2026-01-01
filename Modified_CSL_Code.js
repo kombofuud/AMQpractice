@@ -1615,7 +1615,8 @@ function endGuessPhase(songNumber) {
                         timerEnd = Math.min(100, timerEnd);
                     }
                     if(song.length > 0){
-                        timerEnd = Math.min(timerEnd, 10*(song.length-currentStartPoint*(song.length-guessTime)/100), 10*(song.length));
+                        let replayStartPoint = Math.max(currentStartPoint-500/song.length,0);
+                        timerEnd = Math.min(timerEnd, 10*(song.length-replayStartPoint*(song.length-guessTime)/100), 10*(song.length));
                     }
                     let defaultTimer = 13;
                     //console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
