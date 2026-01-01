@@ -1513,6 +1513,7 @@ function endGuessPhase(songNumber) {
                 }
             }
             if (quiz.soloMode) {
+                console.log(song)
                 const data = {
                     "players": [],
                     "songInfo": {
@@ -2332,6 +2333,7 @@ function getAnisongdbData(mode, query, filters) {
 }
 
 function handleData(data) {
+    console.log(data);
     songList = [];
     //remap data to actual song array
     if (!Array.isArray(data)) {
@@ -2446,6 +2448,7 @@ function handleData(data) {
                 correctGuess,
                 incorrectGuess
             });
+            console.log(songList);
         }
     }
     for (const song of songList) {
@@ -2455,8 +2458,9 @@ function handleData(data) {
                 s.altAnimeNames.forEach(x => otherAnswers.add(x));
             }
         }
-        song.altAnimeNamesAnswers = Array.from(otherAnswers).filter(x => !song.altAnimeNames.includes(x));
+        song.altAnimeNamesAnswers = [...song.altAnimeNamesAnswers, ...Array.from(otherAnswers).filter(x => !(song.altAnimeNames.includes(x) || song.altAnimeNamesAnswers.includes(x)))];
     }
+    console.log(songList);
 }
 
 // create song list table
