@@ -9,7 +9,7 @@ with open(filePrep+".json", 'r', encoding = 'utf8') as f:
     elementNull = prepSongs.pop(0)
 with open(fileLoad+".json", 'r', encoding = 'utf8') as f:
     loadingSongs = json.load(f)
-loadingSongs.sort(key = lambda x: (x["ST"], x["STN"] if x["STN"] is not None else 0, x["rebroadcast"]), reverse = True)
+loadingSongs.sort(key = lambda x: (x["ST"], x["STN"] if x["STN"] is not None else 0, x["rebroadcast"], x["dub"]), reverse = True)
 with open(filePool+".json", 'r', encoding = 'utf8') as f:
     songPool = json.load(f)
 
