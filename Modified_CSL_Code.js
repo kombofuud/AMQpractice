@@ -1232,8 +1232,8 @@ function validateStart() {
     else{
         lobby.settings.modifiers.fullSongRange = false;
     }
-    if(attachedFile == "_practice.json"){
-        guessTime = 2;
+    if(attachedFile == "_practice.json" && songList.length <= 15){
+        guessTime = 60/Math.pow(2,songList.length/3);
     }
     $("#cslgSettingsModal").modal("hide");
     //console.log(songOrder);
@@ -1607,19 +1607,14 @@ function endGuessPhase(songNumber) {
             setTimeout(() => {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
-                    let timerEnd = Math.max(20*currentAnswerTime,60+140/(1+Math.pow(2,song.D-4)));
-                    if(!correct[0] || timerEnd > 300){
-                        timerEnd = 300;
+                    let timerEnd = 300;
+                    if (attachedFile == "_practice.json"){
+                        timerEnd = 150+10*guessTime;
                     }
-                    if (attachedFile == "_practice.json" && song.D != 0){
-                        timerEnd = Math.min(100, timerEnd);
-                    }
-                    if(song.length > 0){
-                        let replayStartPoint = Math.max(currentStartPoint-500/song.length,0);
-                        timerEnd = Math.min(timerEnd, 10*(song.length-replayStartPoint*(song.length-guessTime)/100), 10*(song.length));
+                    if (attachedFile == "_quiz.json"){
+                        timerEnd = 100;
                     }
                     let defaultTimer = 13;
-                    //console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
                     skipInterval = setInterval(() => {
                         if (defaultTimer >= timerEnd-5){
                             fireListener("quiz overlay message", "About to Skip");
@@ -2334,7 +2329,6 @@ function getAnisongdbData(mode, query, filters) {
 }
 
 function handleData(data) {
-    console.log(data);
     songList = [];
     //remap data to actual song array
     if (!Array.isArray(data)) {
@@ -2449,7 +2443,6 @@ function handleData(data) {
                 correctGuess,
                 incorrectGuess
             });
-            console.log(songList);
         }
     }
     //combine anime names from duplicate songs
