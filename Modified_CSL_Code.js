@@ -373,7 +373,9 @@ function setup() {
             if(cslState == 2){
                 videoPlayer.allowSeeking = true;
                 setTimeout(() => {
-                    videoPlayer.player.currentTime(0);
+                    if(cslState == 2){
+                        videoPlayer.player.currentTime(0);
+                    }
                 }, 3000);
             }
         });
@@ -1513,7 +1515,6 @@ function endGuessPhase(songNumber) {
                 }
             }
             if (quiz.soloMode) {
-                console.log(song)
                 const data = {
                     "players": [],
                     "songInfo": {
