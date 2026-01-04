@@ -1570,7 +1570,7 @@ function endGuessPhase(songNumber) {
                         }
                     },
                     "progressBarState": {
-                        "length": 15,
+                        "length": guessTime+5,
                         "played": 0
                     },
                     "groupMap": createGroupSlotMap(Object.keys(quiz.players)),
@@ -1615,12 +1615,12 @@ function endGuessPhase(songNumber) {
                     if (attachedFile == "_quiz.json"){
                         timerEnd = 100;
                     }
-                    let defaultTimer = 13;
+                    let defaultTimer = 10;
                     skipInterval = setInterval(() => {
-                        if (defaultTimer >= timerEnd-5){
+                        if (defaultTimer >= timerEnd-25){
                             fireListener("quiz overlay message", "About to Skip");
                         }
-                        if (quiz.skipController._toggled || defaultTimer >= timerEnd+20) {
+                        if (quiz.skipController._toggled || defaultTimer >= timerEnd) {
                             clearInterval(skipInterval);
                             currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
