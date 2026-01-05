@@ -452,9 +452,14 @@ with open(fileAdd+".json", "r+", encoding="utf-8") as file:
 
 if newSongCount > 0:
     with open(malUpdateFile, 'r+', encoding = 'utf8') as file:
+            if file.tell() > 0:
+                file.seek(file.tell()-1)
+                if file.read(1) != "\n":
+                    file.seek(0,2)
+                    file.write("\n")
             file.seek(0,2)
             for ID in completedMalIds:
-                file.write(f"\n{ID}")
+                file.write(f"{ID}\n")
 
 #overwrite quiz to prevent accidentally forgetting to run quiz.py next time
 with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
