@@ -373,7 +373,9 @@ function setup() {
             if(cslState == 2){
                 videoPlayer.allowSeeking = true;
                 setTimeout(() => {
-                    videoPlayer.player.currentTime(0);
+                    if(cslState == 2){
+                        videoPlayer.player.currentTime(0);
+                    }
                 }, 3000);
             }
         });
@@ -1232,8 +1234,8 @@ function validateStart() {
     else{
         lobby.settings.modifiers.fullSongRange = false;
     }
-    if(attachedFile == "_practice.json"){
-        guessTime = 2;
+    if(attachedFile == "_practice.json" && songList.length <= 15){
+        guessTime = 60/Math.pow(2,songList.length/3);
     }
     $("#cslgSettingsModal").modal("hide");
     //console.log(songOrder);
@@ -1513,7 +1515,6 @@ function endGuessPhase(songNumber) {
                 }
             }
             if (quiz.soloMode) {
-                console.log(song)
                 const data = {
                     "players": [],
                     "songInfo": {
@@ -1569,7 +1570,7 @@ function endGuessPhase(songNumber) {
                         }
                     },
                     "progressBarState": {
-                        "length": 15,
+                        "length": guessTime+5,
                         "played": 0
                     },
                     "groupMap": createGroupSlotMap(Object.keys(quiz.players)),
@@ -1607,24 +1608,19 @@ function endGuessPhase(songNumber) {
             setTimeout(() => {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
-                    let timerEnd = Math.max(20*currentAnswerTime,60+140/(1+Math.pow(2,song.D-4)));
-                    if(!correct[0] || timerEnd > 300){
-                        timerEnd = 300;
+                    let timerEnd = 300;
+                    if (attachedFile == "_practice.json"){
+                        timerEnd = 150+10*guessTime;
                     }
-                    if (attachedFile == "_practice.json" && song.D != 0){
-                        timerEnd = Math.min(100, timerEnd);
+                    if (attachedFile == "_quiz.json"){
+                        timerEnd = 100;
                     }
-                    if(song.length > 0){
-                        let replayStartPoint = Math.max(currentStartPoint-500/song.length,0);
-                        timerEnd = Math.min(timerEnd, 10*(song.length-replayStartPoint*(song.length-guessTime)/100), 10*(song.length));
-                    }
-                    let defaultTimer = 13;
-                    //console.log(currentStartPoint*(song.length-guessTime)/100, song.length-currentStartPoint*(song.length-guessTime)/100);
+                    let defaultTimer = 10;
                     skipInterval = setInterval(() => {
-                        if (defaultTimer >= timerEnd-5){
+                        if (defaultTimer >= timerEnd-25){
                             fireListener("quiz overlay message", "About to Skip");
                         }
-                        if (quiz.skipController._toggled || defaultTimer >= timerEnd+20) {
+                        if (quiz.skipController._toggled || defaultTimer >= timerEnd) {
                             clearInterval(skipInterval);
                             currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
@@ -2334,7 +2330,6 @@ function getAnisongdbData(mode, query, filters) {
 }
 
 function handleData(data) {
-    console.log(data);
     songList = [];
     //remap data to actual song array
     if (!Array.isArray(data)) {
@@ -2449,7 +2444,6 @@ function handleData(data) {
                 correctGuess,
                 incorrectGuess
             });
-            console.log(songList);
         }
     }
     //combine anime names from duplicate songs
