@@ -316,13 +316,12 @@ songDistribution = [0]*(maxD-minD+1)
 for song in songPool:
     songDistribution[int(round(song["D"]-minD))] += 1
     currentWeightCount += 2/(1+math.exp(song["D"]))
-newSongCount = prevWeightCount-currentWeightCount
+weightChange = prevWeightCount-currentWeightCount
 
-targetGain = min(2, max(-2, (newSongCount-prevGain)/(prevWeightCount-oldWeight)))
+targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)))
 targetMean += targetGain
-weightChange = newSongCount
 
-newSongCount = max(0,int(math.ceil(targetMean-currentWeightCount)))
+newSongCount = max(0,int(math.ceil((targetMean-currentWeightCount)/2)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
@@ -330,17 +329,19 @@ with open(gainFile, 'w', encoding = 'utf8') as f:
     f.write(f"{targetMean}\n")
     f.write(f"{prevWeightCount}\n")
     f.write(f"{weightChange}\n")
+
+if newSongCount > len(prepSongs):
+    print("Warning: Insufficient New Songs")
+    newSongCount = len(prepSongs)
+
 songDistribution[-minD] += newSongCount
 currentWeightCount += newSongCount
+
 if len(practice)+newSongCount > 15:
     practice.sort(key = lambda x: x["D"])
     practice = practice[:15-newSongCount]
 
 newSongs = []
-if newSongCount > len(prepSongs):
-    print("Warning: Insufficient New Songs")
-    newSongCount = len(prepSongs)
-
 if newSongCount > 0:
     newSongMalIds = set()
     newSongs = prepSongs[0:newSongCount]
@@ -468,7 +469,7 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,3)}, TargetWeight = {round(targetMean,3)}, TargetGain = {round(targetGain,3)}")
+print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,3)}, CurrentWeight = {currentWeightCount} TargetWeight = {round(targetMean,3)}, TargetGain = {round(targetGain,3)}")
 print("DValue distribution")
 for index in range(len(songDistribution)):
     if index==-minD:
