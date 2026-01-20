@@ -338,8 +338,11 @@ songDistribution[-minD] += newSongCount
 currentWeightCount += newSongCount
 
 if len(practice)+newSongCount > 10:
-    practice.sort(key = lambda x: x["D"])
+    practiceSongWeights = [(random.gauss(i, math.sqrt(i)), song) for i, song in enumerate(practice)]
+    prepSongWeights.sort(key = lambda x: x[0])
+    practice = [song for _, song in prepSongWeights]
     practice = practice[:10-newSongCount]
+    practice.sort(key = lambda x: x["D"])
 
 newSongs = []
 if newSongCount > 0:
