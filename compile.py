@@ -318,7 +318,7 @@ for song in songPool:
     currentWeightCount += 2/(1+math.exp(song["D"]))
 weightChange = prevWeightCount-currentWeightCount
 
-targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/10))
+targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/4))
 targetMean += targetGain
 
 newSongCount = max(0,int(math.ceil((targetMean-currentWeightCount)/3)))
@@ -339,10 +339,10 @@ currentWeightCount += newSongCount
 
 if len(practice)+newSongCount > 10:
     practiceSongWeights = [(random.gauss(i, math.sqrt(i)), song) for i, song in enumerate(practice)]
-    prepSongWeights.sort(key = lambda x: x[0])
-    practice = [song for _, song in prepSongWeights]
+    practiceSongWeights.sort(key = lambda x: x[0])
+    practice = [song for _, song in practiceSongWeights]
     practice = practice[:10-newSongCount]
-    practice.sort(key = lambda x: x["D"])
+practice.sort(key = lambda x: x["D"])
 
 newSongs = []
 if newSongCount > 0:
