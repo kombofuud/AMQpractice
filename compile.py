@@ -338,7 +338,7 @@ songDistribution[-minD] += newSongCount
 currentWeightCount += newSongCount
 
 if len(practice)+newSongCount > 10:
-    practiceWeights = [2/(1+math.exp(song["D"] for song in practice)
+    practiceWeights = [2/(1+math.exp(song["D"])) for song in practice]
     practice = list(numpy.random.choice(practice, size = len(practice), p = practiceWeights/numpy.sum(practiceWeights), replace = False))
     practice = practice[:10-newSongCount]
 practice.sort(key = lambda x: x["D"])
