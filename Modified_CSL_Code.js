@@ -1077,8 +1077,8 @@ function setup() {
             }
         }
         if(event.keyCode=='188' && !quiz.isSpectator && event.ctrlKey && justPressed) {
-            justPressed = false;
-            quiz.skipClicked();
+            /*justPressed = false;
+            quiz.skipClicked();*/
         }
         else if (event.keyCode == '222' && shift && ctrl){
             if (quiz.cslActive) {
@@ -1676,6 +1676,7 @@ function endReplayPhase(songNumber) {
                         cslMessage("§CSL10");
                     }
                 }
+                fireListener("quiz overlay message", "Exiting Game");
             }, 100);
         }, fastSkip ? 1 : 12000);
     }
