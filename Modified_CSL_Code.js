@@ -1077,8 +1077,8 @@ function setup() {
             }
         }
         if(event.keyCode=='188' && !quiz.isSpectator && event.ctrlKey && justPressed) {
-            justPressed = false;
-            quiz.skipClicked();
+            /*justPressed = false;
+            quiz.skipClicked();*/
         }
         else if (event.keyCode == '222' && shift && ctrl){
             if (quiz.cslActive) {
@@ -1235,7 +1235,7 @@ function validateStart() {
         lobby.settings.modifiers.fullSongRange = false;
     }
     if(attachedFile == "_practice.json" && songList.length <= 15){
-        guessTime = 60/Math.pow(2,songList.length/3);
+        guessTime = 30;
     }
     $("#cslgSettingsModal").modal("hide");
     //console.log(songOrder);
@@ -1676,6 +1676,7 @@ function endReplayPhase(songNumber) {
                         cslMessage("§CSL10");
                     }
                 }
+                fireListener("quiz overlay message", "Exiting Game");
             }, 100);
         }, fastSkip ? 1 : 12000);
     }
