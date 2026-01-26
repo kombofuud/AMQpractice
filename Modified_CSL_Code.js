@@ -1235,7 +1235,7 @@ function validateStart() {
         lobby.settings.modifiers.fullSongRange = false;
     }
     if(attachedFile == "_practice.json" && songList.length <= 15){
-        guessTime = 60/Math.pow(2,songList.length/3);
+        guessTime = 30;
     }
     $("#cslgSettingsModal").modal("hide");
     //console.log(songOrder);
