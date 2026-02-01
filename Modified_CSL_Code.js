@@ -370,7 +370,11 @@ function setup() {
     }
     for (const videoPlayer of quizVideoController.moePlayers) {
         videoPlayer.player.on("ended", () => {
-            if(cslState == 2){
+            if (cslState == 1 && attachedFile == "_practice.json"){
+                videoPlayer.allowSeeking = true;
+                videoPlayer.player.currentTime(0);
+            }
+            else if(cslState == 2){
                 videoPlayer.allowSeeking = true;
                 setTimeout(() => {
                     if(cslState == 2){
@@ -1296,7 +1300,7 @@ function startQuiz() {
     setTimeout(() => {
         if (quiz.soloMode) {
             fireListener("quiz next video info", {
-                "playLength": guessTime,
+                "playLength": attachedFile == "_practice.json"? 15: guessTime,
                 "playbackSpeed": 1,
                 "startPoint": currentStartPoint,
                 "fullSongRange": fullSongRange,
@@ -1423,7 +1427,7 @@ function playSong(songNumber) {
                 const nextSong = songList[songOrder[songNumber + 1]];
                 nextStartPoint = getStartPoint(nextSong.startPoint);
                 fireListener("quiz next video info", {
-                    "playLength": guessTime,
+                    "playLength": attachedFile == "_practice.json"? 15: guessTime,
                     "playbackSpeed": 1,
                     "startPoint": nextStartPoint,
                     "videoInfo": {
