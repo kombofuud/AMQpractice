@@ -1234,7 +1234,7 @@ function validateStart() {
     else{
         lobby.settings.modifiers.fullSongRange = false;
     }
-    if(attachedFile == "_practice.json" && songList.length <= 15){
+    if(attachedFile == "_practice.json"){
         guessTime = 30;
     }
     $("#cslgSettingsModal").modal("hide");
