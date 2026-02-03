@@ -1596,7 +1596,7 @@ function endGuessPhase(songNumber) {
                 fireListener("answer results", data);
                 quizVideoController.getCurrentPlayer().allowSeeking = true;
                 quizVideoController.getCurrentPlayer().pauseVideo();
-                quizVideoController.getCurrentPlayer().player.currentTime(Math.max(0,currentStartPoint*(song.length-guessTime)/100-5));
+                quizVideoController.getCurrentPlayer().player.currentTime(Math.max(0,currentStartPoint*(song.length-(attachedFile == "_practice.json"? 15: guessTime))/100-5));
                 quizVideoController.getCurrentPlayer().player.play();
                 quizVideoController.getCurrentPlayer().allowSeeking = false;
             }
