@@ -155,8 +155,9 @@ for i, song in enumerate(songPool):
         elif song["X"] == 2:
             quizIds[song["ID"]] = -math.sqrt(1+math.log(1+math.exp(song["D"])))
             missedCount += 1
+        if quizIds[song["ID"]] <= 0 and song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
-        if quizIds[song["ID"]] <= 0:
+        #if quizIds[song["ID"]] <= 0:
             pSong = copy.deepcopy(song)
             pSong["startPoint"] = quizSamples[pSong["ID"]]
             if pSong["startPoint"] == 0:
@@ -318,7 +319,7 @@ for song in songPool:
     currentWeightCount += 2/(1+math.exp(song["D"]))
 weightChange = prevWeightCount-currentWeightCount
 
-targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/6))
+targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/10))
 if weightChange < 0:
     targetGain = min(targetGain, 0)
 targetMean += targetGain
@@ -340,8 +341,8 @@ songDistribution[-minD] += newSongCount
 currentWeightCount += newSongCount
 
 practice.sort(key = lambda x: x["D"])
-if len(practice)+newSongCount > 10:
-    practice = practice[:10-newSongCount]
+'''if len(practice)+newSongCount > 10:
+    practice = practice[:10-newSongCount]'''
 
 newSongs = []
 if newSongCount > 0:
