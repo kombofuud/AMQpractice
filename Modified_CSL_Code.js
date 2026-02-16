@@ -370,18 +370,18 @@ function setup() {
     }
     for (const videoPlayer of quizVideoController.moePlayers) {
         videoPlayer.player.on("ended", () => {
-            if (cslState == 1 && attachedFile == "_practice.json"){
+            if (cslState == 1 && attachedFile == "_practice.json" || cslState == 2){
                 videoPlayer.allowSeeking = true;
                 videoPlayer.player.currentTime(0);
             }
-            else if(cslState == 2){
+            /*else if(cslState == 2){
                 videoPlayer.allowSeeking = true;
                 setTimeout(() => {
                     if(cslState == 2){
                         videoPlayer.player.currentTime(0);
                     }
                 }, 3000);
-            }
+            }*/
         });
     }
 
