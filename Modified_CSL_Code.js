@@ -2517,56 +2517,60 @@ function createSongListTable(skipSort) {
     }
     if (songListTableView === 0) {
         $thead.append($("<tr>")
+            .append($("<th>", { class: "action" }))
             .append($("<th>", { class: "number", text: "#" }))
             .append($("<th>", { class: "song clickAble", text: "Song", "data-sort": "songName" }))
             .append($("<th>", { class: "artist clickAble", text: "Artist", "data-sort": "artist" }))
             .append($("<th>", { class: "difficulty clickAble", text: "Dif", "data-sort": "difficulty" }))
-            .append($("<th>", { class: "action" }))
         );
         songList.forEach((song, i) => {
             $tbody.append($("<tr>")
-                .append($("<td>", { class: "number", text: i + 1 }))
-                .append($("<td>", { class: "song", text: song.songName }))
-                .append($("<td>", { class: "artist", text: song.songArtist }))
-                .append($("<td>", { class: "difficulty", text: Number.isFinite(song.songDifficulty) ? Math.floor(song.songDifficulty) : "" }))
                 .append($("<td>", { class: "action" })
                     .append(`<i class="fa fa-plus clickAble" aria-hidden="true"></i>`)
                     .append(`<i class="fa fa-trash clickAble" aria-hidden="true"></i>`)
                 )
+                .append($("<td>", { class: "number", text: i + 1 }))
+                .append($("<td>", { class: "song", text: song.songName }))
+                .append($("<td>", { class: "artist", text: song.songArtist }))
+                .append($("<td>", { class: "difficulty", text: Number.isFinite(song.songDifficulty) ? Math.floor(song.songDifficulty) : "" }))
             );
         });
     }
     else if (songListTableView === 1) {
         $thead.append($("<tr>")
+            .append($("<th>", { class: "action" }))
             .append($("<th>", { class: "number", text: "#" }))
             .append($("<th>", { class: "anime clickAble", text: "Anime", "data-sort": "anime" }))
             .append($("<th>", { class: "songType clickAble", text: "Type", "data-sort": "songType" }))
             .append($("<th>", { class: "vintage clickAble", text: "Vintage", "data-sort": "vintage" }))
-            .append($("<th>", { class: "action" }))
         );
         songList.forEach((song, i) => {
             $tbody.append($("<tr>")
-                .append($("<td>", { class: "number", text: i + 1 }))
-                .append($("<td>", { class: "anime", text: song[language] }))
-                .append($("<td>", { class: "songType", text: songTypeText(song.songType, song.songTypeNumber) }))
-                .append($("<td>", { class: "vintage", text: song.animeVintage }))
                 .append($("<td>", { class: "action" })
                     .append(`<i class="fa fa-plus clickAble" aria-hidden="true"></i>`)
                     .append(`<i class="fa fa-trash clickAble" aria-hidden="true"></i>`)
                 )
+                .append($("<td>", { class: "number", text: i + 1 }))
+                .append($("<td>", { class: "anime", text: song[language] }))
+                .append($("<td>", { class: "songType", text: songTypeText(song.songType, song.songTypeNumber) }))
+                .append($("<td>", { class: "vintage", text: song.animeVintage }))
             );
         });
     }
     else if (songListTableView === 2) {
         $thead.append($("<tr>")
+            .append($("<th>", { class: "action" }))
             .append($("<th>", { class: "number", text: "#" }))
             .append($("<th>", { class: "link clickAble", text: "MP3", "data-sort": "mp3" }))
             .append($("<th>", { class: "link clickAble", text: "480", "data-sort": "480" }))
             .append($("<th>", { class: "link clickAble", text: "720", "data-sort": "720" }))
-            .append($("<th>", { class: "action" }))
         );
         songList.forEach((song, i) => {
             $tbody.append($("<tr>")
+                .append($("<td>", { class: "action" })
+                    .append(`<i class="fa fa-plus clickAble" aria-hidden="true"></i>`)
+                    .append(`<i class="fa fa-trash clickAble" aria-hidden="true"></i>`)
+                )
                 .append($("<td>", { class: "number", text: i + 1 }))
                 .append($("<td>", { class: "link" })
                     .append(createLinkElement(song.audio)))
@@ -2574,10 +2578,6 @@ function createSongListTable(skipSort) {
                     .append(createLinkElement(song.video480)))
                 .append($("<td>", { class: "link" })
                     .append(createLinkElement(song.video720)))
-                .append($("<td>", { class: "action" })
-                    .append(`<i class="fa fa-plus clickAble" aria-hidden="true"></i>`)
-                    .append(`<i class="fa fa-trash clickAble" aria-hidden="true"></i>`)
-                )
             );
         });
     }
