@@ -522,7 +522,7 @@ if (!isNode) {
 	}
 
 	AmqAwesomeplete.prototype.evaluate = function () {
-		if (this.isAnimeAutocomplete == false || options.enabled == false) return oldEvaluate.call(this);
+		if (this.isAnimeAutocomplete != true || options.enabled == false) return oldEvaluate.call(this);
         this.index = -3;
 		let suggestions = this.filterManager.filterBy(this.input.value, options.fuzzy.dropdown);
 
