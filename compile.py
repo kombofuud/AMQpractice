@@ -146,6 +146,8 @@ prevNewSongs = 0
 
 for i, song in enumerate(songPool):
     prevWeightCount += 2/(1+math.exp(song["D"]))
+    song["ID"] = f"``{song["annId"]}" #in case I accidentally changed some characters during the quiz
+    song["SN"] = f"`{song["songName"]}`"
     if song["D"] == 0 and type(song["D"]) is int:
         prevNewSongs += 1
     if song["ID"] in quizIds:
@@ -341,6 +343,7 @@ songDistribution[-minD] += newSongCount
 currentWeightCount += newSongCount
 
 practice.sort(key = lambda x: x["D"])
+practice.insert(0, {})
 '''if len(practice)+newSongCount > 10:
     practice = practice[:10-newSongCount]'''
 
@@ -472,7 +475,7 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,3)}, CurrentWeight = {currentWeightCount} TargetWeight = {round(targetMean,3)}, TargetGain = {round(targetGain,3)}")
+print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount-1}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,3)}, CurrentWeight = {currentWeightCount} TargetWeight = {round(targetMean,3)}, TargetGain = {round(targetGain,3)}")
 print("DValue distribution")
 for index in range(len(songDistribution)):
     if index==-minD:
