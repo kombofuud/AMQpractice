@@ -370,10 +370,8 @@ function setup() {
     }
     for (const videoPlayer of quizVideoController.moePlayers) {
         videoPlayer.player.on("ended", () => {
-            if (cslState == 1 && attachedFile == "_practice.json" || cslState == 2){
-                videoPlayer.allowSeeking = true;
-                videoPlayer.player.currentTime(0);
-            }
+            videoPlayer.allowSeeking = true;
+            videoPlayer.player.currentTime(0);
             /*else if(cslState == 2){
                 videoPlayer.allowSeeking = true;
                 setTimeout(() => {
@@ -731,17 +729,14 @@ function setup() {
                     messageDisplayer.displayMessage("Upload Error");
                 }
                 attachedFile = this.files[0].name;
-                if(attachedFile == "_practice.json"){
+                if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json"){
                     songListTableView = 1;
-                    songOrderType = "random";
                 }
-                if(attachedFile == "_quiz.json"){
+                else if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_quiz.json"){
                     songListTableView = 2;
-                    songOrderType = "ascending";
                 }
-                if(attachedFile == "_split.json"){
+                else if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_split.json"){
                     songListTableView = 2;
-                    songOrderType = "random";
                 }
                 setSongListTableSort();
                 createSongListTable(true);
@@ -1223,6 +1218,16 @@ function validateStart() {
         .filter((key) => difficultyFilter(songList[key], difficultyRange[0], difficultyRange[1]))
         .filter((key) => guessTypeFilter(songList[key], correctGuesses, incorrectGuesses))
         .filter((key) => broadcastTypeFilter(songList[key], dub, rebroadcast));
+    songOrderType = $("#cslgSongOrderSelect").val();
+    if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json"){
+        songOrderType = "random";
+    }
+    else if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_quiz.json"){
+        songOrderType = "ascending";
+    }
+    else if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_split.json"){
+        songOrderType = "random";
+    }
     if (songOrderType === "random") shuffleArray(songKeys);
     else if (songOrderType === "descending") songKeys.reverse();
     songKeys.slice(0, numSongs).forEach((key, i) => { songOrder[i + 1] = parseInt(key) });
@@ -1238,7 +1243,7 @@ function validateStart() {
     else{
         lobby.settings.modifiers.fullSongRange = false;
     }
-    if(attachedFile == "_practice.json"){
+    if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json"){
         guessTime = 30;
     }
     $("#cslgSettingsModal").modal("hide");
@@ -1300,7 +1305,7 @@ function startQuiz() {
     setTimeout(() => {
         if (quiz.soloMode) {
             fireListener("quiz next video info", {
-                "playLength": attachedFile == "_practice.json"? 15: guessTime,
+                "playLength": ($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json")? 15: guessTime,
                 "playbackSpeed": 1,
                 "startPoint": currentStartPoint,
                 "fullSongRange": fullSongRange,
@@ -1427,7 +1432,7 @@ function playSong(songNumber) {
                 const nextSong = songList[songOrder[songNumber + 1]];
                 nextStartPoint = getStartPoint(nextSong.startPoint);
                 fireListener("quiz next video info", {
-                    "playLength": attachedFile == "_practice.json"? 15: guessTime,
+                    "playLength": ($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json")? 15: guessTime,
                     "playbackSpeed": 1,
                     "startPoint": nextStartPoint,
                     "videoInfo": {
@@ -1597,7 +1602,7 @@ function endGuessPhase(songNumber) {
                 /*
                 quizVideoController.getCurrentPlayer().allowSeeking = true;
                 quizVideoController.getCurrentPlayer().pauseVideo();
-                quizVideoController.getCurrentPlayer().player.currentTime(Math.max(0,currentStartPoint*(song.length-(attachedFile == "_practice.json"? 15: guessTime))/100-5));
+                quizVideoController.getCurrentPlayer().player.currentTime(Math.max(0,currentStartPoint*(song.length-(($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json")? 15: guessTime))/100-5));
                 quizVideoController.getCurrentPlayer().player.play();
                 quizVideoController.getCurrentPlayer().allowSeeking = false;
                 */
@@ -1615,10 +1620,10 @@ function endGuessPhase(songNumber) {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
                     let timerEnd = 300;
-                    if (attachedFile == "_practice.json"){
-                        timerEnd = 150+10*guessTime;
+                    if ($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json"){
+                        timerEnd = 50+10*song.length;
                     }
-                    if (attachedFile == "_quiz.json"){
+                    if ($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_quiz.json"){
                         timerEnd = 100;
                     }
                     let defaultTimer = 10;
@@ -1673,7 +1678,7 @@ function endReplayPhase(songNumber) {
             skipInterval = setInterval(() => {
                 if (!quiz.pauseButton.pauseOn){
                     if (quiz.soloMode) {
-                        if(attachedFile == "_quiz.json"){
+                        if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_quiz.json"){
                             gameChat.systemMessage(missedSongList.length+" missed: " + missedSongList);
                         }
                         quizOver();
@@ -2210,6 +2215,7 @@ function loadPreviousGameOptions() {
 
 // when you click the go button
 function anisongdbDataSearch() {
+    songOrderType = $("#cslgSongOrderSelect").val();
     const mode = $("#cslgAnisongdbModeSelect").val().toLowerCase();
     const query = $("#cslgAnisongdbQueryInput").val();
     const filters = {
@@ -2701,6 +2707,7 @@ function songTypeSortValue(a, b) {
 
 // filter the song list
 function filterSongList() {
+    songOrderType = $("#cslgSongOrderSelect").val();
     const keep = $("#cslgFilterModeSelect").val() === "Keep";
     const key = $("#cslgFilterKeySelect").val();
     let text = $("#cslgFilterListInput").val();
