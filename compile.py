@@ -326,7 +326,7 @@ if weightChange < 0:
     targetGain = min(targetGain, 0)
 targetMean += targetGain
 
-newSongCount = max(0,int(math.ceil((targetMean-currentWeightCount)/3)))
+newSongCount = max(0,int(math.ceil((targetMean-currentWeightCount)/5)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
