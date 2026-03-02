@@ -1,3 +1,4 @@
+import json
 with open("pool.json", 'r', encoding = 'utf8') as f:
     known = json.load(f)
 
