@@ -321,12 +321,12 @@ for song in songPool:
     currentWeightCount += 2/(1+math.exp(song["D"]))
 weightChange = prevWeightCount-currentWeightCount
 
-targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/10))
+targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/20))
 if weightChange < 0:
     targetGain = min(targetGain, 0)
 targetMean += targetGain
 
-newSongCount = max(0,int(math.ceil((targetMean-currentWeightCount)/5)))
+newSongCount = max(0,int(math.ceil((targetMean-currentWeightCount)/1)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
