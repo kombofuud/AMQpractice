@@ -153,9 +153,9 @@ for i, song in enumerate(songPool):
     if song["ID"] in quizIds:
         idIndices[song["ID"]] = i
         if song["X"] == 1:
-            quizIds[song["ID"]] = math.sqrt(1+math.log(1+math.exp(-song["D"])))
+            quizIds[song["ID"]] = 1
         elif song["X"] == 2:
-            quizIds[song["ID"]] = -math.sqrt(1+math.log(1+math.exp(song["D"])))
+            quizIds[song["ID"]] = -math.sqrt(1+max(song["D"],0))
             missedCount += 1
         if quizIds[song["ID"]] <= 0 and song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
@@ -315,18 +315,22 @@ for ID, index in idIndices.items():
 
 #Add new songs if appropriate
 currentWeightCount = 0
+phantomWeightCount = 0
 songDistribution = [0]*(maxD-minD+1)
 for song in songPool:
     songDistribution[int(round(song["D"]-minD))] += 1
+    phantomWeightCount += 2/(1+math.exp(song["D"]))
+    song["D"] = max(song["D"], 0.0)
     currentWeightCount += 2/(1+math.exp(song["D"]))
 weightChange = prevWeightCount-currentWeightCount
 
-targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/20))
-if weightChange < 0:
-    targetGain = min(targetGain, 0)
+#targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/20))
+targetGain = 0
 targetMean += targetGain
 
-newSongCount = max(0,int(math.ceil((targetMean-currentWeightCount)/1)))
+newSongCount = 0
+if prevWeightCount > phantomWeightCount
+    newSongCount = max(0,int(math.ceil(weightChange)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
