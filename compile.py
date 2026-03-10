@@ -145,7 +145,7 @@ prevWeightCount = 0
 prevNewSongs = 0
 
 for i, song in enumerate(songPool):
-    prevWeightCount += 2/(1+math.exp(song["D"]))
+    prevWeightCount += math.exp(-song["D"])
     song["ID"] = f"``{song["annId"]}" #in case I accidentally changed some characters during the quiz
     song["SN"] = f"`{song["songName"]}`"
     if song["D"] == 0 and type(song["D"]) is int:
