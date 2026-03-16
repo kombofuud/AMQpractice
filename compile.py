@@ -156,7 +156,7 @@ for i, song in enumerate(songPool):
         elif song["X"] == 2:
             quizIds[song["ID"]] = -math.sqrt(1+max(song["D"],0))
             missedCount += 1
-        if quizIds[song["ID"]] <= 0 and song["D"] <= 0:
+        if quizIds[song["ID"]] + song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
         #if quizIds[song["ID"]] <= 0:
             pSong = copy.deepcopy(song)
@@ -340,7 +340,7 @@ with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
     f.seek(0)
     f.write(f"{targetMean}\n")
-    f.write(f"{prevWeightCount if newSongCount > 0 else min(prevWeightCount, oldWeight)}\n")
+    f.write(f"{currentWeightCount+newSongCount if newSongCount > 0 else min(currentWeightCount, oldWeight)}\n")
     f.write(f"{weightChange}\n")
 
 if newSongCount > len(prepSongs):
