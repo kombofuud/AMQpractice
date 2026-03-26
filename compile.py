@@ -4,6 +4,7 @@ import math
 import copy
 import random
 import numpy
+import shutil
 
 fileQuiz = "_quiz"
 filePractice = "_practice"
@@ -59,77 +60,14 @@ else:
 
 #if quizSongs is empty, reset the pool list to before the update
 if len(quizSongs) == 0 and len(songPool) > 0:
-    with open(filePrevPool+".json", 'r', encoding = 'utf8') as f:
-        prevSongs = json.load(f)
-    with open(filePool+".json", 'r+', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        json.dump(prevSongs,f,ensure_ascii=False)
-        f.seek(0)
-        fileData = f.read()
-        fileData = fileData.replace(", {","\n,{")
-        fileData = fileData.replace("}]","}\n]")
-        f.seek(0)
-        f.write(fileData)
-    with open(filePrevQuiz+".json", 'r', encoding = 'utf8') as f:
-        prevQuizSongs = json.load(f)
-    with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        json.dump(prevQuizSongs,f,ensure_ascii=False)
-        f.seek(0)
-        fileData = f.read()
-        fileData = fileData.replace(", {","\n,{")
-        fileData = fileData.replace("}]","}\n]")
-        f.seek(0)
-        f.write(fileData)
-    with open(filePrevPrep+".json", 'r', encoding = 'utf8') as f:
-        prevPrepSongs = json.load(f)
-    with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        json.dump(prevPrepSongs,f,ensure_ascii=False)
-        f.seek(0)
-        fileData = f.read()
-        fileData = fileData.replace(", {","\n,{")
-        fileData = fileData.replace("}]","}\n]")
-        f.seek(0)
-        f.write(fileData)
-    with open(filePrevLoad+".json", 'r', encoding = 'utf8') as f:
-        prevLoadSongs = json.load(f)
-    with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        json.dump(prevLoadSongs,f,ensure_ascii=False)
-        f.seek(0)
-        fileData = f.read()
-        fileData = fileData.replace(", {","\n,{")
-        fileData = fileData.replace("}]","}\n]")
-        f.seek(0)
-        f.write(fileData)
-    with open(prevMalUpdateFile, 'r', encoding = 'utf8') as f:
-        prevMalUpdates = f.read()
-    with open(malUpdateFile, 'w', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        f.write(prevMalUpdates)
-    with open(filePrevAdd+".json", 'r', encoding = 'utf8') as f:
-        prevAddedSongOrder = f.read()
-    with open(fileAdd+".json", 'w', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        f.write(prevAddedSongOrder)
-    with open(prevGainFile, 'r', encoding = 'utf8') as f:
-        prevGains = f.read()
-    with open(gainFile, 'w', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        f.write(prevGains)
+    shutil.copyfile(filePrevPool+".json", filePool+".json")
+    shutil.copyfile(filePrevQuiz+".json", fileQuiz+".json")
+    shutil.copyfile(filePrevPrep+".json", filePrep+".json")
+    shutil.copyfile(filePrevLoad+".json", fileLoad+".json")
+    shutil.copyfile(prevMalUpdateFile, malUpdateFile)
+    shutil.copyfile(filePrevAdd+".json", fileAdd+".json")
+    shutil.copyfile(prevGainFile, gainFile)
     print("Pool+Quiz+Prep+Load+Update+AddedOrder+fileGains Restored")
-    '''with open(filePractice+".json", 'r', encoding = 'utf8') as f:
-        practiceSongs = json.load(f)
-    for song in practiceSongs:
-        print(f"{song["SN"]} __from__ {song["EN"]}")'''
     sys.exit(0)
 
 #Run through list of quizSongs and check for songs which are marked for an update. 1 is a correct, 2 is a miss
@@ -154,11 +92,10 @@ for i, song in enumerate(songPool):
         if song["X"] == 1:
             quizIds[song["ID"]] = 1.0
         elif song["X"] == 2:
-            quizIds[song["ID"]] = -math.sqrt(1+max(song["D"],0))
+            quizIds[song["ID"]] = -math.log(2+max(song["D"],0))
             missedCount += 1
         if quizIds[song["ID"]] + song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
-        #if quizIds[song["ID"]] <= 0:
             pSong = copy.deepcopy(song)
             pSong["startPoint"] = quizSamples[pSong["ID"]]
             if pSong["startPoint"] == 0:
@@ -224,74 +161,13 @@ if errorQ:
 
 
 #save copy of pool,quiz,prep,loading,gain to prevPool,prevQuiz etc
-with open(filePrevPool+".json", 'r+', encoding = 'utf8') as f:
-    f.truncate(0)
-    f.seek(0)
-    json.dump(songPool,f,ensure_ascii=False)
-    f.seek(0)
-    fileData = f.read()
-    fileData = fileData.replace(", {","\n,{")
-    fileData = fileData.replace("}]","}\n]")
-    f.seek(0)
-    f.write(fileData)
-
-with open(filePrevQuiz+".json", 'r+', encoding = 'utf8') as f:
-    f.truncate(0)
-    f.seek(0)
-    json.dump(quizSongs,f,ensure_ascii=False)
-    f.seek(0)
-    fileData = f.read()
-    fileData = fileData.replace(", {","\n,{")
-    fileData = fileData.replace("}]","}\n]")
-    f.seek(0)
-    f.write(fileData)
-
-with open(filePrevPrep+".json", 'r+', encoding = 'utf8') as f:
-    f.truncate(0)
-    f.seek(0)
-    prepSongs.insert(0, elementNull)
-    json.dump(prepSongs,f,ensure_ascii=False)
-    elementNull = prepSongs.pop(0)
-    f.seek(0)
-    fileData = f.read()
-    fileData = fileData.replace(", {","\n,{")
-    fileData = fileData.replace("}]","}\n]")
-    f.seek(0)
-    f.write(fileData)
-
-with open(filePrevLoad+".json", 'r+', encoding = 'utf8') as f:
-    f.truncate(0)
-    f.seek(0)
-    json.dump(loadingSongs,f,ensure_ascii=False)
-    f.seek(0)
-    fileData = f.read()
-    fileData = fileData.replace(", {","\n,{")
-    fileData = fileData.replace("}]","}\n]")
-    f.seek(0)
-    f.write(fileData)
-
-with open(malUpdateFile, 'r', encoding = 'utf8') as f:
-    malUpdates = f.read()
-with open(prevMalUpdateFile, 'w', encoding = 'utf8') as f:
-    f.truncate(0)
-    f.seek(0)
-    f.write(malUpdates)
-
-with open(fileAdd+".json", 'r', encoding = 'utf8') as f:
-    addedSongOrder = f.read()
-with open(filePrevAdd+".json", 'w', encoding = 'utf8') as f:
-    f.truncate(0)
-    f.seek(0)
-    f.write(addedSongOrder)
-
-with open(gainFile, 'r', encoding = 'utf8') as f:
-    targetMean, oldWeight, prevGain = [float(line.strip()) for line in f.readlines()]
-with open(prevGainFile, 'w', encoding = 'utf8') as f:
-    f.truncate(0)
-    f.seek(0)
-    f.write(f"{targetMean}\n")
-    f.write(f"{oldWeight}\n")
-    f.write(f"{prevGain}\n")
+shutil.copyfile(filePool+".json", filePrevPool+".json")
+shutil.copyfile(fileQuiz+".json", filePrevQuiz+".json")
+shutil.copyfile(filePrep+".json", filePrevPrep+".json")
+shutil.copyfile(fileLoad+".json", filePrevLoad+".json")
+shutil.copyfile(malUpdateFile, prevMalUpdateFile)
+shutil.copyfile(fileAdd+".json", filePrevAdd+".json")
+shutil.copyfile(gainFile, prevGainFile)
 
 #Update all keys
 print("Missed Song Numbers_______")
@@ -306,11 +182,14 @@ for ID, index in idIndices.items():
     minD = int(round(min(minD, songPool[index]["D"])))
     if quizSamples[ID] == 0:
         songPool[index]["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
+        songPool[index]["sampleWeights"][0] = min(0,songPool[index]["sampleWeights"][0])
     elif quizSamples[ID] == 100:
         songPool[index]["sampleWeights"][-1] += 1-(1+songPool[index]["X"])%3
+        songPool[index]["sampleWeights"][-1] = min(0,songPool[index]["sampleWeights"][-1])
     else:
         sectionCount = len(songPool[index]["sampleWeights"])-2
         songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += 1-(1+songPool[index]["X"])%3
+        songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] = min(0,songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)])
     songPool[index]["X"] = 0
 
 #Add new songs if appropriate
@@ -324,6 +203,9 @@ for song in songPool:
     currentWeightCount += math.log(1+math.exp(-song["D"]))
 phantomWeightCount /= math.log(2)
 currentWeightCount /= math.log(2)
+
+with open(gainFile, 'r', encoding = 'utf8') as f:
+    targetMean, oldWeight, prevGain = [float(line.strip()) for line in f.readlines()]
 weightChange = min(prevWeightCount, oldWeight)-currentWeightCount
 
 #targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/20))
