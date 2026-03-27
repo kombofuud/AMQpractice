@@ -12,10 +12,12 @@ DMin = 0
 indexMap = dict()
 maxWeightCount = 0
 songCounter = 0
+totalWeight = 0
 for song in known:
     if song["D"] <= 0:
         maxWeightCount += 1
-    DList.append(math.log(1+math.exp(-song["D"])))
+    DList.append(math.pow(2, -song["D"]))
+    totalWeight += math.pow(2, -song["D"])
     DMax = max(DMax, song["D"])
     DMin = min(DMin, song["D"])
     songCounter += 1
@@ -38,6 +40,7 @@ for _ in range(1000):
     minCount = min(minCount, songCount)
     maxCount = max(maxCount, songCount)
     songTotal += songCount
+print(f"totalWeight: {totalWeight}")
 print(f"min: {minCount}")
 print(f"max: {maxCount}")
 print(f"mean: {songTotal/1000}")
