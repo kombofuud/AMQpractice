@@ -46,7 +46,7 @@ for index, song in enumerate(poolSongList):
     if song["X"] != 0:
         print("Error: Previous quiz not compiled")
         sys.exit(1)
-    if song["D"] <= 0:
+    if song["D"] <= 1:
         maxWeightCount += 1
     indexMap[song["ID"]] = index
     DList.append(math.log(1+math.exp(-song["D"])))
@@ -62,7 +62,7 @@ randomSongList = copy.deepcopy(randomSongList)
 songCount = 0
 for song in randomSongList:
     songCount += 1
-    if song["D"] <= 0:
+    if song["D"] <= 1:
          maxWeightCount-= 1
     if maxWeightCount == 0:
         break
