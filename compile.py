@@ -99,18 +99,18 @@ for i, song in enumerate(songPool):
             pSong = copy.deepcopy(song)
             pSong["startPoint"] = quizSamples[pSong["ID"]]
             if pSong["startPoint"] == 0:
-                pSong["sampleWeights"][0] += 1-(1+pSong["X"])%3
+                pSong["sampleWeights"][0] += (1+pSong["X"])%3-1
             elif pSong["startPoint"] == 100:
-                pSong["sampleWeights"][-1] += 1-(1+pSong["X"])%3
+                pSong["sampleWeights"][-1] += (1+pSong["X"])%3-1
             else:
                 sectionCount = len(pSong["sampleWeights"])-2
-                pSong["sampleWeights"][math.ceil(pSong["startPoint"]*sectionCount/100)] += 1-(1+pSong["X"])%3
+                pSong["sampleWeights"][math.ceil(pSong["startPoint"]*sectionCount/100)] += (1+pSong["X"])%3-1
             #songWeightStrength = 1-math.pow(0.95,pSong["D"])
             '''for i in range(len(pSong["sampleWeights"])-1):
                 pSong["sampleWeights"][i+1] += song["sampleWeights"][i]/3
                 pSong["sampleWeights"][i] += song["sampleWeights"][i+1]/3'''
             for i in range(len(pSong["sampleWeights"])):
-                pSong["sampleWeights"][i] = math.log(1+math.pow(math.e,pSong["sampleWeights"][i]))
+                pSong["sampleWeights"][i] = math.log(1+math.pow(math.e,-pSong["sampleWeights"][i]))
             pSong["startPoint"] = pSong["sampleWeights"]
             pSong["sampleWeights"] = song["sampleWeights"]
             pSong["D"] += quizIds[song["ID"]]
@@ -181,15 +181,15 @@ for ID, index in idIndices.items():
     maxD = int(round(max(maxD, songPool[index]["D"])))
     minD = int(round(min(minD, songPool[index]["D"])))
     if quizSamples[ID] == 0:
-        songPool[index]["sampleWeights"][0] += 1-(1+songPool[index]["X"])%3
-        songPool[index]["sampleWeights"][0] = min(0,songPool[index]["sampleWeights"][0])
+        songPool[index]["sampleWeights"][0] += (1+songPool[index]["X"])%3-1
+        songPool[index]["sampleWeights"][0] = max(0,songPool[index]["sampleWeights"][0])
     elif quizSamples[ID] == 100:
-        songPool[index]["sampleWeights"][-1] += 1-(1+songPool[index]["X"])%3
-        songPool[index]["sampleWeights"][-1] = min(0,songPool[index]["sampleWeights"][-1])
+        songPool[index]["sampleWeights"][-1] += (1+songPool[index]["X"])%3-1
+        songPool[index]["sampleWeights"][-1] = max(0,songPool[index]["sampleWeights"][-1])
     else:
         sectionCount = len(songPool[index]["sampleWeights"])-2
-        songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += 1-(1+songPool[index]["X"])%3
-        songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] = min(0,songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)])
+        songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += (1+songPool[index]["X"])%3-1
+        songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] = max(0,songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)])
     songPool[index]["X"] = 0
 
 #Add new songs if appropriate
