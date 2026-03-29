@@ -4,6 +4,7 @@ import json
 import copy
 import numpy
 import sys
+from itertools import compress
 
 #Read ALL Files
 
@@ -57,16 +58,12 @@ for index, song in enumerate(poolSongList):
 #Pick Songs and Generate Song Section
 
 #Pick Songs
-randomSongList = list(numpy.random.choice(poolSongList, size = len(DList), p = DList/numpy.sum(DList), replace = False))
-randomSongList = copy.deepcopy(randomSongList)
-songCount = 0
-for song in randomSongList:
-    songCount += 1
-    if song["D"] <= 1:
-         maxWeightCount-= 1
-    if maxWeightCount == 0:
-        break
-randomSongList = randomSongList[:songCount]
+randomSongList = copy.deepcopy(poolSongList)
+randomSongWeights = [random.random() for _ in range(len(poolSongList))]
+for i in range(len(randomSongList)):
+    randomSongWeights[i] = int(randomSongWeights[i] < math.pow(1.618033,-randomSongList[i]["D"]))
+randomSongList = list(compress(randomSongList,randomSongWeights))
+songCount = len(randomSongList)
 
 #For each song, pick sample point
 for index, song in enumerate(randomSongList):
@@ -76,7 +73,7 @@ for index, song in enumerate(randomSongList):
         distribution[i+1] += song["sampleWeights"][i]/3
         distribution[i] += song["sampleWeights"][i+1]/3'''
     for i in range(len(distribution)):
-        distribution[i] = math.log(1+math.pow(math.e,distribution[i]))
+        distribution[i] = math.pow(math.e, distribution[i])
     section = random.choices(range(len(distribution)), weights=distribution, k=1)[0]
     if section == 0:
         samplePoint = 0
