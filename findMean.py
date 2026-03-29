@@ -13,33 +13,29 @@ indexMap = dict()
 maxWeightCount = 0
 songCounter = 0
 totalWeight = 0
-for song in known:
-    if song["D"] <= 0:
-        maxWeightCount += 1
-    DList.append(math.pow(2, -song["D"]))
-    totalWeight += math.pow(2, -song["D"])
-    DMax = max(DMax, song["D"])
-    DMin = min(DMin, song["D"])
-    songCounter += 1
-
-minCount = len(DList)+1
+minCount = len(known)+1
 maxCount = -1
 songTotal = 0
-songDistribution = [0]*(int(round(DMax))-int(round(DMin))+1)
+
+weights = []
+for song in known:
+    totalWeight += math.pow(1.618033, -song["D"])
+    weights.append(math.pow(1.618033, -song["D"]))
+    DMax = max(DMax, song["D"])
+
+songDistribution = [0]*(int(round(DMax))+1)
+
 for _ in range(1000):
-    randomSongList = list(numpy.random.choice(known, size = len(DList), p = DList/numpy.sum(DList), replace = False))
-    songCount = 0
-    testWeightCount = maxWeightCount
-    for song in randomSongList:
-        songCount += 1
-        songDistribution[int(round(song["D"]))-int(round(DMin))] += 1
-        if song["D"] <= 0:
-            testWeightCount-= 1
-        if testWeightCount == 0:
-            break
-    minCount = min(minCount, songCount)
-    maxCount = max(maxCount, songCount)
-    songTotal += songCount
+    songSelector = [random.random() for _ in range(len(known))]
+    for i in range(len(known)):
+        if songSelector[i] < weights[i]:
+            songSelector[i] = 1
+            songDistribution[int(round(known[i]["D"]))] += 1
+        else:
+            songSelector[i] = 0
+    minCount = min(minCount, sum(songSelector))
+    maxCount = max(maxCount, sum(songSelector))
+    songTotal += sum(songSelector)
 print(f"totalWeight: {totalWeight}")
 print(f"min: {minCount}")
 print(f"max: {maxCount}")
