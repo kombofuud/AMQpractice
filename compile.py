@@ -212,9 +212,9 @@ targetMean += targetGain
 
 newSongCount = 0
 if min(prevWeightCount, oldWeight) > phantomWeightCount:
-    newSongCount = int(math.floor(weightChange/2))
+    newSongCount = int(math.ceil(weightChange*0))
 else:
-    newSongCount = max(0,int(math.floor(weightChange/2)))
+    newSongCount = max(0,int(math.floor(weightChange*0)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
