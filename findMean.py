@@ -19,8 +19,8 @@ songTotal = 0
 
 weights = []
 for song in known:
-    totalWeight += math.pow(1.618033, -song["D"])
-    weights.append(math.pow(1.618033, -song["D"]))
+    totalWeight += math.pow(2, -song["D"])
+    weights.append(math.pow(2, -song["D"]))
     DMax = max(DMax, song["D"])
 
 songDistribution = [0]*(int(round(DMax))+1)
