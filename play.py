@@ -61,7 +61,7 @@ for index, song in enumerate(poolSongList):
 randomSongList = copy.deepcopy(poolSongList)
 randomSongWeights = [random.random() for _ in range(len(poolSongList))]
 for i in range(len(randomSongList)):
-    randomSongWeights[i] = int(randomSongWeights[i] < math.pow(2,-randomSongList[i]["D"]))
+    randomSongWeights[i] = int(randomSongWeights[i] < 1/math.sqrt(math.gamma(randomSongList[i]["D"]+1.5)))
 randomSongList = list(compress(randomSongList,randomSongWeights))
 songCount = len(randomSongList)
 

@@ -83,7 +83,7 @@ prevWeightCount = 0
 prevNewSongs = 0
 
 for i, song in enumerate(songPool):
-    prevWeightCount += math.pow(2,-song["D"])
+    prevWeightCount += 1/math.sqrt(math.gamma(1.5+song["D"]))
     song["SN"] = f"`{song["songName"]}`"
     if song["D"] == 0 and type(song["D"]) is int:
         prevNewSongs += 1
@@ -198,23 +198,19 @@ phantomWeightCount = 0
 songDistribution = [0]*(maxD-minD+1)
 for song in songPool:
     songDistribution[int(round(song["D"]-minD))] += 1
-    phantomWeightCount += math.pow(2,-song["D"])
+    phantomWeightCount += 1/math.sqrt(math.gamma(1.5+song["D"]))
     song["D"] = max(song["D"], 0.0)
-    currentWeightCount += math.pow(2,-song["D"])
+    currentWeightCount += 1/math.sqrt(math.gamma(1.5+song["D"]))
 
 with open(gainFile, 'r', encoding = 'utf8') as f:
     targetMean, oldWeight, prevGain = [float(line.strip()) for line in f.readlines()]
-weightChange = min(prevWeightCount, oldWeight)-currentWeightCount
+weightChange = 40.5-currentWeightCount
 
 #targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/20))
 targetGain = 0
 targetMean += targetGain
 
-newSongCount = 0
-if min(prevWeightCount, oldWeight) > phantomWeightCount:
-    newSongCount = int(math.ceil(weightChange))
-else:
-    newSongCount = max(0,int(math.floor(weightChange)))
+newSongCount = max(0,int(math.floor(weightChange)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
