@@ -210,7 +210,7 @@ weightChange = prevWeightCount-currentWeightCount
 targetGain = 0
 targetMean += targetGain
 
-newSongCount = max(0,int(math.floor(48.5-currentWeightCount)))
+newSongCount = max(0,int(math.floor(45.5-currentWeightCount)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
