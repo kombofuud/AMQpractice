@@ -83,7 +83,7 @@ prevWeightCount = 0
 prevNewSongs = 0
 
 for i, song in enumerate(songPool):
-    prevWeightCount += 1/(1+4**(song["D"]-3))
+    prevWeightCount += 1.015625/(1+4**(song["D"]-3))
     song["SN"] = f"`{song["songName"]}`"
     if song["D"] == 0 and type(song["D"]) is int:
         prevNewSongs += 1
@@ -92,7 +92,7 @@ for i, song in enumerate(songPool):
         if song["X"] == 1:
             quizIds[song["ID"]] = 1.0
         elif song["X"] == 2:
-            quizIds[song["ID"]] = -math.log(2+max(song["D"],0))
+            quizIds[song["ID"]] = -math.sqrt(max(song["D"],0))
             missedCount += 1
         if quizIds[song["ID"]] + song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
@@ -123,7 +123,6 @@ for i, song in enumerate(songPool):
     else:
         maxD = int(round(max(maxD, song["D"])))
         minD = int(round(min(minD, song["D"])))
-prevWeightCount /= math.log(2)
 
 #Ensure that the correct number of songs were accounted for
 countedKeys = 0
@@ -172,7 +171,8 @@ shutil.copyfile(gainFile, prevGainFile)
 #Update all keys
 print("Missed Song Numbers_______")
 for i, song in enumerate(quizSongs):
-    if quizIds[song["ID"]] < 0.0:
+#   if quizIds[song["ID"]] < 0.0:
+    if songPool[idIndices[song["ID"]]]["X"] == 2:
         print(f"{i+1}", end = ' ')
 print()
 
@@ -198,19 +198,19 @@ phantomWeightCount = 0
 songDistribution = [0]*(maxD-minD+1)
 for song in songPool:
     songDistribution[int(round(song["D"]-minD))] += 1
-    phantomWeightCount += 1/(1+4**(song["D"]-3))
+    phantomWeightCount += 1.015625/(1+4**(song["D"]-3))
     song["D"] = max(song["D"], 0.0)
-    currentWeightCount += 1/(1+4**(song["D"]-3))
+    currentWeightCount += 1.015625/(1+4**(song["D"]-3))
 
 with open(gainFile, 'r', encoding = 'utf8') as f:
     targetMean, oldWeight, prevGain = [float(line.strip()) for line in f.readlines()]
-weightChange = 60.5-currentWeightCount
+weightChange = prevWeightCount-currentWeightCount
 
 #targetGain = min(2, max(-2, (weightChange-prevGain)/(prevWeightCount-oldWeight)/20))
 targetGain = 0
 targetMean += targetGain
 
-newSongCount = max(0,int(math.floor(weightChange)))
+newSongCount = max(0,int(math.floor(48.5-currentWeightCount)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
@@ -359,7 +359,7 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
     json.dump([],f,ensure_ascii=False)
 
 #Print sucess statement
-print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,3)}, PhantomThreshold = {round(phantomWeightCount-currentWeightCount+newSongCount,3)}, CurrentWeight = {currentWeightCount}")
+print(f"\033[31mPractice List Compiled:\033[0m Missed = {missedCount}, PracticeSize = {len(practice)-newSongCount}+{newSongCount}, PoolSize = {len(songPool)}, LoadingSize = {len(loadingSongs)+len(prepSongs)}, Gain = {round(weightChange,3)}, CurrentWeight = {round(currentWeightCount,5)}")
 print("DValue distribution")
 for index in range(len(songDistribution)):
     if index==-minD:
