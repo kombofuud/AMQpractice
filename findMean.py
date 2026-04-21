@@ -23,14 +23,14 @@ for song in known:
     weights.append(1.015625/(1+4**(song["D"]-3)))
     DMax = max(DMax, song["D"])
 
-songDistribution = [0]*(int(round(DMax))+1)
+songDistribution = [0]*(int(math.ceil(DMax))+1)
 
 for _ in range(1000):
     songSelector = [random.random() for _ in range(len(known))]
     for i in range(len(known)):
         if songSelector[i] < weights[i]:
             songSelector[i] = 1
-            songDistribution[int(round(known[i]["D"]))] += 1
+            songDistribution[int(math.ceil(known[i]["D"]))] += 1
         else:
             songSelector[i] = 0
     minCount = min(minCount, sum(songSelector))
