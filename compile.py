@@ -178,8 +178,8 @@ print()
 
 for ID, index in idIndices.items():
     songPool[index]["D"] += quizIds[ID]
-    maxD = int(round(max(maxD, songPool[index]["D"])))
-    minD = int(round(min(minD, songPool[index]["D"])))
+    maxD = int(math.ceil(max(maxD, songPool[index]["D"])))
+    minD = int(math.ceil(min(minD, songPool[index]["D"])))
     if quizSamples[ID] == 0:
         songPool[index]["sampleWeights"][0] += (1+songPool[index]["X"])%3-1
         songPool[index]["sampleWeights"][0] = max(0,songPool[index]["sampleWeights"][0])
@@ -197,7 +197,7 @@ currentWeightCount = 0
 phantomWeightCount = 0
 songDistribution = [0]*(maxD-minD+1)
 for song in songPool:
-    songDistribution[int(round(song["D"]-minD))] += 1
+    songDistribution[int(math.ceil(song["D"]-minD))] += 1
     phantomWeightCount += 1.015625/(1+4**(song["D"]-3))
     song["D"] = max(song["D"], 0.0)
     currentWeightCount += 1.015625/(1+4**(song["D"]-3))
@@ -210,7 +210,7 @@ weightChange = prevWeightCount-currentWeightCount
 targetGain = 0
 targetMean += targetGain
 
-newSongCount = max(0,int(math.floor(45.5-currentWeightCount)))
+newSongCount = max(0,int(math.floor(43.5-currentWeightCount)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
