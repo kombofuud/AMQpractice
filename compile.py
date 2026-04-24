@@ -121,8 +121,8 @@ for i, song in enumerate(songPool):
         extraIds.add(song["ID"])
         extraIndices[song["ID"]] = i
     else:
-        maxD = int(round(max(maxD, song["D"])))
-        minD = int(round(min(minD, song["D"])))
+        maxD = int(math.ceil(max(maxD, song["D"])))
+        minD = int(math.ceil(min(minD, song["D"])))
 
 #Ensure that the correct number of songs were accounted for
 countedKeys = 0
@@ -210,7 +210,7 @@ weightChange = prevWeightCount-currentWeightCount
 targetGain = 0
 targetMean += targetGain
 
-newSongCount = max(0,int(math.floor(43.5-currentWeightCount)))
+newSongCount = max(0,int(math.floor(41.5-currentWeightCount)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
