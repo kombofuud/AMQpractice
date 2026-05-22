@@ -92,7 +92,7 @@ for i, song in enumerate(songPool):
         if song["X"] == 1:
             quizIds[song["ID"]] = 1.0
         elif song["X"] == 2:
-            quizIds[song["ID"]] = -math.sqrt(max(song["D"],0))
+            quizIds[song["ID"]] = -1.5
             missedCount += 1
         if quizIds[song["ID"]] + song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
@@ -210,7 +210,7 @@ weightChange = prevWeightCount-currentWeightCount
 targetGain = 0
 targetMean += targetGain
 
-newSongCount = max(0,int(math.floor(39-currentWeightCount)))
+newSongCount = max(0,int(math.floor(40-currentWeightCount)))
 
 with open(gainFile, 'w', encoding = 'utf8') as f:
     f.truncate(0)
