@@ -1636,7 +1636,9 @@ function endGuessPhase(songNumber) {
                             currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
-                        defaultTimer += 1;
+                        if(attachedFile == "_practice.json"){
+                            defaultTimer += 1;
+                        }
                     }, 100);
                 }
             }, fastSkip ? 1000 : 2000);
