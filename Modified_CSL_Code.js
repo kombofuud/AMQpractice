@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Custom Kombo Song Games
 // @namespace    https://github.com/kempanator
-// @version      0.94
+// @version      0.99
 // @description  Play a solo game with a custom song list
 // @author       kempanator
 // @match        https://*.animemusicquiz.com/*
@@ -195,8 +195,14 @@ function setup() {
             if (message.message.startsWith("§CSL")) {
                 if (!showCSLMessages) {
                     setTimeout(() => {
-                        const $message = gameChat.$chatMessageContainer.find(".gcMessage").last();
-                        if ($message.text().startsWith("§CSL")) $message.parent().remove();
+                        const $entry = $("#gcPlayerMessage-" + message.messageId);
+                        if ($entry.length && $entry.find(".gcMessage").text().startsWith("§CSL")) {
+                            $entry.remove();
+                            if (Number.isInteger(gameChat.currentMessageCount) && gameChat.currentMessageCount > 0) {
+                                gameChat.currentMessageCount--;
+                            }
+                            gameChat.$SCROLLABLE_CONTAINERS.perfectScrollbar("update");
+                        }
                     }, 0);
                 }
                 parseMessage(message.message, message.sender);
@@ -545,6 +551,7 @@ function setup() {
                                 <label class="clickAble" style="margin-left: 10px">OVA<input id="cslgSettingsOVACheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">ONA<input id="cslgSettingsONACheckbox" type="checkbox" checked></label>
                                 <label class="clickAble" style="margin-left: 10px">Special<input id="cslgSettingsSpecialCheckbox" type="checkbox" checked></label>
+                                <label class="clickAble" style="margin-left: 10px">Doujin<input id="cslgSettingsDoujinCheckbox" type="checkbox" checked></label>
                             </div>
                             <div style="margin-top: 5px">
                                 <span style="font-size: 18px; font-weight: bold; margin-right: 15px;">Broadcast Types:</span>
@@ -713,35 +720,35 @@ function setup() {
         $(this).find("i").toggleClass("fa-caret-down fa-caret-up");
         $("#cslgAnisongdbFilterOptions").slideToggle(150);
     });
-    $("#cslgFileUpload").on("change", function () {
-        if (this.files.length) {
-            this.files[0].text().then((data) => {
-                try {
-                    handleData(JSON.parse(data));
-                    if (songList.length === 0) {
-                        messageDisplayer.displayMessage("0 song links found");
-                    }
-                }
-                catch (error) {
-                    songList = [];
-                    $(this).val("");
-                    console.error(error);
-                    messageDisplayer.displayMessage("Upload Error");
-                }
-                attachedFile = this.files[0].name;
-                if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json"){
-                    songListTableView = 1;
-                }
-                else if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_quiz.json"){
-                    songListTableView = 2;
-                }
-                else if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_split.json"){
-                    songListTableView = 2;
-                }
-                setSongListTableSort();
-                createSongListTable(true);
-                createAnswerTable();
-            });
+    $("#cslgFileUpload").on("change", async function () {
+        if (!this.files.length) return;
+        try {
+            handleData(JSON.parse(await this.files[0].text()));
+            if (!songList.length) {
+                messageDisplayer.displayMessage("0 song links found");
+            }
+        }
+        catch (error) {
+            this.value = "";
+            songList = [];
+            console.error(error);
+            messageDisplayer.displayMessage("Upload Error");
+        }
+        finally {
+            attachedFile = this.files[0].name;
+            if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json"){
+                songListTableView = 1;
+            }
+            else if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_quiz.json"){
+                songListTableView = 2;
+            }
+            else if($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_split.json"){
+                songListTableView = 2;
+            }
+            setSongListTableSort();
+            createSongListTable(true);
+            createAnswerTable();
+
         }
     });
     $("#cslgPreviousGameButtonGo").on("click", () => {
@@ -1208,13 +1215,14 @@ function validateStart() {
     const ova = $("#cslgSettingsOVACheckbox").prop("checked");
     const ona = $("#cslgSettingsONACheckbox").prop("checked");
     const special = $("#cslgSettingsSpecialCheckbox").prop("checked");
+    const doujin = $("#cslgSettingsDoujinCheckbox").prop("checked");
     const dub = $("#cslgSettingsDubCheckbox").prop("checked");
     const rebroadcast = $("#cslgSettingsRebroadcastCheckbox").prop("checked");
     const correctGuesses = $("#cslgSettingsCorrectGuessCheckbox").prop("checked");
     const incorrectGuesses = $("#cslgSettingsIncorrectGuessCheckbox").prop("checked");
     const songKeys = Object.keys(songList)
         .filter((key) => songTypeFilter(songList[key], ops, eds, ins))
-        .filter((key) => animeTypeFilter(songList[key], tv, movie, ova, ona, special))
+        .filter((key) => animeTypeFilter(songList[key], tv, movie, ova, ona, special, doujin))
         .filter((key) => difficultyFilter(songList[key], difficultyRange[0], difficultyRange[1]))
         .filter((key) => guessTypeFilter(songList[key], correctGuesses, incorrectGuesses))
         .filter((key) => broadcastTypeFilter(songList[key], dub, rebroadcast));
@@ -1309,19 +1317,8 @@ function startQuiz() {
                 "playbackSpeed": 1,
                 "startPoint": currentStartPoint,
                 "fullSongRange": fullSongRange,
-                "videoInfo": {
-                    "id": null,
-                    "videoMap": {
-                        "catbox": createCatboxLinkObject(song.audio, song.video480, song.video720)
-                    },
-                    "videoVolumeMap": {
-                        "catbox": {
-                            "0": -20,
-                            "480": -20,
-                            "720": -20
-                        }
-                    }
-                }
+                "videoInfo": createCslVideoInfo(song.audio, song.video480, song.video720)
+
             });
         }
         else {
@@ -1435,19 +1432,8 @@ function playSong(songNumber) {
                     "playLength": ($("#cslgSongListModeSelect").val() === "Load File" && attachedFile == "_practice.json")? 15: guessTime,
                     "playbackSpeed": 1,
                     "startPoint": nextStartPoint,
-                    "videoInfo": {
-                        "id": null,
-                        "videoMap": {
-                            "catbox": createCatboxLinkObject(nextSong.audio, nextSong.video480, nextSong.video720)
-                        },
-                        "videoVolumeMap": {
-                            "catbox": {
-                                "0": -20,
-                                "480": -20,
-                                "720": -20
-                            }
-                        }
-                    }
+                    "videoInfo": createCslVideoInfo(nextSong.audio, nextSong.video480, nextSong.video720)
+
                 });
             }
             else {
@@ -1532,21 +1518,11 @@ function endGuessPhase(songNumber) {
                             "romaji": song.animeRomajiName
                         },
                         "artist": song.songArtist,
-                        "artistInfo": {
-                            "artistId": null, //song.songArtistIds.artistId,
-                            "groupId": null, //song.songArtistIds.groupId,
-                            "name": song.songArtist
-                        },
-                        "arrangerInfo": {
-                            "artistId": null, //song.songArrangerIds.artistId,
-                            "groupId": null, //song.songArrangerIds.groupId,
-                            "name": song.songArranger
-                        },
-                        "composerInfo": {
-                            "artistId": null, //song.songComposerIds.artistId,
-                            "groupId": null, //song.songComposerIds.groupId,
-                            "name": song.songComposer
-                        },
+                        // artistInfo/arrangerInfo/composerInfo need groupId or artistId for #qpSongArtist hover (library "artist hover information")
+                        "artistInfo": song.artistInfo || { name: song.songArtist },
+                        "arrangerInfo": song.arrangerInfo,
+                        "composerInfo": song.composerInfo,
+
                         "songName": song.songName,
                         "videoTargetMap": {
                             "catbox": {
@@ -1636,7 +1612,7 @@ function endGuessPhase(songNumber) {
                             currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
-                        if(attachedFile == "_practice.json"){
+                        if(attachedFile != "_practice.json"){
                             defaultTimer += 1;
                         }
                     }, 100);
@@ -1849,19 +1825,8 @@ function parseMessage(content, sender) {
                             "playLength": guessTime,
                             "playbackSpeed": 1,
                             "startPoint": parseInt(split[1]),
-                            "videoInfo": {
-                                "id": null,
-                                "videoMap": {
-                                    "catbox": createCatboxLinkObject(split[2], split[3], split[4])
-                                },
-                                "videoVolumeMap": {
-                                    "catbox": {
-                                        "0": -20,
-                                        "480": -20,
-                                        "720": -20
-                                    }
-                                }
-                            }
+                            "videoInfo": createCslVideoInfo(split[2], split[3], split[4])
+
                         });
                         if (Object.keys(songLinkReceived).length === 1) {
                             setTimeout(() => {
@@ -2076,19 +2041,17 @@ function songTypeFilter(song, ops, eds, ins) {
 }
 
 // return true if anime type is allowed
-function animeTypeFilter(song, tv, movie, ova, ona, special) {
-    if (song.animeType) {
-        const type = song.animeType.toLowerCase();
-        if (tv && type === "tv") return true;
-        if (movie && type === "movie") return true;
-        if (ova && type === "ova") return true;
-        if (ona && type === "ona") return true;
-        if (special && type === "special") return true;
-        return false;
-    }
-    else {
-        return tv && movie && ova && ona && special;
-    }
+function animeTypeFilter(song, tv, movie, ova, ona, special, doujin) {
+    if (tv && movie && ova && ona && special && doujin) return true;
+    if (!song.animeType) return false;
+    const type = song.animeType.toLowerCase();
+    if (tv && type === "tv") return true;
+    if (movie && type === "movie") return true;
+    if (ova && type === "ova") return true;
+    if (ona && type === "ona") return true;
+    if (special && type === "special") return true;
+    if (doujin && type === "doujin") return true;
+    return false;
 }
 
 // return true if the song difficulty is in allowed range
@@ -2202,7 +2165,7 @@ function loadPreviousGameOptions() {
     for (const game of Object.values(songHistoryWindow.tabs[2].gameMap)) {
         if (game.songTable.rows.length) {
             games.push({
-                roomName: game.roomName,
+                roomName: localizationHandler.translate(game.roomNameKey),
                 startTime: game.startTime,
                 quizId: game.quizId
             });
@@ -2364,21 +2327,12 @@ function handleData(data) {
         let animeEnglishName = song.animeEnglishName ?? song.animeENName ?? song.songInfo?.animeNames?.english ?? song.anime?.english ?? song.animeEnglish ?? song.animeEng ?? "";
         let altAnimeNames = song.altAnimeNames ?? song.songInfo?.altAnimeNames ?? [].concat(animeRomajiName, animeEnglishName, song.animeAltName || []);
         let altAnimeNamesAnswers = song.altAnimeNamesAnswers ?? song.songInfo?.altAnimeNamesAnswers ?? [];
-        let songArtist = song.songArtist ?? song.artist ?? song.songInfo?.artist ?? song.artistInfo?.name ?? "";
-        /*let songArtistIds = {
-            artistId: song.songArtistIds?.artistId ?? song.artistInfo?.artistId,
-            groupId: song.songArtistIds?.groupId ?? song.artistInfo?.groupId
-        };*/
-        let songArranger = song.songArranger ?? song.arrangerInfo?.name ?? "";
-        /*let songArrangerIds = {
-            artistId: song.songArrangerIds?.artistId ?? song.arrangerInfo?.artistId,
-            groupId: song.songArrangerIds?.groupId ?? song.arrangerInfo?.groupId
-        };*/
-        let songComposer = song.songComposer ?? song.composerInfo?.name ?? "";
-        /*let songComposerIds = {
-            artistId: song.songComposerIds?.artistId ?? song.composerInfo?.artistId,
-            groupId: song.songComposerIds?.groupId ?? song.composerInfo?.groupId
-        };*/
+        let songArtist = song.songArtist ?? song.artist ?? song.songInfo?.artist ?? song.artistInfo?.name ?? song.artists?.[0]?.names?.[0] ?? "";
+        let artistInfo = resolveCreatorInfo(song, "artistInfo", "artists", songArtist);
+        let songArranger = song.songArranger ?? song.arrangerInfo?.name ?? song.songInfo?.arrangerInfo?.name ?? song.arrangers?.[0]?.names?.[0] ?? "";
+        let arrangerInfo = resolveCreatorInfo(song, "arrangerInfo", "arrangers", songArranger);
+        let songComposer = song.songComposer ?? song.composerInfo?.name ?? song.songInfo?.composerInfo?.name ?? song.composers?.[0]?.names?.[0] ?? "";
+        let composerInfo = resolveCreatorInfo(song, "composerInfo", "composers", songComposer);
         let songName = song.songName ?? song.name ?? song.songInfo?.songName ?? "";
         let songType = song.songType ?? song.type ?? song.songInfo?.type ?? null;
         let songTypeNumber = song.songTypeNumber ?? song.songInfo?.typeNumber ?? null;
@@ -2394,7 +2348,7 @@ function handleData(data) {
         let rebroadcast = song.rebroadcast ?? song.isRebroadcast ?? song.songInfo?.rebroadcast ?? null;
         let dub = song.dub ?? song.isDub ?? song.songInfo?.dub ?? null;
         let startPoint = song.startPoint ?? song.startSample ?? null;
-        let annSongId = song.annSongId ?? null;
+        let annSongId = song.annSongId ?? song.songInfo?.annSongId ?? null;
         let length = parseFloat(song.songLength ?? parseFloat(song.length)) || null;
         let D = song.D === undefined || song.D === null ? 0 : song.D;
         let audio = song.audio ?? song.videoUrl ?? song.urls?.catbox?.[0] ?? song.songInfo?.videoTargetMap?.catbox?.[0] ?? song.songInfo?.urlMap?.catbox?.[0] ?? song.LinkMp3 ?? "";
@@ -2430,11 +2384,11 @@ function handleData(data) {
                 altAnimeNames,
                 altAnimeNamesAnswers,
                 songArtist,
-                //songArtistIds,
+                artistInfo,
                 songArranger,
-                //songArrangerIds,
+                arrangerInfo,
                 songComposer,
-                //songComposerIds,
+                composerInfo,
                 songName,
                 songType,
                 songTypeNumber,
@@ -2847,6 +2801,56 @@ function switchTab(tab) {
     $w.find(`#${tab}Tab`).addClass("selected");
     $w.find(`#${tab}Container`).show();
 }
+function isArtistHoverInfo(info) {
+    return Boolean(info && (info.artistId || info.groupId || info.memberArtists || info.memberGroups || info.memberInGroups?.length || info.altNames?.length));
+}
+
+function parseAnisongdbArtistEntry(entry) {
+    // anisongdb uses artists/composers/arrangers[] with { id, names, members }; AMQ uses artistId or groupId.
+    if (!entry || entry.id == null) return null;
+    const name = entry.names?.[0] ?? "";
+    const hasMembers = Array.isArray(entry.members) && entry.members.length > 0;
+    const info = {
+        name,
+        memberArtists: [],
+        memberGroups: [],
+        memberInGroups: [],
+        altNames: []
+    };
+    if (hasMembers) {
+        info.groupId = entry.id; // e.g. μ's with member seiyuu list
+    }
+    else {
+        info.artistId = entry.id; // solo composer/arranger/artist
+    }
+    return info;
+}
+
+function resolveCreatorInfo(song, infoKey, anisongdbKey, nameFallback) {
+    // Prefer AMQ songInfo, then anisongdb array, else name-only (no hover)
+    const existing = song[infoKey] ?? song.songInfo?.[infoKey];
+    if (isArtistHoverInfo(existing)) {
+        return existing;
+    }
+    if (existing?.artistId || existing?.groupId) {
+        return {
+            name: existing.name ?? nameFallback,
+            artistId: existing.artistId ?? null,
+            groupId: existing.groupId ?? null,
+            memberArtists: existing.memberArtists ?? [],
+            memberGroups: existing.memberGroups ?? [],
+            memberInGroups: existing.memberInGroups ?? [],
+            altNames: existing.altNames ?? []
+        };
+    }
+    const entry = song[anisongdbKey]?.[0];
+    if (entry) {
+        const parsed = parseAnisongdbArtistEntry(entry);
+        if (parsed) return parsed;
+    }
+    return nameFallback ? { name: nameFallback } : null;
+}
+
 
 // convert vintage string into AMQ songInfo vintage object
 function formatAmqVintage(vintage) {
@@ -2857,9 +2861,8 @@ function formatAmqVintage(vintage) {
     if (!regex) return null;
     return {
         key: "song_library.anime_entry.vintage." + regex[1],
-        data: {
-            year: Number(regex[2])
-        }
+        data: { year: Number(regex[2]) }
+
     }
 }
 
@@ -2877,6 +2880,25 @@ function songTypeText(type, typeNumber) {
     if (type === 2) return "ED" + typeNumber;
     if (type === 3) return "IN";
     return "";
+}
+
+// videoInfo payload for quiz next video info (guessMode required by MoeVideoPlayer.updatePlayMode)
+function createCslVideoInfo(audio, video480, video720) {
+    return {
+        id: null,
+        encrypted: false,
+        guessMode: { song: true, tinyVideo: false, blurVideo: false },
+        videoMap: {
+            catbox: createCatboxLinkObject(audio, video480, video720)
+        },
+        videoVolumeMap: {
+            catbox: {
+                "0": -20,
+                "480": -20,
+                "720": -20
+            }
+        }
+    };
 }
 
 // input 3 links, return formatted catbox link object
@@ -3289,13 +3311,17 @@ async function startImport() {
 
 // input list and file name, download json file
 function downloadListJson(list, fileName) {
-    const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(list));
-    const element = document.createElement("a");
-    element.setAttribute("href", data);
-    element.setAttribute("download", fileName);
-    document.body.appendChild(element);
-    element.click();
-    element.remove();
+    const json = JSON.stringify(list);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 // validate json data in local storage
