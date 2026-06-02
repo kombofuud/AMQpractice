@@ -1612,7 +1612,7 @@ function endGuessPhase(songNumber) {
                             currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
-                        if(attachedFile != "_practice.json"){
+                        if(attachedFile != "_practice.json" && (attachedFile != "_quiz.json" || correct[0]) ){
                             defaultTimer += 1;
                         }
                     }, 100);
