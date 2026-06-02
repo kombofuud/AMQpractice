@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AMQ Vivace! Shortcuts
 // @namespace    http://tampermonkey.net/
-// @version      1.9
+// @version      1.11
 // @description  Displays at least 10 of the shortest shortcuts for an anime after guessing phase, defined as the shortest substrings of length 10 or less for which the target anime (or any of its alt names) is a suggestion in the dropdown list (a 1 character penalty represented by "↓" is applied for every position below the top that the name associated with the shortcut appears). Adapted from https://github.com/tutti-amq/amq-scripts/blob/main/animeShortcuts.user.js All shortcuts (that aren't longer version of shorter shortcuts) with the smallest length are displayed. Click on a shortcut to highlight it and move it to the front of the list.
 // @author       Einlar, Tutti, kombofuud
 // @match        https://animemusicquiz.com/*
@@ -15,6 +15,14 @@
 
 /**
  * CHANGELOG
+ *
+ * v1.11 (by kombofuud)
+ * - Reduces lag when checking for substrings by optimizing the checking algorithm and using a Set for highlighted shortcuts.
+ *
+ * v1.10 (by kombofuud)
+ * - Highlighted shortcuts now always show even when NUM_SHORTCUTS limit is reached, bypassing length restrictions
+ * - Fixed: localeCompare issue in sorting that could cause inconsistent behavior
+ * - Fixed: correctly handle the disallowed characters when a custom keyboard layout is used
  *
  * v1.9 (by kombofuud)
  * - By default include shortcuts that contain only keyboard characters (ANSI 104 layout by default, configurable) unless KEYBOARD_LAYOUT_WHITELIST is set to null.
@@ -229,7 +237,7 @@ const getSuggestions = (search) => {
     );
 
   filteredList.sort((a, b) => {
-    return a.length - b.length || (a < b ? -1: 1);
+    return a.length - b.length || (a < b ? -1 : 1);
   });
 
   return filteredList.slice(0, MAX_DROPDOWN_ITEMS);
@@ -264,20 +272,20 @@ const mapToAlternativeSubstrings = (substring) => {
   const alternatives = new Set();
 
   // Add the AMQ replacement
-  if (ACTIVE_KEYBOARD_LAYOUT){
-      alternatives.add(
-          replaceCharactersForSeachCharacters(substring).replace(
-              new RegExp(`[^${RegExp.escape(ACTIVE_KEYBOARD_LAYOUT)}]`, "gu"),
-              ""
-          )
-      );
+  if (ACTIVE_KEYBOARD_LAYOUT) {
+    alternatives.add(
+      replaceCharactersForSeachCharacters(substring).replace(
+        new RegExp(`[^${RegExp.escape(ACTIVE_KEYBOARD_LAYOUT)}]`, "gu"),
+        ""
+      )
+    );
   } else {
-      alternatives.add(
-          replaceCharactersForSeachCharacters(substring).replace(
-              new RegExp(DISALLOWED_SPECIAL_CHARACTERS.join("|"), "g"),
-              ""
-          )
-      );
+    alternatives.add(
+      replaceCharactersForSeachCharacters(substring).replace(
+        new RegExp(DISALLOWED_SPECIAL_CHARACTERS.join("|"), "g"),
+        ""
+      )
+    );
   }
 
   // Apply mandatory replacements
@@ -393,16 +401,17 @@ const optimizedShortcuts = (targets) => {
   let altShortcuts = [];
   let currentLength = 0;
   let shortestLength = 999;
-  let highlightsOnly = false;
-  let highlightedShortcuts = JSON.parse(
+  let indexSlice = 0;
+  let highlightedList = []; //Used to show shortcuts that contain more down arrows than another one, but are still highlighted
+  let highlightedShortcuts = new Set(JSON.parse(
     localStorage.getItem(LOCAL_STORAGE_KEY) || "[]"
-  );
+  ));
 
   for (let substring of sortedSubstrings) {
     const newLength = substring.length;
 
     // When searching for longer substrings, first pick those from the altShortcuts list
-    if (newLength > currentLength && !highlightsOnly) {
+    if (newLength > currentLength) {
       altShortcuts = altShortcuts.filter((s) => {
         // Move altShortcuts of the currentLength to the shortcuts list
         if (s.length === currentLength) {
@@ -417,11 +426,11 @@ const optimizedShortcuts = (targets) => {
       if (
         shortcuts.length >= NUM_SHORTCUTS ||
         newLength > shortestLength + MAX_LENGTH_DIFFERENTIAL
-      ){
-        highlightsOnly = true;
+      ) {
+        break;
       }
     }
-
+    indexSlice += 1;
     const suggestions = getSuggestions(substring);
     currentLength = newLength;
 
@@ -436,15 +445,15 @@ const optimizedShortcuts = (targets) => {
         bestSubstring = substring + "↓".repeat(pos);
       }
       substring = substring + "↓".repeat(pos);
-      if (highlightedShortcuts.includes(substring)){
+      if (highlightedShortcuts.has(substring)) {
         shortcuts.push(substring);
         shortestLength = shortcuts[0].length;
+        highlightedList.push(substring+"↓");
         continue;
       }
       if (
         substring.length > MAX_SUBSTRING_LENGTH ||
-        (TOP_SHORTCUTS_ONLY && pos > 0) ||
-        highlightsOnly
+        (TOP_SHORTCUTS_ONLY && pos > 0)
       ) {
         continue;
       }
@@ -467,6 +476,25 @@ const optimizedShortcuts = (targets) => {
       }
     }
   }
+
+  //Avoids calling getSuggestions on shortcuts when only checking for highlighted shortcuts. This reduces lags when there are a lot of candidates (e.g. CHA-LA HEAD-CHA-LA)
+  const remainingSubstrings = [...highlightedList, ...sortedSubstrings.slice(indexSlice)];
+  remainingSubstrings.forEach((rawSubstring) => {
+    const cleanSubstring = rawSubstring.replaceAll("↓", "");
+    const initialArrowCount = rawSubstring.length - cleanSubstring.length;
+
+    for (let arrowCount = initialArrowCount; arrowCount < MAX_DROPDOWN_ITEMS; arrowCount++) {
+      const candidateShortcut = cleanSubstring + "↓".repeat(arrowCount);
+
+      if (highlightedShortcuts.has(candidateShortcut)) {
+        const suggestions = getSuggestions(cleanSubstring);
+        if (targets.includes(suggestions[arrowCount])) {
+          shortcuts.push(candidateShortcut);
+        }
+      }
+    }
+  });
+
 
   // If not enough shortcuts were found, try to fill with the alternative shortcuts to reach at least NUM_SHORTCUTS. When including a shortcut, ensure that all the ones with the same length are included too.
   if (altShortcuts.length > 0 && shortcuts.length < NUM_SHORTCUTS) {
