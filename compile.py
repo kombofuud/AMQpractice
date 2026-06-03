@@ -94,7 +94,7 @@ for i, song in enumerate(songPool):
         elif song["X"] == 2:
             quizIds[song["ID"]] = -1.5
             missedCount += 1
-        if quizIds[song["ID"]] + song["D"] <= 0:
+        if False and quizIds[song["ID"]] + song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
             pSong = copy.deepcopy(song)
             pSong["startPoint"] = quizSamples[pSong["ID"]]
