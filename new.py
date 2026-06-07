@@ -59,7 +59,7 @@ for index in range(len(rawSongList)):
         songList[index][key] = rawSongList[index][key]
     if "D" in songList[index]:
         songList[index].pop("D")
-    songList["CountDown"] = 0
+    songList[index]["CountDown"] = 0
     songList[index]["sampleWeights"] = None
     songList[index]["D"] = startingD
     songList[index]["annId"] = songList[index]["annSongId"]

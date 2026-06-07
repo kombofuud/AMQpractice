@@ -59,9 +59,14 @@ for index, song in enumerate(poolSongList):
 
 #Pick Songs
 randomSongList = copy.deepcopy(poolSongList)
-randomSongWeights = [random.random() for _ in range(len(poolSongList))]
+randomSongWeights = [0]*len(poolSongList)
 for i in range(len(randomSongList)):
-    randomSongWeights[i] = int(randomSongWeights[i] < (1.015625)/(1+4**(randomSongList[i]["D"]-3)))
+    countdown = (randomSongList[i]["CountDown"] << 3 | randomSongList[i]["CountDown"] >> 29) & 0xFFFFFFFF
+    countdown = (countdown ^ randomSongList[i]["annSongId"]) & 0xFFFFFFFF
+    if song["annSongId"] == 47579:
+        print(f"encrypted: {song["CountDown"]}")
+        print(f"decrypted: {countdown}")
+    randomSongWeights[i] = (countdown <= 0)
 randomSongList = list(compress(randomSongList,randomSongWeights))
 songCount = len(randomSongList)
 
