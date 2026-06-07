@@ -22,7 +22,8 @@ songTotal = 0
 
 weights = []
 for song in known:
-    songWeight = 1.015625/(1+4**(song["D"]-3))
+#    songWeight = 1.015625/(1+4**(song["D"]-3))
+    songWeight = 1/(1+((2**song["D"]-1)/(100+2**song["D"]))*2**(song["D"]+1))
     totalWeight += songWeight
     weights.append(songWeight)
     DMax = max(DMax, song["D"])
