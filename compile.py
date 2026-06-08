@@ -83,7 +83,7 @@ prevWeightCount = 0
 prevNewSongs = 0
 
 for i, song in enumerate(songPool):
-    prevWeightCount += 1.015625/(1+4**(song["D"]-3))
+    prevWeightCount += 1/(1+(2**song["D"]-1)/(100+2**song["D"])*2**(song["D"]+1))
     song["SN"] = f"`{song["songName"]}`"
     if song["D"] == 0 and type(song["D"]) is int:
         prevNewSongs += 1
@@ -92,7 +92,7 @@ for i, song in enumerate(songPool):
         if song["X"] == 1:
             quizIds[song["ID"]] = 1.0
         elif song["X"] == 2:
-            quizIds[song["ID"]] = -1.5
+            quizIds[song["ID"]] = -1.2
             missedCount += 1
         if False and quizIds[song["ID"]] + song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
@@ -168,7 +168,7 @@ shutil.copyfile(malUpdateFile, prevMalUpdateFile)
 shutil.copyfile(fileAdd+".json", filePrevAdd+".json")
 shutil.copyfile(gainFile, prevGainFile)
 
-#Update all keys
+#Print list of missed songs
 print("Missed Song Numbers_______")
 for i, song in enumerate(quizSongs):
 #   if quizIds[song["ID"]] < 0.0:
@@ -176,6 +176,20 @@ for i, song in enumerate(quizSongs):
         print(f"{i+1}", end = ' ')
 print()
 
+#Subtract 1 from all the countdowns
+for song in songPool:
+    if song["ID"] not in quizIds:
+        countdown = song["CountDown"]
+        countdown = ((countdown << 3 ) | (countdown >> 29)) & 0xFFFFFFFF
+        countdown ^= song["annSongId"]
+        countdown &= 0xFFFFFFFF
+        countdown -= 1
+        countdown ^= song["annSongId"]
+        countdown &= 0xFFFFFFFF
+        countdown = ((countdown >> 3) | (countdown << 29)) & 0xFFFFFFFF
+        song["CountDown"] = countdown
+
+#Update all keys
 for ID, index in idIndices.items():
     songPool[index]["D"] += quizIds[ID]
     maxD = int(math.ceil(max(maxD, songPool[index]["D"])))
@@ -190,6 +204,11 @@ for ID, index in idIndices.items():
         sectionCount = len(songPool[index]["sampleWeights"])-2
         songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += (1+songPool[index]["X"])%3-1
         songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] = max(0,songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)])
+    countdown = random.binomialvariate(int(random.random()+((2**songPool[index]["D"]-1)/(100+2**songPool[index]["D"]))*(2**(songPool[index]["D"]+2))),0.5)
+    countdown ^= songPool[index]["annSongId"]
+    countdown &= 0xFFFFFFFF
+    countdown = (countdown >> 3) | (countdown << 29)
+    songPool[index]["CountDown"] = countdown & 0xFFFFFFFF
     songPool[index]["X"] = 0
 
 #Add new songs if appropriate
@@ -198,9 +217,9 @@ phantomWeightCount = 0
 songDistribution = [0]*(maxD-minD+1)
 for song in songPool:
     songDistribution[int(math.ceil(song["D"]-minD))] += 1
-    phantomWeightCount += 1.015625/(1+4**(song["D"]-3))
+    phantomWeightCount += 1/(1+(2**song["D"]-1)/(100+2**song["D"])*2**(song["D"]+1))
     song["D"] = max(song["D"], 0.0)
-    currentWeightCount += 1.015625/(1+4**(song["D"]-3))
+    currentWeightCount += 1/(1+(2**song["D"]-1)/(100+2**song["D"])*2**(song["D"]+1))
 
 with open(gainFile, 'r', encoding = 'utf8') as f:
     targetMean, oldWeight, prevGain = [float(line.strip()) for line in f.readlines()]
@@ -235,6 +254,9 @@ newSongs = []
 if newSongCount > 0:
     newSongMalIds = set()
     newSongs = prepSongs[0:newSongCount]
+    for song in newSongs:
+        countdown = song["D"] & 0xFFFFFFFF
+        song["CountDown"] = ((countdown >> 3) | (countdown << 29)) & 0xFFFFFFFF
     practice = newSongs+practice
     songPool.extend(newSongs)
     prepSongs = prepSongs[newSongCount:]
