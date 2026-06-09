@@ -255,7 +255,7 @@ if newSongCount > 0:
     newSongMalIds = set()
     newSongs = prepSongs[0:newSongCount]
     for song in newSongs:
-        countdown = song["D"] & 0xFFFFFFFF
+        countdown = song["annSongId"] & 0xFFFFFFFF
         song["CountDown"] = ((countdown >> 3) | (countdown << 29)) & 0xFFFFFFFF
     practice = newSongs+practice
     songPool.extend(newSongs)
