@@ -203,6 +203,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["D"] = song["D"]
         knownList[index]["X"] = song["X"]
+        knownList[index]["CountDown"] = song["CountDown"]
         familiarMalIds.add(knownList[index]["malId"])
         knownList[index]["sampleWeights"] = translateLength(song["sampleWeights"], song["length"], knownList[index]["length"], knownList[index]["annId"])
         if song["length"] is not None and knownList[index]["length"] is not None:
