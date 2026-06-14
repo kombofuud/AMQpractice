@@ -92,7 +92,7 @@ for i, song in enumerate(songPool):
         if song["X"] == 1:
             quizIds[song["ID"]] = 1.0
         elif song["X"] == 2:
-            quizIds[song["ID"]] = -1.2
+            quizIds[song["ID"]] = -1.125
             missedCount += 1
         if False and quizIds[song["ID"]] + song["D"] <= 0:
         #if quizIds[song["ID"]] <= 0 and quizIds[song["ID"]]+song["D"] < 0:
