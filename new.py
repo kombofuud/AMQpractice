@@ -74,7 +74,7 @@ altNames = []
 for index, entry in enumerate(equivalances):
     for ID in entry["equiv"]:
         equivMap[ID] = index
-    altNames.append([])
+    altNames.append(set())
 brokenMap = {}
 deadSongIdsQ = 0
 for index, URL in enumerate(brokenURLs):
@@ -84,7 +84,8 @@ for index, URL in enumerate(brokenURLs):
 
 for song in songList:
     if song["annSongId"] in equivMap:
-        altNames[equivMap[song["annSongId"]]].extend(song["altAnimeNames"]+song["altAnimeNamesAnswers"])
+        altNames[equivMap[song["annSongId"]]].update(song["altAnimeNames"]+song["altAnimeNamesAnswers"])
+altNames = [list(altNameSet) for altNameSet in altNames]
 
 fixedList = []
 for index, song in enumerate(songList):
