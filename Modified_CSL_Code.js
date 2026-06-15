@@ -967,7 +967,7 @@ function setup() {
     $("#cslgAnisongdbMinGroupMembersInput").val("0");
     $("#cslgSettingsSongs").val("999");
     $("#cslgSettingsGuessTime").val("15");
-    $("#cslgSettingsExtraGuessTime").val("7");
+    $("#cslgSettingsExtraGuessTime").val("60");
     $("#cslgSettingsStartPoint").val("0-100");
     $("#cslgSettingsDifficulty").val("0-100");
     $("#cslgAnisongdbSearchRow").hide();
