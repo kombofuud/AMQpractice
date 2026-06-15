@@ -1555,7 +1555,7 @@ function endGuessPhase(songNumber) {
                         }
                     },
                     "progressBarState": {
-                        "length": guessTime+5,
+                        "length": guessTime,
                         "played": 0
                     },
                     "groupMap": createGroupSlotMap(Object.keys(quiz.players)),
