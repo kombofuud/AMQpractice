@@ -210,7 +210,8 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
         if song["length"] is not None and knownList[index]["length"] is not None:
             if song["length"] != knownList[index]["length"]:
                 print(f"ANNID={song["annSongId"]} {song["EN"]} by {song["SA"]} length increased by {knownList[index]["length"]-song["length"]} seconds")
-                knownList[index]["D"] = startingD
+                if len(song["sampleWeights"]) != len(knownList[index]["sampleWeights"]):
+                    knownList[index]["D"] = startingD
     deadIndices.reverse()
     for index in deadIndices:
         knownList.pop(index)
