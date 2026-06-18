@@ -204,7 +204,7 @@ for ID, index in idIndices.items():
         sectionCount = len(songPool[index]["sampleWeights"])-2
         songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] += (1+songPool[index]["X"])%3-1
         songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)] = max(0,songPool[index]["sampleWeights"][math.ceil(quizSamples[ID]*sectionCount/100)])
-    countdown = random.binomialvariate(int(random.random()+((2**songPool[index]["D"]-1)/(100+2**songPool[index]["D"]))*(2**(songPool[index]["D"]+2))),0.5)
+    countdown = int(random.random()+((2**songPool[index]["D"]-1)/(100+2**songPool[index]["D"]))*(2**songPool[index]["D"]))+random.binomialvariate(int(random.random()+((2**songPool[index]["D"]-1)/(100+2**songPool[index]["D"]))*(2**(songPool[index]["D"]+1))),0.5)
     if quizIds[ID] == 0:
         countdown //= 4
     countdown ^= songPool[index]["annSongId"]
