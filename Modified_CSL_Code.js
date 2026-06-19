@@ -79,6 +79,8 @@ let skipInterval;
 let nextVideoReadyInterval;
 let answerTimer;
 let extraGuessTimer;
+let replaySample;
+let endReplaySample;
 let endGuessTimer;
 let fileHostOverride = 0;
 let animeListLower = new Set(); //store lowercase version for faster compare speed
@@ -95,7 +97,7 @@ let nextSongChunk;
 let importRunning = false;
 let attachedFile = "";
 let missedSongList = [];
-let justPressed = true;
+let semicolonPressed = false;
 let hotKeys = {
     cslgWindow: loadHotkey("cslgWindow"),
     start: loadHotkey("start"),
@@ -1082,9 +1084,8 @@ function setup() {
                 hotkeyActions[action]();
             }
         }
-        if(event.keyCode=='188' && !quiz.isSpectator && event.ctrlKey && justPressed) {
-            /*justPressed = false;
-            quiz.skipClicked();*/
+        if(event.keyCode=='59' && !quiz.isSpectator && ctrl && !semicolonPressed) {
+            semicolonPressed = true;
         }
         else if (event.keyCode == '222' && shift && ctrl){
             if (quiz.cslActive) {
@@ -1125,8 +1126,8 @@ function setup() {
         }
     });
     document.addEventListener("keyup", (event) => {
-      if (event.keyCode=='188'){
-        justPressed = true;
+      if (event.keyCode=='59'){
+        semicolonPressed = false;
       }
     });
 
@@ -1385,6 +1386,7 @@ function playSong(songNumber) {
     cslState = 1;
     skipping = false;
     songStartTime = Date.now();
+    let currentlyPlaying = true;
     fireListener("play next song", {
         "time": guessTime,
         "extraGuessTime": extraGuessTime,
@@ -1396,13 +1398,26 @@ function playSong(songNumber) {
     if (extraGuessTime) {
         extraGuessTimer = setTimeout(() => {
             fireListener("extra guess time");
+            currentlyPlaying = false;
         }, guessTime * 1000);
     }
+    replaySample = setInterval(() => {
+        if(!currentlyPlaying && semicolonPressed && quiz.soloMode){
+            currentlyPlaying = true;
+            quizVideoController.getCurrentPlayer().playVideo();
+            endReplaySample = setTimeout(() => {
+                quizVideoController.getCurrentPlayer().pauseVideo();
+                currentlyPlaying = false;
+            }, guessTime * 1000)
+        }
+    }, 100);
     endGuessTimer = setTimeout(() => {
         if (quiz.soloMode) {
             clearInterval(skipInterval);
             clearTimeout(endGuessTimer);
             clearTimeout(extraGuessTimer);
+            clearInterval(replaySample);
+            clearTimeout(endReplaySample);
             endGuessPhase(songNumber);
         }
         else if (quiz.isHost) {
@@ -1416,6 +1431,8 @@ function playSong(songNumber) {
                 clearInterval(skipInterval);
                 clearTimeout(endGuessTimer);
                 clearTimeout(extraGuessTimer);
+                clearInterval(replaySample);
+                clearTimeout(endReplaySample);
                 setTimeout(() => {
                     endGuessPhase(songNumber);
                 }, fastSkip ? 1 : 3000);
@@ -1612,7 +1629,7 @@ function endGuessPhase(songNumber) {
                             currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
-                        if(attachedFile != "_practice.json" && (attachedFile != "_quiz.json" || correct[0]) ){
+                        if(attachedFile != "_practice.json" && attachedFile != "_quiz.json"){
                             defaultTimer += 1;
                         }
                     }, 100);
@@ -2087,6 +2104,8 @@ function clearTimeEvents() {
     clearTimeout(endGuessTimer);
     clearTimeout(extraGuessTimer);
     clearTimeout(answerTimer);
+    clearInterval(replaySample);
+    clearTimeout(endReplaySample);
 }
 
 // reset variables from this script
