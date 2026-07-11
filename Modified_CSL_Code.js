@@ -1084,7 +1084,7 @@ function setup() {
                 hotkeyActions[action]();
             }
         }
-        if(event.keyCode=='59' && !quiz.isSpectator && ctrl && !semicolonPressed) {
+        if(event.keyCode=='191' && !quiz.isSpectator && alt && !semicolonPressed) {
             semicolonPressed = true;
         }
         else if (event.keyCode == '222' && shift && ctrl){
@@ -1410,7 +1410,7 @@ function playSong(songNumber) {
                 currentlyPlaying = false;
             }, guessTime * 1000)
         }
-    }, 100);
+    }, 50);
     endGuessTimer = setTimeout(() => {
         if (quiz.soloMode) {
             clearInterval(skipInterval);
