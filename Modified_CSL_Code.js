@@ -1404,7 +1404,7 @@ function playSong(songNumber) {
     replaySample = setInterval(() => {
         if(!currentlyPlaying && semicolonPressed && quiz.soloMode){
             currentlyPlaying = true;
-            quizVideoController.getCurrentPlayer().playVideo();
+            quizVideoController.getCurrentPlayer().player.play();
             endReplaySample = setTimeout(() => {
                 quizVideoController.getCurrentPlayer().pauseVideo();
                 currentlyPlaying = false;
