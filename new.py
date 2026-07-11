@@ -219,7 +219,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     for song in songList:            
         if song["annSongId"] not in oldSongs and song["annSongId"] in deadMap:
             reviveSong = copy.deepcopy(deadList[deadMap[song["annSongId"]]])
-            if reviveSong["D"] == startingD and not any(reviveSong["sampleWeights"]):
+            if reviveSong["D"] == startingD and (reviveSong["sampleWeights"] is None or not any(reviveSong["sampleWeights"])):
                 continue
             reviveSong["sampleWeights"] = translateLength(reviveSong["sampleWeights"], reviveSong["length"], song["length"], song["annSongId"])
             knownList.append(song)
