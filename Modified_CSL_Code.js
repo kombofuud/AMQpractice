@@ -1126,7 +1126,7 @@ function setup() {
         }
     });
     document.addEventListener("keyup", (event) => {
-      if (event.keyCode=='59'){
+      if (event.keyCode=='191'){
         semicolonPressed = false;
       }
     });
