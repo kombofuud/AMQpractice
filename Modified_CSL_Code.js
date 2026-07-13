@@ -97,7 +97,7 @@ let nextSongChunk;
 let importRunning = false;
 let attachedFile = "";
 let missedSongList = [];
-let semicolonPressed = false;
+let slashPressed = false;
 let hotKeys = {
     cslgWindow: loadHotkey("cslgWindow"),
     start: loadHotkey("start"),
@@ -1084,8 +1084,8 @@ function setup() {
                 hotkeyActions[action]();
             }
         }
-        if(event.keyCode=='191' && !quiz.isSpectator && alt && !semicolonPressed) {
-            semicolonPressed = true;
+        if(event.keyCode=='191' && !quiz.isSpectator && alt && !slashPressed) {
+            slashPressed = true;
         }
         else if (event.keyCode == '222' && shift && ctrl){
             if (quiz.cslActive) {
@@ -1127,7 +1127,7 @@ function setup() {
     });
     document.addEventListener("keyup", (event) => {
       if (event.keyCode=='191'){
-        semicolonPressed = false;
+        slashPressed = false;
       }
     });
 
@@ -1387,6 +1387,7 @@ function playSong(songNumber) {
     skipping = false;
     songStartTime = Date.now();
     let currentlyPlaying = true;
+    let slashReleased = true;
     fireListener("play next song", {
         "time": guessTime,
         "extraGuessTime": extraGuessTime,
@@ -1399,16 +1400,22 @@ function playSong(songNumber) {
         extraGuessTimer = setTimeout(() => {
             fireListener("extra guess time");
             currentlyPlaying = false;
+            slashRelesed = true;
         }, guessTime * 1000);
     }
     replaySample = setInterval(() => {
-        if(!currentlyPlaying && semicolonPressed && quiz.soloMode){
+        if(!currentlyPlaying && slashPressed && slashReleased && quiz.soloMode){
             currentlyPlaying = true;
+            slashReleased = false;
             quizVideoController.getCurrentPlayer().player.play();
-            endReplaySample = setTimeout(() => {
-                quizVideoController.getCurrentPlayer().pauseVideo();
-                currentlyPlaying = false;
-            }, guessTime * 1000)
+        }
+        else if(currentlyPlaying && slashPressed && slashReleased && quiz.soloMode){
+            quizVideoController.getCurrentPlayer().pauseVideo();
+            currentlyPlaying = false;
+            slashReleased = false;
+        }
+        if(!slashReleased && !slashPressed){
+            slashReleased = true;
         }
     }, 50);
     endGuessTimer = setTimeout(() => {
