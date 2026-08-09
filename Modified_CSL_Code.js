@@ -1412,7 +1412,7 @@ function playSong(songNumber) {
         extraGuessTimer = setTimeout(() => {
             fireListener("extra guess time");
             currentlyPlaying = false;
-            slashRelesed = true;
+            slashReleased = true;
         }, guessTime * 1000);
     }
     replaySample = setInterval(() => {
@@ -1629,6 +1629,23 @@ function endGuessPhase(songNumber) {
                     cslMessage("§CSL6" + base10to36(index % 36) + item);
                 });
             }
+            let currentlyPlaying = true;
+            let slashReleased = true;
+            replaySample = setInterval(() => {
+                if(!currentlyPlaying && slashPressed && slashReleased && quiz.soloMode){
+                    currentlyPlaying = true;
+                    slashReleased = false;
+                    quizVideoController.getCurrentPlayer().player.play();
+                }
+                else if(currentlyPlaying && slashPressed && slashReleased && quiz.soloMode){
+                    quizVideoController.getCurrentPlayer().pauseVideo();
+                    currentlyPlaying = false;
+                    slashReleased = false;
+                }
+                if(!slashReleased && !slashPressed){
+                    slashReleased = true;
+                }
+            }, 50);
             setTimeout(() => {
                 if (!quiz.cslActive || !quiz.inQuiz) return reset();
                 if (quiz.soloMode) {
@@ -1646,6 +1663,7 @@ function endGuessPhase(songNumber) {
                         }
                         if (quiz.skipController._toggled || defaultTimer >= timerEnd) {
                             clearInterval(skipInterval);
+                            clearInterval(replaySample);
                             currentStartPoint = nextStartPoint;
                             endReplayPhase(songNumber);
                         }
