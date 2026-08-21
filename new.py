@@ -56,27 +56,27 @@ shortHand = ["ST","STN","ID","SN","EN","SA","AID"]
 longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName","songArtist","annId"]
 songList = []
 idMap = {}
-for index in range(len(rawSongList)):
-    if overwriteMap.get(rawSongList[index]["annSongId"]) is False:
+for song in rawSongList:
+    if overwriteMap.get(song["annSongId"]) is False:
         continue
         
-    idMap[rawSongList[index]["annSongId"]] = index
+    idMap[song["annSongId"]] = len(songList)
     songList.append({})
-    songList[index]["X"] = 0
+    songList[-1]["X"] = 0
     for jindex in range(len(shortHand)):
-        songList[index][shortHand[jindex]] = rawSongList[index][longHand[jindex]]
-    for key in rawSongList[index]:
-        songList[index][key] = rawSongList[index][key]
-    if "D" in songList[index]:
-        songList[index].pop("D")
-    songList[index]["CountDown"] = 0
-    songList[index]["sampleWeights"] = None
-    songList[index]["D"] = startingD
-    songList[index]["annId"] = songList[index]["annSongId"]
-    songList[index]["SN"] = "`"+songList[index]["SN"]+"`"
-    songList[index]["ID"] = "``"+str(songList[index]["ID"])
-    if songList[index]["songDifficulty"] is None:
-        songList[index]["songDifficulty"] = 30
+        songList[-1][shortHand[jindex]] = song[longHand[jindex]]
+    for key in song:
+        songList[-1][key] = song[key]
+    if "D" in songList[-1]:
+        songList[-1].pop("D")
+    songList[-1]["CountDown"] = 0
+    songList[-1]["sampleWeights"] = None
+    songList[-1]["D"] = startingD
+    songList[-1]["annId"] = songList[-1]["annSongId"]
+    songList[-1]["SN"] = "`"+songList[-1]["SN"]+"`"
+    songList[-1]["ID"] = "``"+str(songList[-1]["ID"])
+    if songList[-1]["songDifficulty"] is None:
+        songList[-1]["songDifficulty"] = 30
 
 #map song ID's and broken URL's to equivalences
 equivMap = {}
@@ -183,17 +183,6 @@ for index, song in enumerate(deadList):
         deadMap[song["annSongId"]] = index
 
 #replace songs in each list 1 by 1, but keep the old "D" value for songs in pool. Eliminate dead songs
-with open(fileMerged+".json", 'r+', encoding = 'utf8') as f:
-        f.truncate(0)
-        f.seek(0)
-        json.dump(songList,f,ensure_ascii=False)
-        f.seek(0)
-        fileData = f.read()
-        fileData = fileData.replace(", {","\n,{")
-        fileData = fileData.replace("}]","}\n]")
-        f.seek(0)
-        f.write(fileData)
-
 deadCount = set()
 oldSongs = set()
 familiarMalIds = set()
@@ -204,8 +193,9 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
-            if overwriteMap(song["annSongId"]) is True:
+            if overwriteMap.get(song["annSongId"]) is True:
                 knownList[index] = song
+                songList.append(song)
                 familiarMalIds.add(knownList[index]["malId"])
                 continue
             deadIndices.append(index)
@@ -237,6 +227,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
                 continue
             reviveSong["sampleWeights"] = translateLength(reviveSong["sampleWeights"], reviveSong["length"], song["length"], song["annSongId"])
             knownList.append(reviveSong)
+            songList.append(reviveSong)
             oldSongs.add(song["annSongId"])
             familiarMalIds.add(knownList[index]["malId"])
             revivedSongSet.add(deadMap[reviveSong["annSongId"]])
@@ -248,6 +239,7 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
                 continue
             reviveSong["sampleWeights"] = translateLength(reviveSong["sampleWeights"], reviveSong["length"], song["length"], song["annSongId"])
             knownList.append(reviveSong)
+            songList.append(reviveSong)
             oldSongs.add(reviveSong["annSongId"])
             familiarMalIds.add(knownList[index]["malId"])
             revivedSongSet.add(deadMap[reviveSong["annSongId"]])
@@ -313,8 +305,9 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
-            if overwriteMap(song["annSongId"]) is True:
+            if overwriteMap.get(song["annSongId"]) is True:
                 knownList[index] = song
+                songList.append(song)
                 learningMalIds.add(knownList[index]["malId"])
                 continue
             deadIndices.append(index)
@@ -348,6 +341,7 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
             if key not in oldSongs and reviveSong["malId"] in familiarMalIds and reviveSong["malId"] not in learningMalIds:
                 reviveSong["sampleWeights"] = translateLength(None, None, reviveSong["length"], reviveSong["annSongId"])
                 knownList.append(reviveSong)
+                songList.append(reviveSong)
                 oldSongs.add(key)
                 learningMalIds.add(reviveSong["malId"])
                 revivedSongSet.add(deadMap[reviveSong["annSongId"]])
@@ -372,6 +366,7 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
         if song["annSongId"] not in idMap:
             if overwriteMap.get(song["annSongId"]) is True:
                 knownList[index] = song
+                songList.append(song)
                 oldSongs.add(song["annSongId"])
             deadIndices.append(index)
             if song["annSongId"] not in deadCount:
@@ -399,6 +394,7 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
         if overwriteMap[key] is True and key in deadMap and key not in oldSongs:
             reviveSong = copy.deepcopy(deadList[deadMap[key]])
             knownList.append(reviveSong)
+            songList.append(reviveSong)
             revivedSongSet.add(deadMap[song["annSongId"]])
 
     f.truncate(0)
@@ -411,9 +407,19 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     f.seek(0)
     f.write(fileData)
 
-#removed revived songs from dead.json
+with open(fileMerged+".json", 'r+', encoding = 'utf8') as f:
+        f.truncate(0)
+        f.seek(0)
+        json.dump(songList,f,ensure_ascii=False)
+        f.seek(0)
+        fileData = f.read()
+        fileData = fileData.replace(", {","\n,{")
+        fileData = fileData.replace("}]","}\n]")
+        f.seek(0)
+        f.write(fileData)
 
-#add dead songs to dead song list if there are any
+
+#add dead songs to dead song list and remove revived songs if there are any
 if len(deadCount) or len(revivedSongSet):
     print("\033[31mRevivedSongs:\033[0m_______________________")
     revivedSongList = list(revivedSongSet)
