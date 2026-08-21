@@ -43,6 +43,13 @@ with open("modifications.json", 'r', encoding = 'utf8') as f:
     equivalances = json.load(f)
 with open("broken.json", 'r', encoding = 'utf8') as f:
     brokenURLs = json.load(f)
+with open("updateOverwrite.json", 'r', encoding = 'utf8') as f:
+    overwrites = json.load(f)
+
+#organize list of songs that shouldn't be overwritten by their presence in the json
+overwriteMap = {}
+for i in range(len(overwrites)):
+    overwriteMap[overwrites[i]["id"]] = overwrites[i]["exist"]
 
 #put useful information at start of list
 shortHand = ["ST","STN","ID","SN","EN","SA","AID"]
@@ -50,6 +57,9 @@ longHand = ["songType","songTypeNumber","annSongId","songName","animeEnglishName
 songList = []
 idMap = {}
 for index in range(len(rawSongList)):
+    if overwriteMap.get(rawSongList[index]["annSongId"]) is False:
+        continue
+        
     idMap[rawSongList[index]["annSongId"]] = index
     songList.append({})
     songList[index]["X"] = 0
@@ -74,7 +84,7 @@ altNames = []
 for index, entry in enumerate(equivalances):
     for ID in entry["equiv"]:
         equivMap[ID] = index
-    altNames.append(set())
+    altNames.append(set(entry.get("altNames", [])))
 brokenMap = {}
 deadSongIdsQ = 0
 for index, URL in enumerate(brokenURLs):
@@ -194,6 +204,10 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
     deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
+            if overwriteMap(song["annSongId"]) is True:
+                knownList[index] = song
+                familiarMalIds.add(knownList[index]["malId"])
+                continue
             deadIndices.append(index)
             if song["annSongId"] not in deadCount:
                 deadMap[song["annSongId"]] = len(deadList)
@@ -222,8 +236,19 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
             if reviveSong["D"] == startingD and (reviveSong["sampleWeights"] is None or not any(reviveSong["sampleWeights"])):
                 continue
             reviveSong["sampleWeights"] = translateLength(reviveSong["sampleWeights"], reviveSong["length"], song["length"], song["annSongId"])
-            knownList.append(song)
+            knownList.append(reviveSong)
             oldSongs.add(song["annSongId"])
+            familiarMalIds.add(knownList[index]["malId"])
+            revivedSongSet.add(deadMap[reviveSong["annSongId"]])
+            print(f"Previously deleted song: {reviveSong["annSongId"]} has returned")
+    for key in overwriteMap.keys():
+        if overwriteMap[key] == True and key in deadMap:
+            reviveSong = copy.deepcopy(deadList[deadMap[key]])
+            if reviveSong["D"] == startingD and (reviveSong["sampleWeights"] is None or not any(reviveSong["sampleWeights"])):
+                continue
+            reviveSong["sampleWeights"] = translateLength(reviveSong["sampleWeights"], reviveSong["length"], song["length"], song["annSongId"])
+            knownList.append(reviveSong)
+            oldSongs.add(reviveSong["annSongId"])
             familiarMalIds.add(knownList[index]["malId"])
             revivedSongSet.add(deadMap[reviveSong["annSongId"]])
             print(f"Previously deleted song: {reviveSong["annSongId"]} has returned")
@@ -246,6 +271,8 @@ with open(fileQuiz+".json", 'r+', encoding = 'utf8') as f:
             knownList[index]["D"] = song["D"]
             knownList[index]["startPoint"] = song["startPoint"]
             knownList[index]["sampleWeights"] = song["sampleWeights"]
+        elif overwriteMap.get(song["annSongId"]) is True:
+            knownList[index] = song
     
     f.truncate(0)
     f.seek(0)
@@ -266,6 +293,8 @@ with open(filePractice+".json", 'r+', encoding = 'utf8') as f:
             knownList[index]["startPoint"] = song["startPoint"]
             knownList[index]["sampleWeights"] = song["sampleWeights"]
             knownList[index]["X"] = song["X"]
+        elif overwriteMap.get(song["annSongId"]) is True:
+            knownList[index] = song
     
     f.truncate(0)
     f.seek(0)
@@ -284,6 +313,10 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
     deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
+            if overwriteMap(song["annSongId"]) is True:
+                knownList[index] = song
+                learningMalIds.add(knownList[index]["malId"])
+                continue
             deadIndices.append(index)
             if song["annSongId"] not in deadCount:
                 deadMap[song["annSongId"]] = len(deadList)
@@ -309,6 +342,16 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
             else:
                 newSongs.append(song)
             print(f"Previously learned MalID: {song["malId"]} gained at least 1 song.")
+    for key in overwriteMap.keys():
+        if overwriteMap[key] == True and key in deadMap:
+            reviveSong = copy.deepcopy(deadList[deadMap[key]])
+            if key not in oldSongs and reviveSong["malId"] in familiarMalIds and reviveSong["malId"] not in learningMalIds:
+                reviveSong["sampleWeights"] = translateLength(None, None, reviveSong["length"], reviveSong["annSongId"])
+                knownList.append(reviveSong)
+                oldSongs.add(key)
+                learningMalIds.add(reviveSong["malId"])
+                revivedSongSet.add(deadMap[reviveSong["annSongId"]])
+                print(f"Previously learned MalID: {reviveSong["malId"]} gained at least 1 song.")
 
     f.truncate(0)
     f.seek(0)
@@ -327,6 +370,9 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
     deadIndices = []
     for index, song in enumerate(knownList):
         if song["annSongId"] not in idMap:
+            if overwriteMap.get(song["annSongId"]) is True:
+                knownList[index] = song
+                oldSongs.add(song["annSongId"])
             deadIndices.append(index)
             if song["annSongId"] not in deadCount:
                 deadMap[song["annSongId"]] = len(deadList)
@@ -349,6 +395,11 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
                 revivedSongSet.add(deadMap[song["annSongId"]])
             else:
                 newSongs.append(song)
+    for key in overwriteMap.keys():
+        if overwriteMap[key] is True and key in deadMap and key not in oldSongs:
+            reviveSong = copy.deepcopy(deadList[deadMap[key]])
+            knownList.append(reviveSong)
+            revivedSongSet.add(deadMap[song["annSongId"]])
 
     f.truncate(0)
     f.seek(0)
