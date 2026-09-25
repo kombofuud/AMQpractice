@@ -6,6 +6,10 @@
 #teal=26
 #blue=16
 
+import math
+
+marbleValues = (16,26,41,61,96,156)
+
 def yellowOdds(y, diagCount):
     return (3-y)/diagCount, 1-(3-y)/diagCount
 
@@ -29,7 +33,7 @@ def EVRed(o, y, g, horizTeal, diagTeal, diagCount, adjCount, guesses):
         eTeal = EVRed(o, y, g, horizTeal+1, diagTeal, diagCount, adjCount-1, guesses-1) if pTeal > 0 else 0
         return pOrange*(96+eOrange)+pGreen*(41+eGreen)+pTeal*(26+eTeal)
 
-def legalList(colors, colorIndices):
+def legalList(colorIndices, colors):
     legalList = [0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24]
     legalList = [x for x in legalList if x not in colorIndices]
     for i in range(len(colorIndices)):
@@ -46,8 +50,9 @@ def legalList(colors, colorIndices):
                 legalList = [x for x in legalList if abs(x//5 - colorIndices[i]//5) + abs(x%5 - colorIndices[i]%5) == 1]
     return legalList
 
-def redCenterOdds(colors, colorIndices):
-    centerPool = legalList(colors, colorIndices)
+def redCenterCombinations(colorIndices, colors):
+    centerPool = legalList(colorIndices, colors)
+    centerWeights = []
     for i in centerPool:
         adj = []
         horiz = []
@@ -59,57 +64,101 @@ def redCenterOdds(colors, colorIndices):
                 diag.append(colors[j])
             elif i//5 == colorIndices[j]//5 or i%5 == colorIndices[j]%5:
                 horiz.append(colors[j])
-        diagLength = 4
+        diagLength = 6
         if i//5 in (0,4) or i%5 in (0,4):
-            diagLength = 6
+            diagLength = 4
+        adjLength = 4-(i//5 in (0,4))-(i%5 in (0,4))
         #compute number of combination next
-print(legalList([0],[0]))
-print(legalList([1],[1]))
-print(legalList([2],[2]))
-print(legalList([3],[3]))
-print(legalList([4],[4]))
+        centerWeights.append(math.comb(adjLength-len(adj), 2-adj.count(4))*math.comb(6-len(horiz)-len(adj)+adj.count(4),4-adj.count(2)-horiz.count(2))*math.comb(diagLength-len(diag),3-diag.count(3))/math.comb(diagLength,3)/math.comb(adjLength,2))
+    return centerPool, centerWeights
 
-'''
-def adjOdds(redIndex):
-    adj = 4
-    if redIndex in [1,2,3,5,9,10,14,15,19,21,22,23]:
-        adj = 3
-    elif redIndex in [0,4,20,24]:
-        adj = 2
-    pOrange = 2/adj
-    return [0, (1-pOrange)/3,(1-pOrange)*2/3, 0, pOrange, 0]
-def diagOdds(redIndex):
-    diag = 4
-    if redIndex in [6,7,8,11,13,16,17,18]:
-        diag = 6
-    return [0,(diag-3)/diag,0,3/diag,0,0]
-
-def horizOdds(color):
-    return [0,1/3,2/3,0,0,0]
-
-def nothingOdds(color):
-    return[1,0,0,0,0,0]
-
-def centerOdds(redIndex, colors, colorIndices):
-    odds = 1
-    for i in range(len(colorIndices)):
-        if abs(redIndex-colorIndices[i]) == 5 or (abs(redIndex-colorIndices[i]) == 1 and abs(redIndex%5-colorIndices[i]%5) == 1):
-            odds *= adjOdds(redIndex)[colors[i]]
-        elif redIndex // 5 == colorIndices[i]//5 or redIndex%5 == colorIndices[i]%5:
-            odds *= horizOdds[colors[i]]
-        elif abs(redIndex // 5 - colorIndices[i] // 5) == abs(redIndex%5 - colorIndices[i]%5):
-            odds *= diagOdds(redIndex)[colors[i]]
-        else:
-            odds *= nothingOdds[colors[i]]
-        if odds==0:
-            return 0
-    return odds
-
-
-def colorOdds(colors, colorIndices, index):
-    indexOdds = [0]*6
-    for i in range(25):
-        if i==13 or i in colorIndices:
+def tealCount(colorIndices, colors, center):
+    hCount = 0
+    dCount = 0
+    for pos, color in zip(colorIndices, colors):
+        if color != 1:
             continue
-        #looping through possible red centers here
-'''
+        if center%5 == pos%5 or center//5 == pos//5:
+            hCount += 1
+        else:
+            dCount += 1
+    return hCount, dCount
+def adjCounter(colorIndices, colors, center):
+    adjCount = 0
+    for pos in colorIndices:
+        if abs(center%5-pos%5)+abs(center//5-pos//5) == 1:
+            adjCount += 1
+    return adjCount
+
+def squareExpectedValues(colorIndices, colors):
+    if len(colorIndices) == 5:
+        return [0]
+    centerList, centerWeights = redCenterCombinations(colorIndices, colors)
+    centerWeightTotal = sum(centerWeights)
+    if centerWeightTotal == 0:
+        return [0]*(25-len(colorIndices))
+    guessList = [x for x in range(25) if x not in colorIndices]
+    if len(colors)==0:
+        guessList = [0,1,2,6,7,12]
+    oCount = colors.count(4)
+    yCount = colors.count(3)
+    gCount = colors.count(2)
+    guessEVs = []
+    for guess in guessList:
+        pList = [0,0,0,0,0,0]
+        for center, weight in zip(centerList, centerWeights):
+            hTeal, dTeal = tealCount(colorIndices, colors, center)
+            aCount = adjCounter(colorIndices, colors, center)
+            if center == guess:
+                pList[5] += weight/centerWeightTotal
+            elif abs(center%5-guess%5) + abs(center//5-guess//5) == 1:
+                adjLength = 4-(center%5 in (0,4))-(center//5 in (0,4))
+                pList[4] += weight/centerWeightTotal*(2-oCount)/(adjLength-aCount)
+                pList[1] += weight/centerWeightTotal*(adjLength+oCount-aCount-2)/(adjLength-aCount)*(2-hTeal)/(6-gCount-hTeal)
+                pList[2] += weight/centerWeightTotal*(adjLength+oCount-aCount-2)/(adjLength-aCount)*(4-gCount)/(6-gCount-hTeal)
+            elif abs(center%5-guess%5) ==  abs(center//5-guess//5):
+                diagLength = 6-2*(center%5 in (0,4) or center//5 in (0,4))
+                pList[1] += weight/centerWeightTotal*(diagLength-3-dTeal)/(diagLength-yCount-dTeal)
+                pList[3] += weight/centerWeightTotal*(3-yCount)/(diagLength-yCount-dTeal)
+            elif center%5 == guess%5 or center//5 == guess//5:
+                pList[1] += weight/centerWeightTotal*(2-hTeal)/(6-gCount-hTeal)
+                pList[2] += weight/centerWeightTotal*(4-gCount)/(6-gCount-hTeal)
+            else:
+                pList[0] += weight/centerWeightTotal
+        ev = 0
+        for i in range(5):
+            if pList[i] == 0:
+                continue
+            ev += pList[i] * (marbleValues[i]+max(squareExpectedValues(colorIndices+[guess], colors+[i])))
+        if pList[5] != 0:
+            hTeal, dTeal = tealCount(colorIndices, colors, guess)
+            ev += pList[5]*(156+EVRed(oCount, yCount, gCount, hTeal, dTeal, 6-2*(guess%5 in (0,4) or guess//5 in (0,4))-yCount-dTeal, 4-(guess%5 in (0,4))-(guess//5 in (0,4))-adjCounter(colorIndices, colors, guess), 4-len(colorIndices)))
+        guessEVs.append(ev)
+    return guessEVs
+
+def display(colorIndices, colors):
+    EVs = squareExpectedValues(colorIndices, colors)
+    redSpots = legalList(colorIndices, colors)
+    if len(colors) == 0:
+        EVs = [EVs[0], EVs[1], EVs[2], EVs[1], EVs[0], EVs[1], EVs[3], EVs[4], EVs[3], EVs[1], EVs[2], EVs[4], EVs[5], EVs[4], EVs[2], EVs[1], EVs[3], EVs[4], EVs[3], EVs[1], EVs[0], EVs[1], EVs[2], EVs[1], EVs[0]]
+    j = 0
+    myArray = []
+    for i in range(25):
+        if i in colorIndices:
+            myArray.append(["Blue", "Teal", "Green", "Yellow", "Orange", "Red"][colors[colorIndices.index(i)]])
+        else:
+            myArray.append(round(EVs[j], 4))
+            j+=1
+    if len(redSpots) == 1 and round(myArray[redSpots[0]],4) == round(max(EVs),4):
+        print(f"Max: \033[31m {redSpots[0]}\033[0m, {round(max(EVs),4)}")
+    else:
+        print(f"Max: {myArray.index(round(max(EVs),4))}, {round(max(EVs),4)}")
+        print(redCenterCombinations(colorIndices, colors))
+    matrix = [myArray[i : i + 5] for i in range(0, len(myArray), 5)]
+    for row in matrix:
+        print("".join(f"{val:<10}" for val in row))
+
+#print(legalList([1,5,6],[4,4,3]))
+#print(redCenterCombinations([],[]))
+#print(squareExpectedValues([1,5,6],[4,4,3]))
+display([6,0,9],[1,0,1])
