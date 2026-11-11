@@ -161,4 +161,4 @@ def display(colorIndices, colors):
 #print(legalList([1,5,6],[4,4,3]))
 #print(redCenterCombinations([],[]))
 #print(squareExpectedValues([1,5,6],[4,4,3]))
-display([6,0,9],[1,0,1])
+display([6,18],[3,3])
