@@ -21,17 +21,17 @@ for song in playPool:
     playMalIds.add(song["malId"])
 
 learningMalIds = set()
+print("unadded MALIDs:_____________________")
+for song in known:
+    if song["malId"] not in playMalIds and song["malId"] not in learningMalIds:
+        print(song["malId"])
+        playMalIds.add(song["malId"])
+
 print("unfinished MALIDs:__________________")
 for song in learning:
     if song["malId"] in playMalIds:
         print(song["malId"])
         playMalIds.remove(song["malId"])
     learningMalIds.add(song["malId"])
-
-print("unadded MALIDs:_____________________")
-for song in known:
-    if song["malId"] not in playMalIds and song["malId"] not in learningMalIds:
-        print(song["malId"])
-        playMalIds.add(song["malId"])
 
 os.remove(downloadFile)

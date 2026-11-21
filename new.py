@@ -197,13 +197,15 @@ with open(filePool+".json", 'r+', encoding = 'utf8') as f:
                 knownList[index] = song
                 songList.append(song)
                 familiarMalIds.add(knownList[index]["malId"])
+                oldSongs.add(song["annSongId"])
                 continue
-            deadIndices.append(index)
-            if song["annSongId"] not in deadCount:
-                deadMap[song["annSongId"]] = len(deadList)
-                deadList.append(song)
-                deadCount.add(song["annSongId"])
-            continue
+            else:
+                deadIndices.append(index)
+                if song["annSongId"] not in deadCount:
+                    deadMap[song["annSongId"]] = len(deadList)
+                    deadList.append(song)
+                    deadCount.add(song["annSongId"])
+                continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["D"] = song["D"]
@@ -309,13 +311,15 @@ with open(filePrep+".json", 'r+', encoding = 'utf8') as f:
                 knownList[index] = song
                 songList.append(song)
                 learningMalIds.add(knownList[index]["malId"])
+                oldSongs.add(song["annSongId"])
                 continue
-            deadIndices.append(index)
-            if song["annSongId"] not in deadCount:
-                deadMap[song["annSongId"]] = len(deadList)
-                deadList.append(song)
-                deadCount.add(song["annSongId"])
-            continue
+            else:
+                deadIndices.append(index)
+                if song["annSongId"] not in deadCount:
+                    deadMap[song["annSongId"]] = len(deadList)
+                    deadList.append(song)
+                    deadCount.add(song["annSongId"])
+                continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["sampleWeights"] = translateLength(None, None, knownList[index]["length"], song["annSongId"])
@@ -368,12 +372,14 @@ with open(fileLoad+".json", 'r+', encoding = 'utf8') as f:
                 knownList[index] = song
                 songList.append(song)
                 oldSongs.add(song["annSongId"])
-            deadIndices.append(index)
-            if song["annSongId"] not in deadCount:
-                deadMap[song["annSongId"]] = len(deadList)
-                deadList.append(song)
-                deadCount.add(song["annSongId"])
-            continue
+                continue
+            else:
+                deadIndices.append(index)
+                if song["annSongId"] not in deadCount:
+                    deadMap[song["annSongId"]] = len(deadList)
+                    deadList.append(song)
+                    deadCount.add(song["annSongId"])
+                continue
         oldSongs.add(song["annSongId"])
         knownList[index] = songList[idMap[song["annSongId"]]]
         knownList[index]["sampleWeights"] = translateLength(None, None, knownList[index]["length"], song["annSongId"])
